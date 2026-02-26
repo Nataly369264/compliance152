@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Compliance 152-ФЗ{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container navbar-inner">
+            <a href="/" class="navbar-brand">Compliance 152-ФЗ</a>
+            <div class="navbar-links" id="nav-links">
+                <a href="/check" class="nav-link">Проверка сайта</a>
+                <a href="/organizations/new" class="nav-link">Организация</a>
+                <a href="/documents" class="nav-link">Документы</a>
+                <a href="/reports" class="nav-link">Отчёты</a>
+            </div>
+            <button class="navbar-toggle" id="nav-toggle" aria-label="Меню">&#9776;</button>
+        </div>
+    </nav>
+
+    <main class="container main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Compliance 152-ФЗ &mdash; ИИ-проверка соответствия закону о персональных данных</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Отчёт — Compliance 152-ФЗ{% endblock %}
+{% block content %}
+
+{% if not report %}
+<div class="alert alert-error">Отчёт не найден.</div>
+<p><a href="/reports" class="btn">Все отчёты</a></p>
+{% else %}
+
+<div class="report-header">
+    {% set risk = report.risk_level|default('high')|lower %}
+    <div class="score-circle risk-{{ risk }}">
+        <span class="score-value">{{ report.overall_score|default(0) }}</span>
+        <span class="score-label">из 100</span>
+    </div>
+    <div class="report-meta">
+        <h2>{{ report.site_url }}</h2>
+        <p>
+            <span class="risk-label {{ risk }}">
+                {% if risk == 'critical' %}Критический
+                {% elif risk == 'high' %}Высокий
+                {% elif risk == 'medium' %}Средний
+                {% elif risk == 'low' %}Низкий
+                {% else %}Информация{% endif %}
+            </span>
+            <span style="margin-left:12px;color:var(--color-text-secondary)">
+                {{ report.scan_date[:10] if report.scan_date else '' }}
+            </span>
+        </p>
+        {% if report.summary %}
+        <p style="margin-top:8px">{{ report.summary }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-value">{{ report.total_checks|default(0) }}</div>
+        <div class="stat-label">Всего проверок</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color:var(--color-low)">{{ report.passed_checks|default(0) }}</div>
+        <div class="stat-label">Пройдено</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color:var(--color-critical)">{{ report.failed_checks|default(0) }}</div>
+        <div class="stat-label">Не пройдено</div>
+    </div>
+    <div class="stat-card stat-card-warn">
+        <div class="stat-value">
+            {% if report.fine_estimate %}
+                {{ "{:,}".format(report.fine_estimate.min_total|default(0)).replace(",", " ") }}
+                &ndash;
+                {{ "{:,}".format(report.fine_estimate.max_total|default(0)).replace(",", " ") }} &#8381;
+            {% else %}—{% endif %}
+        </div>
+        <div class="stat-label">Возможный штраф</div>
+    </div>
+</div>
+
+{% if report.violations %}
+<section>
+    <h2>Нарушения ({{ report.violations|length }})</h2>
+    {% for v in report.violations %}
+    {% set sev = v.severity|default('medium') %}
+    {% if sev is mapping %}{% set sev = sev.value|default('medium') %}{% endif %}
+    {% set sev = sev|lower %}
+    <div class="violation-card sev-{{ sev }}">
+        <div class="violation-title">
+            <span class="risk-label {{ sev }}" style="font-size:.75rem;padding:2px 8px;margin-right:6px">
+                {{ sev|upper }}
+            </span>
+            {{ v.title|default(v.check_id|default('')) }}
+        </div>
+        <div class="violation-meta">
+            {% if v.category %}<span>{{ v.category }}</span>{% endif %}
+            {% if v.law_reference %} &mdash; <span>{{ v.law_reference }}</span>{% endif %}
+            {% if v.fine_range %}
+                &mdash; Штраф: {{ v.fine_range.min|default(0)|int }} &ndash; {{ v.fine_range.max|default(0)|int }} &#8381;
+            {% endif %}
+        </div>
+        {% if v.description %}
+        <p style="margin-top:4px">{{ v.description }}</p>
+        {% endif %}
+        {% if v.recommendation %}
+        <div class="violation-recommendation">
+            <strong>Рекомендация:</strong> {{ v.recommendation }}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% if report.checklist %}
+<section>
+    <h2>Чеклист проверок</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Проверка</th>
+                <th>Категория</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in report.checklist %}
+            {% set st = item.status|default('not_applicable') %}
+            {% if st is mapping %}{% set st = st.value|default('not_applicable') %}{% endif %}
+            {% set st = st|lower %}
+            <tr>
+                <td><span class="check-status {{ st }}"></span></td>
+                <td>{{ item.title|default(item.check_id|default('')) }}</td>
+                <td>{{ item.category|default('') }}</td>
+                <td>
+                    {% if st == 'pass' %}Пройдено
+                    {% elif st == 'fail' %}Не пройдено
+                    {% elif st == 'warning' %}Предупреждение
+                    {% elif st == 'manual_check' %}Ручная проверка
+                    {% else %}Н/П{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endif %}
+
+{% if report.llm_analysis %}
+<section>
+    <h2>Анализ политики конфиденциальности</h2>
+    <div class="card">
+        <p style="white-space:pre-wrap">{{ report.llm_analysis }}</p>
+    </div>
+</section>
+{% endif %}
+
+<p style="margin-top:20px"><a href="/reports" class="btn">&larr; Все отчёты</a></p>
+
+{% endif %}
+
+{% endblock %}

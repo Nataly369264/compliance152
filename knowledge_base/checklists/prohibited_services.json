@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Google Analytics",
+    "domains": ["google-analytics.com", "www.google-analytics.com", "ssl.google-analytics.com", "analytics.google.com"],
+    "type": "analytics",
+    "alternative": "Яндекс.Метрика (metrika.yandex.ru)",
+    "description": "Передаёт данные о посетителях на серверы Google в США. Запрещён с 01.07.2025."
+  },
+  {
+    "name": "Google Tag Manager",
+    "domains": ["www.googletagmanager.com", "googletagmanager.com", "tagmanager.google.com"],
+    "type": "tag_manager",
+    "alternative": "Прямое подключение скриптов или серверный GTM на российских серверах",
+    "description": "Контейнер для тегов, передающий данные на серверы Google. Запрещён с 01.07.2025."
+  },
+  {
+    "name": "Google Fonts",
+    "domains": ["fonts.googleapis.com", "fonts.gstatic.com"],
+    "type": "fonts",
+    "alternative": "Локальное размещение шрифтов на сервере",
+    "description": "При загрузке шрифтов передаётся IP-адрес пользователя в Google."
+  },
+  {
+    "name": "Google reCAPTCHA",
+    "domains": ["www.google.com/recaptcha", "recaptcha.google.com", "www.recaptcha.net", "www.gstatic.com/recaptcha"],
+    "type": "captcha",
+    "alternative": "Яндекс SmartCaptcha",
+    "description": "Передаёт данные о пользователях (IP, cookie, поведение) на серверы Google."
+  },
+  {
+    "name": "Google Maps",
+    "domains": ["maps.googleapis.com", "maps.google.com", "www.google.com/maps"],
+    "type": "maps",
+    "alternative": "Яндекс.Карты или 2ГИС",
+    "description": "Встраивание карт Google Maps передаёт данные о пользователях на серверы Google."
+  },
+  {
+    "name": "Facebook Pixel",
+    "domains": ["connect.facebook.net", "www.facebook.com/tr", "pixel.facebook.com"],
+    "type": "pixel",
+    "alternative": "VK Pixel или Яндекс.Аудитории",
+    "description": "Трекинговый пиксель Meta. Компания Meta признана экстремистской в РФ."
+  },
+  {
+    "name": "Cloudflare Analytics",
+    "domains": ["static.cloudflareinsights.com", "cloudflareinsights.com"],
+    "type": "analytics",
+    "alternative": "Яндекс.Метрика",
+    "description": "Аналитика Cloudflare, передающая данные на зарубежные серверы."
+  },
+  {
+    "name": "HubSpot Tracking",
+    "domains": ["js.hs-scripts.com", "track.hubspot.com", "js.hsforms.net", "js.hs-analytics.net"],
+    "type": "analytics",
+    "alternative": "Яндекс.Метрика + Битрикс24/AmoCRM",
+    "description": "Маркетинговая платформа, передающая данные на серверы в США."
+  },
+  {
+    "name": "Intercom",
+    "domains": ["widget.intercom.io", "api-iam.intercom.io", "js.intercomcdn.com"],
+    "type": "analytics",
+    "alternative": "Jivo (jivo.ru), Carrot Quest",
+    "description": "Платформа для чатов, передающая ПДн пользователей на серверы в США."
+  },
+  {
+    "name": "Hotjar",
+    "domains": ["static.hotjar.com", "script.hotjar.com", "vars.hotjar.com"],
+    "type": "analytics",
+    "alternative": "Вебвизор в Яндекс.Метрике",
+    "description": "Сервис тепловых карт и записи сессий, передающий данные за рубеж."
+  },
+  {
+    "name": "Mixpanel",
+    "domains": ["cdn.mxpnl.com", "api.mixpanel.com", "api-js.mixpanel.com"],
+    "type": "analytics",
+    "alternative": "Яндекс.Метрика или Amplitude с серверами в РФ",
+    "description": "Продуктовая аналитика, передающая данные на серверы в США."
+  },
+  {
+    "name": "Segment",
+    "domains": ["cdn.segment.com", "api.segment.io", "cdn.segment.io"],
+    "type": "analytics",
+    "alternative": "Серверная аналитика на российском хостинге",
+    "description": "CDP-платформа, передающая все данные на серверы Twilio (США)."
+  }
+]

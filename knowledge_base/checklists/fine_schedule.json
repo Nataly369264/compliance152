@@ -1,0 +1,74 @@
+[
+  {
+    "violation": "Неуведомление Роскомнадзора об обработке ПДн",
+    "law_reference": "ч. 1 ст. 13.11 КоАП РФ",
+    "first_offense_min": 100000,
+    "first_offense_max": 300000,
+    "repeat_offense_max": 500000,
+    "notes": "Штраф за отсутствие уведомления или начало обработки до его подачи."
+  },
+  {
+    "violation": "Подача некорректного уведомления в Роскомнадзор",
+    "law_reference": "ч. 1 ст. 13.11 КоАП РФ",
+    "first_offense_min": 100000,
+    "first_offense_max": 300000,
+    "repeat_offense_max": 500000,
+    "notes": "Уведомление должно содержать актуальные сведения."
+  },
+  {
+    "violation": "Обработка ПДн без согласия субъекта",
+    "law_reference": "ч. 2 ст. 13.11 КоАП РФ",
+    "first_offense_min": 300000,
+    "first_offense_max": 700000,
+    "repeat_offense_max": 1500000,
+    "notes": "С 01.09.2025 согласие должно быть отдельным документом."
+  },
+  {
+    "violation": "Утечка персональных данных",
+    "law_reference": "ч. 12-14 ст. 13.11 КоАП РФ",
+    "first_offense_min": 3000000,
+    "first_offense_max": 15000000,
+    "repeat_offense_max": null,
+    "notes": "Повторно: до 3% годовой выручки (макс. 500 000 000 руб., мин. 15 000 000 руб.)."
+  },
+  {
+    "violation": "Утечка биометрических ПДн",
+    "law_reference": "ч. 15 ст. 13.11 КоАП РФ",
+    "first_offense_min": 15000000,
+    "first_offense_max": 20000000,
+    "repeat_offense_max": null,
+    "notes": "Повышенные штрафы ввиду невозможности замены биометрических данных."
+  },
+  {
+    "violation": "Неуведомление РКН об инциденте утечки данных",
+    "law_reference": "ч. 16 ст. 13.11 КоАП РФ",
+    "first_offense_min": 1000000,
+    "first_offense_max": 3000000,
+    "repeat_offense_max": null,
+    "notes": "Уведомить РКН необходимо в течение 24 часов, результаты расследования — 72 часа."
+  },
+  {
+    "violation": "Использование запрещённых зарубежных сервисов на сайте",
+    "law_reference": "ч. 9-11 ст. 13.11 КоАП РФ",
+    "first_offense_min": 1000000,
+    "first_offense_max": 6000000,
+    "repeat_offense_max": 18000000,
+    "notes": "Google Analytics, Google Fonts, reCAPTCHA, Facebook Pixel и др. Запрещены с 01.07.2025."
+  },
+  {
+    "violation": "Отсутствие cookie-баннера",
+    "law_reference": "ч. 2 ст. 13.11 КоАП РФ",
+    "first_offense_min": 150000,
+    "first_offense_max": 300000,
+    "repeat_offense_max": 500000,
+    "notes": "Cookie, позволяющие идентифицировать пользователя, являются ПДн."
+  },
+  {
+    "violation": "Cookie с чувствительными данными без согласия",
+    "law_reference": "ч. 2 ст. 13.11 КоАП РФ",
+    "first_offense_min": 300000,
+    "first_offense_max": 700000,
+    "repeat_offense_max": 1500000,
+    "notes": "Отслеживание поведения, интересов, здоровья через cookie без явного согласия."
+  }
+]

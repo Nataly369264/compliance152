@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Проверка сайта — Compliance 152-ФЗ{% endblock %}
+{% block content %}
+
+<h1>Проверка сайта на соответствие 152-ФЗ</h1>
+
+<form id="check-form" class="check-form">
+    <div class="input-group">
+        <input type="url" id="site-url" name="url"
+               placeholder="https://example.com"
+               required class="input-lg">
+        <button type="submit" class="btn btn-primary btn-lg" id="check-btn">
+            Проверить
+        </button>
+    </div>
+</form>
+
+<div id="loading" class="loading-overlay" hidden>
+    <div class="spinner"></div>
+    <p class="loading-text">Сканирование и анализ сайта...<br>
+       <small>Это может занять 1-2 минуты</small></p>
+</div>
+
+<div id="error-box" class="alert alert-error" hidden></div>
+
+<section id="results" hidden>
+    <div class="report-header">
+        <div class="score-circle" id="score-circle">
+            <span class="score-value" id="score-value">0</span>
+            <span class="score-label">из 100</span>
+        </div>
+        <div class="report-meta">
+            <h2 id="result-url"></h2>
+            <p><span class="risk-label" id="risk-badge"></span></p>
+            <p id="result-summary" style="margin-top:8px"></p>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-value" id="checks-passed">0</div>
+            <div class="stat-label">Пройдено</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="checks-failed">0</div>
+            <div class="stat-label">Не пройдено</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="violations-count">0</div>
+            <div class="stat-label">Нарушений</div>
+        </div>
+        <div class="stat-card stat-card-warn">
+            <div class="stat-value" id="fine-range">—</div>
+            <div class="stat-label">Возможный штраф, &#8381;</div>
+        </div>
+    </div>
+
+    <p style="margin-top:12px">
+        <a id="full-report-link" href="#" class="btn btn-primary">Полный отчёт &rarr;</a>
+    </p>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% endblock %}

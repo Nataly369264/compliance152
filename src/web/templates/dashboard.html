@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Главная — Compliance 152-ФЗ{% endblock %}
+{% block content %}
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<section class="hero">
+    <h1>Проверка соответствия 152-ФЗ</h1>
+    <p>ИИ-агент для аудита сайтов на соблюдение закона о персональных данных</p>
+    <a href="/check" class="btn btn-primary btn-lg">Проверить сайт</a>
+</section>
+
+<section>
+    <h2>Быстрые действия</h2>
+    <div class="card-grid">
+        <a href="/check" class="action-card">
+            <div class="action-icon">&#128269;</div>
+            <h3>Проверка сайта</h3>
+            <p>Сканирование и анализ на соответствие 152-ФЗ</p>
+        </a>
+        <a href="/organizations/new" class="action-card">
+            <div class="action-icon">&#127970;</div>
+            <h3>Добавить организацию</h3>
+            <p>Заполнить данные для генерации документов</p>
+        </a>
+        <a href="/documents" class="action-card">
+            <div class="action-icon">&#128196;</div>
+            <h3>Генерация документов</h3>
+            <p>Создать пакет документов по 152-ФЗ</p>
+        </a>
+    </div>
+</section>
+
+<section>
+    <h2>Последние отчёты</h2>
+    {% if recent_reports %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Сайт</th>
+                <th>Оценка</th>
+                <th>Риск</th>
+                <th>Дата</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in recent_reports %}
+            <tr>
+                <td>{{ r.site_url }}</td>
+                <td>
+                    <span class="score-badge risk-{{ r.risk_level }}">
+                        {{ r.overall_score }}/100
+                    </span>
+                </td>
+                <td>{{ r.risk_level }}</td>
+                <td>{{ r.report_date[:10] if r.report_date else '' }}</td>
+                <td><a href="/reports/{{ r.id }}" class="btn btn-sm">Подробнее</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">Отчётов пока нет. <a href="/check">Проверьте сайт</a>, чтобы создать первый.</p>
+    {% endif %}
+</section>
+
+{% if recent_orgs %}
+<section>
+    <h2>Организации</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Сайт</th>
+                <th>ИНН</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in recent_orgs %}
+            <tr>
+                <td>{{ o.legal_name }}</td>
+                <td>{{ o.website_url }}</td>
+                <td>{{ o.inn }}</td>
+                <td><a href="/organizations/{{ o.id }}" class="btn btn-sm">Открыть</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endif %}
+
+{% endblock %}

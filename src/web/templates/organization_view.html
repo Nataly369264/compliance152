@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ org.legal_name }} — Compliance 152-ФЗ{% endblock %}
+{% block content %}
+
+<h1>{{ org.legal_name }}</h1>
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Основные данные</h3>
+        <p><strong>Сайт:</strong> <a href="{{ org.website_url }}" target="_blank">{{ org.website_url }}</a></p>
+        {% if org.inn %}<p><strong>ИНН:</strong> {{ org.inn }}</p>{% endif %}
+        {% if org.ogrn %}<p><strong>ОГРН:</strong> {{ org.ogrn }}</p>{% endif %}
+        {% if org.legal_address %}<p><strong>Юр. адрес:</strong> {{ org.legal_address }}</p>{% endif %}
+        {% if org.actual_address %}<p><strong>Факт. адрес:</strong> {{ org.actual_address }}</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Контакты</h3>
+        {% if org.ceo_name %}<p><strong>Руководитель:</strong> {{ org.ceo_name }} ({{ org.ceo_position }})</p>{% endif %}
+        {% if org.responsible_person %}<p><strong>Ответственный за ПДн:</strong> {{ org.responsible_person }}</p>{% endif %}
+        {% if org.email %}<p><strong>Email:</strong> {{ org.email }}</p>{% endif %}
+        {% if org.phone %}<p><strong>Телефон:</strong> {{ org.phone }}</p>{% endif %}
+    </div>
+</div>
+
+{% if org.data_categories %}
+<div class="card" style="margin-bottom:16px">
+    <h3>Обработка персональных данных</h3>
+    <p><strong>Категории ПДн:</strong>
+        {% for c in org.data_categories %}<span class="tag">{{ c }}</span> {% endfor %}
+    </p>
+    {% if org.processing_purposes %}
+    <p style="margin-top:8px"><strong>Цели обработки:</strong>
+        {% for p in org.processing_purposes %}<span class="tag">{{ p }}</span> {% endfor %}
+    </p>
+    {% endif %}
+    {% if org.data_subjects %}
+    <p style="margin-top:8px"><strong>Субъекты:</strong>
+        {% for s in org.data_subjects %}<span class="tag">{{ s }}</span> {% endfor %}
+    </p>
+    {% endif %}
+    {% if org.third_parties %}
+    <p style="margin-top:8px"><strong>Третьи лица:</strong>
+        {% for t in org.third_parties %}<span class="tag">{{ t }}</span> {% endfor %}
+    </p>
+    {% endif %}
+</div>
+{% endif %}
+
+<section>
+    <h2>Документы</h2>
+    {% if documents %}
+    <a href="/api/v1/documents/{{ org.id }}/export/pdf" class="btn btn-success" style="margin-bottom:12px">
+        Скачать все (PDF)
+    </a>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Тип</th>
+                <th>Версия</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in documents %}
+            <tr>
+                <td>{{ doc.title }}</td>
+                <td>{{ doc.doc_type }}</td>
+                <td>{{ doc.version }}</td>
+                <td>
+                    <a href="/api/v1/documents/{{ org.id }}/{{ doc.doc_type }}/export/pdf"
+                       class="btn btn-sm">PDF</a>
+                    <a href="/api/v1/documents/{{ org.id }}/{{ doc.doc_type }}/export/docx"
+                       class="btn btn-sm" style="margin-left:4px">DOCX</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">Документы ещё не сгенерированы.
+        <a href="/documents">Перейти к генерации</a>
+    </p>
+    {% endif %}
+</section>
+
+{% endblock %}
