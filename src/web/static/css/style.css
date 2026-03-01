@@ -276,6 +276,14 @@ h3 { font-size: 1.1rem; margin-bottom: 8px; }
 
 /* ── Score & risk badges ─────────────────────────────────── */
 
+.score-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 .score-circle {
     width: 120px;
     height: 120px;
@@ -285,9 +293,6 @@ h3 { font-size: 1.1rem; margin-bottom: 8px; }
     align-items: center;
     justify-content: center;
     border: 6px solid var(--color-border);
-    flex-shrink: 0;
-    margin: 0 auto;
-    text-align: center;
 }
 .score-circle.risk-critical { border-color: var(--color-critical); }
 .score-circle.risk-high { border-color: var(--color-high); }
@@ -350,12 +355,14 @@ h3 { font-size: 1.1rem; margin-bottom: 8px; }
 
 .report-header {
     display: flex;
-    gap: 24px;
+    flex-direction: column;
     align-items: center;
+    gap: 16px;
     margin-bottom: 24px;
 }
-.report-meta { flex: 1; }
+.report-meta { text-align: center; }
 .report-meta h2 { margin-bottom: 4px; }
+#result-summary { text-align: left; }
 
 .violation-card {
     background: var(--color-surface);
@@ -488,6 +495,50 @@ section:last-child { margin-bottom: 0; }
 .checkbox-item input[type="checkbox"] { margin-top: 4px; }
 .checkbox-label-title { font-weight: 500; }
 .checkbox-label-desc { font-size: .85rem; color: var(--color-text-secondary); }
+
+/* ── Violations preview ──────────────────────────────────── */
+
+.violations-preview-heading { margin: 24px 0 10px; font-size: 1rem; }
+
+.violations-preview { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+.violation-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+}
+
+.severity-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.severity-dot.risk-critical { background: var(--color-critical); }
+.severity-dot.risk-high     { background: var(--color-high); }
+.severity-dot.risk-medium   { background: var(--color-medium); }
+.severity-dot.risk-low      { background: var(--color-low); }
+.severity-dot.risk-info     { background: var(--color-info); }
+
+.violation-preview-title {
+    flex: 1;
+    font-size: .9rem;
+    cursor: default;
+}
+
+.violation-fine {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--color-high);
+    white-space: nowrap;
+}
+
+.link-muted { font-size: .85rem; color: var(--color-text-secondary); }
+.link-muted:hover { color: var(--color-primary); }
 
 /* ── Responsive ──────────────────────────────────────────── */
 

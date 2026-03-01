@@ -25,14 +25,16 @@
 
 <section id="results" hidden>
     <div class="report-header">
-        <div class="score-circle" id="score-circle">
-            <span class="score-value" id="score-value">0</span>
-            <span class="score-label">из 100</span>
+        <div class="score-section">
+            <div class="score-circle" id="score-circle">
+                <span class="score-value" id="score-value">0</span>
+                <span class="score-label">из 100</span>
+            </div>
         </div>
         <div class="report-meta">
             <h2 id="result-url"></h2>
             <p><span class="risk-label" id="risk-badge"></span></p>
-            <p id="result-summary" style="margin-top:8px"></p>
+            <div id="result-summary" style="margin-top:8px"></div>
         </div>
     </div>
 
@@ -53,6 +55,14 @@
             <div class="stat-value" id="fine-range">—</div>
             <div class="stat-label">Возможный штраф, &#8381;</div>
         </div>
+    </div>
+
+    <div id="top-violations" hidden>
+        <h3 class="violations-preview-heading">Основные нарушения</h3>
+        <ul id="violations-list" class="violations-preview"></ul>
+        <p style="margin-top:8px">
+            <a id="all-violations-link" href="#" class="link-muted">Все нарушения &rarr;</a>
+        </p>
     </div>
 
     <p style="margin-top:12px">

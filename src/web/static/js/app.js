@@ -37,6 +37,60 @@ var RISK_LABELS = {
     info: 'Информация',
 };
 
+var SEVERITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
+
+async function fetchAndRenderViolations(reportId) {
+    try {
+        var res = await fetch('/api/v1/report/' + reportId, {
+            headers: { 'Authorization': 'Bearer dev' },
+        });
+        if (!res.ok) return;
+        var report = await res.json();
+        renderTopViolations(report.violations || []);
+    } catch (e) { /* блок остаётся скрытым */ }
+}
+
+function renderTopViolations(violations) {
+    var block = document.getElementById('top-violations');
+    var list = document.getElementById('violations-list');
+    if (!violations || violations.length === 0) { block.hidden = true; return; }
+
+    var sorted = violations.slice().sort(function (a, b) {
+        return (SEVERITY_ORDER[a.severity] || 9) - (SEVERITY_ORDER[b.severity] || 9);
+    });
+
+    list.innerHTML = '';
+    sorted.slice(0, 3).forEach(function (v) {
+        var li = document.createElement('li');
+        li.className = 'violation-preview-item';
+        var fine = v.fine_range
+            ? '<span class="violation-fine">' + escapeHtml(v.fine_range) + '</span>'
+            : '';
+        li.innerHTML =
+            '<span class="severity-dot risk-' + riskClass(v.severity) + '"></span>' +
+            '<span class="violation-preview-title" title="' + escapeHtml(v.recommendation || '') + '">' +
+            escapeHtml(v.title) + '</span>' +
+            fine;
+        list.appendChild(li);
+    });
+    block.hidden = false;
+}
+
+// ── countUp animation ────────────────────────────────────────
+
+function countUp(el, target, duration) {
+    var startTime = null;
+    target = parseInt(target, 10) || 0;
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        var ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(ease * target);
+        if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
 // ── Navigation toggle ───────────────────────────────────────
 
 function initNav() {
@@ -47,6 +101,29 @@ function initNav() {
             links.classList.toggle('open');
         });
     }
+}
+
+// ── Phase progress ───────────────────────────────────────────
+
+var _phaseTimers = [];
+
+function startPhaseProgress() {
+    var el = document.querySelector('.loading-text');
+    if (!el) return;
+    el.firstChild.textContent = 'Сканирование страниц...';
+    _phaseTimers.push(setTimeout(function () {
+        el.firstChild.textContent = 'Анализ нарушений...';
+    }, 8000));
+    _phaseTimers.push(setTimeout(function () {
+        el.firstChild.textContent = 'Формируем отчёт...';
+    }, 20000));
+}
+
+function stopPhaseProgress() {
+    _phaseTimers.forEach(function (t) { clearTimeout(t); });
+    _phaseTimers = [];
+    var el = document.querySelector('.loading-text');
+    if (el) el.firstChild.textContent = 'Сканирование и анализ сайта...';
 }
 
 // ── URL Check page ──────────────────────────────────────────
@@ -63,6 +140,7 @@ function initCheckPage() {
         hideError();
         hideEl('results');
         showEl('loading');
+        startPhaseProgress();
         document.getElementById('check-btn').disabled = true;
 
         try {
@@ -77,9 +155,11 @@ function initCheckPage() {
             }
             var data = await res.json();
             renderCheckResults(data);
+            await fetchAndRenderViolations(data.report_id);
         } catch (err) {
             showError(err.message);
         } finally {
+            stopPhaseProgress();
             hideEl('loading');
             document.getElementById('check-btn').disabled = false;
         }
@@ -89,7 +169,11 @@ function initCheckPage() {
 function renderCheckResults(data) {
     showEl('results');
 
-    document.getElementById('score-value').textContent = data.overall_score;
+    var rc = riskClass(data.risk_level);
+    var circle = document.getElementById('score-circle');
+    circle.className = 'score-circle risk-' + rc;
+    countUp(document.getElementById('score-value'), data.overall_score, 800);
+
     document.getElementById('result-url').textContent = data.site_url;
     document.getElementById('result-summary').innerHTML = marked.parse(data.summary || '');
     document.getElementById('checks-passed').textContent = data.passed_checks;
@@ -102,15 +186,12 @@ function renderCheckResults(data) {
     }
     document.getElementById('fine-range').textContent = fineText;
 
-    var rc = riskClass(data.risk_level);
-    var circle = document.getElementById('score-circle');
-    circle.className = 'score-circle risk-' + rc;
-
     var badge = document.getElementById('risk-badge');
     badge.className = 'risk-label ' + rc;
     badge.textContent = RISK_LABELS[rc] || data.risk_level;
 
     document.getElementById('full-report-link').href = '/reports/' + data.report_id;
+    document.getElementById('all-violations-link').href = '/reports/' + data.report_id;
 }
 
 // ── Organization form ───────────────────────────────────────

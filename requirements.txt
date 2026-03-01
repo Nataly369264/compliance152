@@ -15,6 +15,9 @@ anthropic>=0.40
 # Storage
 aiosqlite>=0.20
 
+# Scheduling
+apscheduler>=3.10
+
 # Document export
 python-docx>=1.1
 reportlab>=4.0

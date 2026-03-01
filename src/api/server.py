@@ -8,6 +8,7 @@ from datetime import datetime
 
 from pathlib import Path
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -40,7 +41,7 @@ class UTF8JSONResponse(JSONResponse):
             separators=(',', ':'),
         ).encode('utf-8')
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 
 
 # ── Request / Response models ────────────────────────────────────
@@ -106,13 +107,47 @@ class OrganizationRequest(BaseModel):
     info_systems: list[str] = Field(default_factory=list)
 
 
+# ── Scheduled jobs ───────────────────────────────────────────────
+
+async def _scheduled_process_updates():
+    """Process all pending legal updates every 24h."""
+    from src.knowledge.loader import load_legal_updates
+    try:
+        updates = load_legal_updates()
+        if not updates:
+            logger.info("Scheduler: no legal updates to process")
+            return
+        results = await process_legal_updates(updates, mode="confirm")
+        logger.info("Scheduler: process_legal_updates — %d updates processed", len(updates))
+    except Exception as exc:
+        logger.error("Scheduler: process_legal_updates failed: %s", exc)
+
+
+async def _scheduled_monitoring_cycle():
+    """Run site monitoring cycle every 7 days."""
+    try:
+        new_updates = await run_monitoring_cycle()
+        logger.info("Scheduler: run_monitoring_cycle — %d new updates found", len(new_updates))
+    except Exception as exc:
+        logger.error("Scheduler: run_monitoring_cycle failed: %s", exc)
+
+
 # ── App ──────────────────────────────────────────────────────────
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db = await get_db()
     logger.info("Database initialized")
+
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(_scheduled_process_updates, "interval", hours=24, jitter=3600)
+    scheduler.add_job(_scheduled_monitoring_cycle, "interval", weeks=1, jitter=3600)
+    scheduler.start()
+    logger.info("Scheduler started: process_legal_updates(24h), run_monitoring_cycle(7d)")
+
     yield
+
+    scheduler.shutdown(wait=False)
     await db.close()
 
 
