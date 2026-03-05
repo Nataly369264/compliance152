@@ -2,7 +2,19 @@
 Дата: 06.03.2026
 
 ## Статус
-Этапы 1–6 завершены.
+**Модуль Competitor Intelligence Monitor реализован полностью и протестирован.**
+Все 7 этапов завершены (06.03.2026). Следующих незакрытых задач нет.
+
+## Реализованные компоненты
+| Этап | Файл(ы) | Коммит |
+|---|---|---|
+| 1 | config/sources.yaml, competitor.py (fetcher, diff, DB) | 7cb05a9 |
+| 2 | competitor.py (LLM queue, rate-limit, threat_score) | af40fd5 |
+| 3 | monitor.py (check_npa_sources, parse_warning, NPA LLM) | 7ab0c12 |
+| 4 | notifier/telegram.py (TelegramNotifier, retry) | 7ab0c12 |
+| 5 | monitor/reporter.py (DigestReporter, build_digest, send) | 7ab0c12 |
+| 6 | scheduler/jobs.py, API /monitor/* эндпоинты | 6483233 |
+| 7 | tests: 14 unit tests, 14 passed | 730b064 |
 
 ## Ключевые файлы
 - config/sources.yaml — конфигурация источников + scheduler cron-строки
