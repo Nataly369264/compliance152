@@ -1,13 +1,16 @@
-"""Competitor Intelligence Monitor — fetcher + diff engine.
+"""Competitor Intelligence Monitor — fetcher, diff engine, LLM analysis.
 
 Stage 1: page fetching with antibot protection, SHA-256 deduplication,
-diff building and keyword pre-filter. LLM analysis is wired in Stage 2.
+         diff building and keyword pre-filter.
+Stage 2: sequential LLM analysis queue with rate-limit guard, threat_score,
+         JSON-structured analysis saved back to competitor_changes table.
 """
 from __future__ import annotations
 
 import asyncio
 import difflib
 import hashlib
+import json
 import logging
 import random
 import re
@@ -19,6 +22,7 @@ import httpx
 import yaml
 from bs4 import BeautifulSoup
 
+from src.llm.client import call_llm
 from src.storage.database import Database
 
 logger = logging.getLogger(__name__)
@@ -31,6 +35,7 @@ RETRY_COUNT = 3                  # attempts per URL
 RETRY_BASE_DELAY = 2.0           # seconds, doubled each retry (exp backoff)
 MIN_ANTIBOT_DELAY = 3.0          # seconds between requests (random)
 MAX_ANTIBOT_DELAY = 8.0
+LLM_RATE_PAUSE = 5.0             # seconds between LLM calls (rate-limit guard)
 
 SOURCES_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "sources.yaml"
 
@@ -96,6 +101,16 @@ class SourceConfig:
     js_render: bool = False
     llm_analyze: bool = True
     watch: list[str] = field(default_factory=list)
+
+
+@dataclass
+class LLMAnalysis:
+    """Structured result from LLM diff analysis."""
+    summary: str
+    change_type: Literal["feature", "pricing", "ui", "npa", "minor"]
+    threat_score: int          # 1–5
+    action_required: bool
+    action: str
 
 
 # ── sources.yaml loader ───────────────────────────────────────────
@@ -273,6 +288,176 @@ def _classify_diff(diff_text: str) -> tuple[bool, Literal["feature", "pricing", 
     return True, "ui"
 
 
+# ── LLM prompts ───────────────────────────────────────────────────
+
+_COMPETITOR_SYSTEM = """\
+Ты — аналитик продукта в области compliance 152-ФЗ.
+Тебе дан unified diff изменений страницы конкурента.
+Определи:
+1. Что изменилось (новые функции, цены, формулировки, UI)?
+2. Уровень угрозы для нашего продукта по шкале 1–5 (5 = критично).
+3. Требует ли изменение наших действий?
+
+Верни ТОЛЬКО валидный JSON без markdown-оберток:
+{
+  "summary": "краткое описание изменения (1–3 предложения)",
+  "change_type": "feature|pricing|ui|minor",
+  "threat_score": <1–5>,
+  "action_required": true|false,
+  "action": "что именно сделать (или пустая строка если action_required=false)"
+}"""
+
+_COMPETITOR_USER = """\
+Конкурент: {name}
+URL: {url}
+
+Unified diff:
+{diff}"""
+
+
+# ── LLM parser ────────────────────────────────────────────────────
+
+def _parse_llm_analysis(response: str) -> LLMAnalysis | None:
+    """Extract and validate JSON from LLM response."""
+    text = response.strip()
+
+    # Strip markdown code fences if present
+    if text.startswith("```"):
+        lines = text.split("\n")
+        text = "\n".join(lines[1:])
+        if text.endswith("```"):
+            text = text[:-3]
+        text = text.strip()
+
+    # Try direct parse
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        # Try to find JSON object inside prose
+        start = text.find("{")
+        end = text.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            logger.error("No JSON object found in LLM response")
+            return None
+        try:
+            data = json.loads(text[start:end + 1])
+        except json.JSONDecodeError:
+            logger.error("Failed to parse JSON from LLM response")
+            return None
+
+    # Validate and normalise fields
+    valid_types = {"feature", "pricing", "ui", "npa", "minor"}
+    change_type = data.get("change_type", "ui")
+    if change_type not in valid_types:
+        change_type = "ui"
+
+    raw_score = data.get("threat_score", 3)
+    try:
+        threat_score = max(1, min(5, int(raw_score)))
+    except (TypeError, ValueError):
+        threat_score = 3
+
+    return LLMAnalysis(
+        summary=str(data.get("summary", ""))[:1000],
+        change_type=change_type,  # type: ignore[arg-type]
+        threat_score=threat_score,
+        action_required=bool(data.get("action_required", False)),
+        action=str(data.get("action", ""))[:500],
+    )
+
+
+# ── LLM analyzer ─────────────────────────────────────────────────
+
+async def _analyze_diff_with_llm(
+    diff: DiffResult,
+    source_name: str,
+) -> LLMAnalysis | None:
+    """Send a single diff to LLM and return structured analysis.
+
+    Returns None on failure (caller decides how to handle).
+    """
+    # Truncate diff to avoid excessive tokens (~4000 chars ≈ ~1000 tokens)
+    diff_text = diff.unified_diff[:4000]
+
+    user_prompt = _COMPETITOR_USER.format(
+        name=source_name,
+        url=diff.url,
+        diff=diff_text,
+    )
+
+    try:
+        raw = await call_llm(
+            system_prompt=_COMPETITOR_SYSTEM,
+            user_prompt=user_prompt,
+            max_tokens=512,
+            temperature=0.1,
+        )
+        analysis = _parse_llm_analysis(raw)
+        if analysis:
+            logger.info(
+                "[%s] LLM analysis: type=%s threat=%d action=%s",
+                diff.source_id, analysis.change_type,
+                analysis.threat_score, analysis.action_required,
+            )
+        return analysis
+
+    except Exception as e:
+        logger.error("[%s] LLM analysis failed for %s: %s", diff.source_id, diff.url, e)
+        return None
+
+
+async def analyze_diffs(
+    diffs: list[DiffResult],
+    db: Database,
+    source_map: dict[str, str],  # source_id → source_name
+) -> int:
+    """Run LLM analysis sequentially with rate-limit guard.
+
+    Processes only diffs with has_meaningful_changes=True.
+    Saves each result to competitor_changes table.
+    Pauses LLM_RATE_PAUSE seconds between calls to avoid exhausting free-tier limits.
+
+    Returns count of successfully analysed diffs.
+    """
+    meaningful = [d for d in diffs if d.has_meaningful_changes]
+    if not meaningful:
+        logger.info("No meaningful diffs to analyse")
+        return 0
+
+    logger.info("Starting LLM analysis for %d diffs (rate pause %.0fs)", len(meaningful), LLM_RATE_PAUSE)
+    analysed = 0
+
+    for i, diff in enumerate(meaningful):
+        if i > 0:
+            logger.debug("LLM rate-limit pause %.0fs", LLM_RATE_PAUSE)
+            await asyncio.sleep(LLM_RATE_PAUSE)
+
+        name = source_map.get(diff.source_id, diff.source_id)
+        analysis = await _analyze_diff_with_llm(diff, name)
+
+        if analysis:
+            await db.save_change(
+                source_id=diff.source_id,
+                url=diff.url,
+                diff_summary=analysis.summary,
+                change_type=analysis.change_type,
+                threat_score=analysis.threat_score,
+            )
+            analysed += 1
+        else:
+            # LLM failed — save with heuristic type and no score so record isn't lost
+            await db.save_change(
+                source_id=diff.source_id,
+                url=diff.url,
+                diff_summary=None,
+                change_type=diff.change_type,
+                threat_score=None,
+            )
+
+    logger.info("LLM analysis complete: %d/%d successful", analysed, len(meaningful))
+    return analysed
+
+
 # ── Main orchestrator ─────────────────────────────────────────────
 
 async def check_competitor(
@@ -338,16 +523,17 @@ async def check_competitor(
             source.id, url, change_type, has_meaningful,
         )
 
-        # Persist change to DB (diff_summary and threat_score added in Stage 2 by LLM)
-        await db.save_change(
-            source_id=source.id,
-            url=url,
-            diff_summary=None,  # filled by analyzer_llm in Stage 2
-            change_type=change_type,
-            threat_score=None,
-        )
-
-        if has_meaningful and source.llm_analyze:
+        if not has_meaningful or not source.llm_analyze:
+            # Minor change or LLM disabled — save immediately, no LLM needed
+            await db.save_change(
+                source_id=source.id,
+                url=url,
+                diff_summary=None,
+                change_type=change_type,
+                threat_score=None,
+            )
+        else:
+            # Meaningful change with LLM enabled — defer to analyze_diffs()
             results.append(
                 DiffResult(
                     source_id=source.id,
@@ -363,23 +549,32 @@ async def check_competitor(
     return results
 
 
-async def run_competitor_check(db: Database) -> list[DiffResult]:
-    """Entry point: load sources.yaml and check all competitors.
+async def run_competitor_check(db: Database) -> int:
+    """Entry point: load sources.yaml, check all competitors, run LLM analysis.
 
-    Returns all DiffResults with meaningful changes (to be fed into LLM in Stage 2).
+    Full pipeline:
+      1. Fetch all competitor URLs (antibot + retry)
+      2. SHA-256 compare with last snapshot
+      3. Diff + keyword pre-filter
+      4. Minor changes → saved immediately
+      5. Meaningful changes → sequential LLM analysis with rate-limit guard
+
+    Returns count of LLM-analysed changes.
     """
     competitors, _ = load_sources()
-    all_results: list[DiffResult] = []
+    all_diffs: list[DiffResult] = []
+    source_map: dict[str, str] = {s.id: s.name for s in competitors}
 
     for source in competitors:
         try:
             diffs = await check_competitor(source, db)
-            all_results.extend(diffs)
+            all_diffs.extend(diffs)
         except Exception as e:
             logger.error("Error checking competitor %s: %s", source.id, e)
 
     logger.info(
-        "Competitor check complete: %d sources, %d meaningful diffs",
-        len(competitors), len(all_results),
+        "Fetch phase complete: %d sources, %d diffs queued for LLM",
+        len(competitors), len(all_diffs),
     )
-    return all_results
+
+    return await analyze_diffs(all_diffs, db, source_map)
