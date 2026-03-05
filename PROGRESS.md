@@ -9,4 +9,4 @@
 - [x] Этап 4 — src/notifier/telegram.py: TelegramNotifier, retry, graceful skip (05.03.2026) — коммит 7ab0c12
 - [x] Этап 5 — src/monitor/reporter.py: DigestReporter, build_digest, send (05.03.2026) — коммит 7ab0c12
 - [x] Этап 6 — src/scheduler/jobs.py, единый APScheduler, API-эндпоинты с Bearer auth (06.03.2026)
-- [ ] Этап 7 — tests/test_competitor.py
+- [x] Этап 7 — tests: test_competitor, test_monitor, test_reporter, test_telegram (06.03.2026) — 14 тестов, 14 passed
