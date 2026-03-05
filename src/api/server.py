@@ -23,6 +23,7 @@ from src.llm.cache import get_cache
 from src.models.organization import OrganizationData
 from src.monitor.monitor import run_monitoring_cycle
 from src.scanner.crawler import SiteScanner
+from src.scheduler.jobs import create_scheduler, run_competitor_check, run_digest, run_npa_check
 from src.storage.database import get_db
 from src.updater.updater import DocumentUpdater, process_legal_updates
 from src.web.routes import web_router
@@ -139,11 +140,11 @@ async def lifespan(app: FastAPI):
     db = await get_db()
     logger.info("Database initialized")
 
-    scheduler = AsyncIOScheduler()
+    scheduler = create_scheduler()
     scheduler.add_job(_scheduled_process_updates, "interval", hours=24, jitter=3600)
     scheduler.add_job(_scheduled_monitoring_cycle, "interval", weeks=1, jitter=3600)
     scheduler.start()
-    logger.info("Scheduler started: process_legal_updates(24h), run_monitoring_cycle(7d)")
+    logger.info("Scheduler started")
 
     yield
 
@@ -684,6 +685,51 @@ async def list_legal_updates():
     return {
         "updates": [u.model_dump(mode="json") for u in updates],
         "count": len(updates),
+    }
+
+
+# ── Competitor Intelligence Monitor — manual triggers ────────────
+
+
+@app.post("/api/v1/monitor/run-npa")
+async def manual_run_npa():
+    """Manually trigger NPA sources check and send critical alerts."""
+    try:
+        alerts = await run_npa_check()
+        return {
+            "status": "completed",
+            "critical_alerts": len(alerts),
+            "alerts": alerts,
+        }
+    except Exception as exc:
+        logger.error("manual_run_npa failed: %s", exc)
+        raise HTTPException(status_code=500, detail=f"NPA check failed: {exc}")
+
+
+@app.post("/api/v1/monitor/run-competitors")
+async def manual_run_competitors():
+    """Manually trigger competitor pages check and LLM analysis."""
+    try:
+        count = await run_competitor_check()
+        return {
+            "status": "completed",
+            "analysed_changes": count,
+        }
+    except Exception as exc:
+        logger.error("manual_run_competitors failed: %s", exc)
+        raise HTTPException(status_code=500, detail=f"Competitor check failed: {exc}")
+
+
+@app.get("/api/v1/monitor/status")
+async def monitor_status(limit: int = 20):
+    """Return recent competitor/NPA changes and latest digest."""
+    db = await get_db()
+    changes = await db.list_pending_changes(limit=limit)
+    latest_digest = await db.get_latest_digest()
+    return {
+        "pending_changes": changes,
+        "pending_count": len(changes),
+        "latest_digest": latest_digest,
     }
 
 

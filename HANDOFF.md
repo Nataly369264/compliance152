@@ -1,17 +1,8 @@
 # Handoff — Competitor Intelligence Monitor
-Дата: 05.03.2026
+Дата: 06.03.2026
 
 ## Статус
-Этапы 1–5 завершены. Следующий — Этап 6.
-
-## Следующий шаг — Этап 6
-Создать src/scheduler/jobs.py:
-- Единый APScheduler (AsyncIOScheduler)
-- Джобы по расписанию из sources.yaml (scheduler.*):
-    competitor_check → run_competitor_check(db)
-    npa_check → LegalMonitor().check_npa_sources(db) + send_critical_alert для каждого alerts
-    digest_generate → DigestReporter + send + mark_changes_digested + save_digest
-- API-эндпоинты с Bearer auth (/jobs/run/competitor, /jobs/run/npa, /jobs/run/digest)
+Этапы 1–6 завершены.
 
 ## Ключевые файлы
 - config/sources.yaml — конфигурация источников + scheduler cron-строки
@@ -46,3 +37,16 @@ if digest:
 ## Anti-patterns (не делать)
 - НЕ использовать константу RKN_URLS из monitor.py — источник истины только sources.yaml (секция npa_sources)
 - НЕ запускать LLM-вызовы параллельно — только sequential queue через analyze_diffs()
+
+## Patterns (зафиксированные решения)
+
+### Scheduler
+- Единственный `AsyncIOScheduler` создаётся через `create_scheduler()` в `src/scheduler/jobs.py`
+- Cron-выражения читаются из `sources.yaml::scheduler` через `CronTrigger.from_crontab()`
+- `AsyncIOScheduler` inline нигде не создавать — только через `create_scheduler()`
+- В `lifespan` можно добавлять дополнительные джобы к уже созданному scheduler, но не создавать второй
+
+### Bearer Auth
+- Middleware в `server.py` покрывает весь `/api/v1/*` автоматически
+- Новые эндпоинты под `/api/v1/` не требуют отдельного `Depends()` или декоратора
+- Принимает любой непустой токен (`Authorization: Bearer <anything>`) — TODO: реальная проверка
