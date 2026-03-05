@@ -56,3 +56,10 @@ WEB_CONTEXT_CACHE_TTL_HOURS = int(_get("WEB_CONTEXT_CACHE_TTL_HOURS", "24"))
 
 # Logging
 LOG_LEVEL = _get("LOG_LEVEL", "INFO")
+
+# ── Competitor Intelligence Monitor ─────────────────────────────
+COMPETITOR_MIN_DELAY = float(_get("COMPETITOR_MIN_DELAY", "3.0"))
+COMPETITOR_MAX_DELAY = float(_get("COMPETITOR_MAX_DELAY", "8.0"))
+COMPETITOR_FETCH_TIMEOUT = int(_get("COMPETITOR_FETCH_TIMEOUT", "25"))
+TELEGRAM_BOT_TOKEN = _get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = _get("TELEGRAM_CHAT_ID", "")
