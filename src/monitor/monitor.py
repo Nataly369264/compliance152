@@ -5,6 +5,7 @@ then LLM to analyze their impact on compliance documents.
 """
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import logging
@@ -13,8 +14,18 @@ from datetime import datetime
 from pathlib import Path
 
 from src.llm.client import call_llm
+from src.llm.utils import parse_llm_json
 from src.llm.web_tools import fetch_page, format_search_results, web_search
 from src.models.legal_update import LegalUpdate
+from src.monitor.competitor import (
+    LLM_RATE_PAUSE,
+    LLMAnalysis,
+    NpaSourceConfig,
+    _build_diff,
+    _fetch_url,
+    load_sources,
+)
+from src.storage.database import Database
 
 logger = logging.getLogger(__name__)
 
@@ -31,14 +42,45 @@ MONITOR_QUERIES = [
     "судебная практика персональные данные 13.11 КоАП {year}",
 ]
 
-# ── RKN specific URLs to monitor ─────────────────────────────────
+# ── NPA keyword pre-filter (base set; sources can add their own) ──────────────
 
-RKN_URLS = [
-    "https://rkn.gov.ru/news/rsoc/",
-    "https://pd.rkn.gov.ru/press-service/news/",
+NPA_BASE_KEYWORDS: list[str] = [
+    "персональн", "152-фз", "роскомнадзор", "ркн",
+    "закон", "поправк", "изменени", "вступает", "вступил",
+    "штраф", "обязан", "требован", "приказ", "постановлен",
+    "уведомлен", "обработк", "согласи", "оператор",
 ]
 
-# ── LLM prompts for analyzing legal changes ──────────────────────
+# ── NPA diff LLM prompts ──────────────────────────────────────────
+
+NPA_DIFF_SYSTEM = """\
+Ты — юрист-аналитик, эксперт по 152-ФЗ о персональных данных.
+Тебе дан unified diff страницы нормативно-правового источника.
+Определи:
+1. Что изменилось в нормативном содержании (новые статьи, поправки, даты вступления)?
+2. Насколько изменение значимо для соответствия 152-ФЗ по шкале 1–5 (5 = критично)?
+3. Требует ли изменение немедленных действий от оператора ПДн?
+
+Верни ТОЛЬКО валидный JSON без markdown-оберток:
+{
+  "summary": "краткое описание изменения (1–3 предложения)",
+  "change_type": "npa|minor",
+  "threat_score": <1–5>,
+  "action_required": true|false,
+  "action": "что именно сделать (или пустая строка если action_required=false)"
+}
+
+Если diff не содержит значимых нормативных изменений, верни change_type="minor" и threat_score=1."""
+
+NPA_DIFF_USER = """\
+Источник НПА: {name}
+URL: {url}
+Тип источника: {source_type}
+
+Unified diff:
+{diff}"""
+
+# ── LLM prompts for web-search based monitoring ──────────────────
 
 MONITOR_ANALYSIS_SYSTEM = """Ты — юрист-аналитик, эксперт по 152-ФЗ о персональных данных.
 
@@ -88,6 +130,81 @@ MONITOR_ANALYSIS_USER = """Дата мониторинга: {date}
 {rkn_content}
 
 Проанализируй и выдели ВСЕ новые изменения в законодательстве о ПДн."""
+
+
+# ── NPA helpers ──────────────────────────────────────────────────
+
+def _count_found_items(text: str) -> int:
+    """Count non-empty lines as a proxy for items found on a page."""
+    return sum(1 for line in text.split("\n") if line.strip())
+
+
+def _npa_has_meaningful_change(diff_text: str, source_keywords: list[str]) -> bool:
+    """Pre-filter: check if diff contains any NPA-relevant keywords.
+
+    Checks base NPA_BASE_KEYWORDS plus source-specific keywords.
+    Returns True if at least one keyword matches.
+    """
+    lower = diff_text.lower()
+    all_keywords = NPA_BASE_KEYWORDS + [kw.lower() for kw in source_keywords]
+    return any(kw in lower for kw in all_keywords)
+
+
+async def _analyze_npa_diff_with_llm(
+    source: NpaSourceConfig,
+    diff_text: str,
+) -> LLMAnalysis | None:
+    """Send NPA page diff to LLM and return structured analysis.
+
+    Returns None on failure (caller saves record with threat_score=None).
+    """
+    user_prompt = NPA_DIFF_USER.format(
+        name=source.name,
+        url=source.url,
+        source_type=source.type,
+        diff=diff_text[:4000],
+    )
+
+    try:
+        raw = await call_llm(
+            system_prompt=NPA_DIFF_SYSTEM,
+            user_prompt=user_prompt,
+            max_tokens=512,
+            temperature=0.1,
+        )
+
+        data = parse_llm_json(raw)
+        if not isinstance(data, dict):
+            logger.error("[%s] NPA LLM response is not a dict", source.id)
+            return None
+
+        valid_types = {"npa", "minor"}
+        change_type = data.get("change_type", "npa")
+        if change_type not in valid_types:
+            change_type = "npa"
+
+        raw_score = data.get("threat_score", 3)
+        try:
+            threat_score = max(1, min(5, int(raw_score)))
+        except (TypeError, ValueError):
+            threat_score = 3
+
+        analysis = LLMAnalysis(
+            summary=str(data.get("summary", ""))[:1000],
+            change_type=change_type,  # type: ignore[arg-type]
+            threat_score=threat_score,
+            action_required=bool(data.get("action_required", False)),
+            action=str(data.get("action", ""))[:500],
+        )
+        logger.info(
+            "[%s] NPA LLM analysis: type=%s threat=%d action=%s",
+            source.id, analysis.change_type, analysis.threat_score, analysis.action_required,
+        )
+        return analysis
+
+    except Exception as e:
+        logger.error("[%s] NPA LLM analysis failed: %s", source.id, e)
+        return None
 
 
 class LegalMonitor:
@@ -150,17 +267,18 @@ class LegalMonitor:
 
         logger.info("Found %d unique search results", len(unique_results))
 
-        # Step 2: Fetch RKN pages
-        rkn_texts: list[str] = []
-        for url in RKN_URLS:
+        # Step 2: Fetch NPA source pages from sources.yaml
+        _, npa_sources = load_sources()
+        npa_texts: list[str] = []
+        for src in npa_sources:
             try:
-                text = await fetch_page(url, allow_any_domain=True)
+                text = await fetch_page(src.url, allow_any_domain=True)
                 if text and not text.startswith("["):
-                    rkn_texts.append(f"Источник: {url}\n{text[:5000]}")
+                    npa_texts.append(f"Источник: {src.name} ({src.url})\n{text[:5000]}")
             except Exception as e:
-                logger.warning("Failed to fetch RKN page %s: %s", url, e)
+                logger.warning("Failed to fetch NPA page %s: %s", src.url, e)
 
-        rkn_content = "\n\n---\n\n".join(rkn_texts) if rkn_texts else "[Не удалось загрузить]"
+        rkn_content = "\n\n---\n\n".join(npa_texts) if npa_texts else "[Не удалось загрузить]"
 
         # Step 3: LLM analysis
         if not unique_results and not rkn_texts:
@@ -216,37 +334,154 @@ class LegalMonitor:
         logger.info("Monitoring complete: %d new updates found", len(new_updates))
         return new_updates
 
+    async def check_npa_sources(self, db: Database) -> list[dict]:
+        """Check all NPA sources from sources.yaml for page changes.
+
+        For each source:
+          1. Fetch URL (antibot + retry via _fetch_url)
+          2. Count found_items; emit parse_warning if 0 and last 3 snapshots had content
+          3. Save snapshot to DB
+          4. If hash unchanged — skip
+          5. Build diff + keyword pre-filter
+          6. LLM analysis with rate-limit guard (5s between calls)
+          7. Save change to DB; fallback saves with threat_score=None, npa_critical=None
+          8. npa_critical sources with detected changes → logged as CRITICAL alert
+
+        Returns list of dicts for critical changes (npa_critical=True sources),
+        ready for Stage 4 notifier.
+        """
+        _, npa_sources = load_sources()
+        if not npa_sources:
+            logger.warning("No NPA sources found in sources.yaml")
+            return []
+
+        logger.info("Starting NPA sources check (%d sources)", len(npa_sources))
+        critical_alerts: list[dict] = []
+        llm_call_count = 0
+
+        for source in npa_sources:
+            logger.info("[%s] Fetching %s", source.id, source.url)
+            fetch = await _fetch_url(source.url)
+
+            found_items = _count_found_items(fetch.text) if fetch.status == "ok" else 0
+
+            # parse_warning: 0 items AND last 3 snapshots all had content
+            if found_items == 0:
+                recent = await db.get_recent_snapshots(source.id, source.url, limit=3)
+                if len(recent) >= 3 and all(
+                    _count_found_items(r.get("raw_text") or "") > 0 for r in recent
+                ):
+                    logger.warning(
+                        "[%s] parse_warning: found_items=0 but last %d snapshots had content "
+                        "— possible blocking or structure change at %s",
+                        source.id, len(recent), source.url,
+                    )
+
+            if fetch.status != "ok":
+                await db.save_snapshot(
+                    source_id=source.id,
+                    url=source.url,
+                    content_hash="",
+                    raw_text="",
+                    fetch_status=fetch.status,
+                )
+                logger.warning("[%s] Fetch failed (%s): %s", source.id, fetch.status, source.url)
+                continue
+
+            last = await db.get_last_snapshot(source.id, source.url)
+            await db.save_snapshot(
+                source_id=source.id,
+                url=source.url,
+                content_hash=fetch.content_hash,
+                raw_text=fetch.text,
+                fetch_status="ok",
+            )
+
+            if last is None:
+                logger.info("[%s] First NPA snapshot — baseline recorded", source.id)
+                continue
+
+            if last["content_hash"] == fetch.content_hash:
+                logger.debug("[%s] No changes at %s", source.id, source.url)
+                continue
+
+            # Hash changed — build diff and keyword pre-filter
+            old_text = last.get("raw_text") or ""
+            diff_text = _build_diff(old_text, fetch.text)
+            meaningful = _npa_has_meaningful_change(diff_text, source.keywords)
+
+            logger.info(
+                "[%s] NPA change detected — meaningful=%s npa_critical=%s",
+                source.id, meaningful, source.npa_critical,
+            )
+
+            if not meaningful:
+                await db.save_change(
+                    source_id=source.id,
+                    url=source.url,
+                    diff_summary=None,
+                    change_type="minor",
+                    threat_score=None,
+                    npa_critical=None,
+                )
+                continue
+
+            # Rate-limit guard between LLM calls
+            if llm_call_count > 0:
+                logger.debug("NPA LLM rate-limit pause %.0fs", LLM_RATE_PAUSE)
+                await asyncio.sleep(LLM_RATE_PAUSE)
+
+            analysis = await _analyze_npa_diff_with_llm(source, diff_text)
+            llm_call_count += 1
+
+            if analysis:
+                await db.save_change(
+                    source_id=source.id,
+                    url=source.url,
+                    diff_summary=analysis.summary,
+                    change_type=analysis.change_type,
+                    threat_score=analysis.threat_score,
+                    npa_critical=source.npa_critical,
+                )
+                if source.npa_critical:
+                    alert = {
+                        "source_id": source.id,
+                        "source_name": source.name,
+                        "url": source.url,
+                        "summary": analysis.summary,
+                        "threat_score": analysis.threat_score,
+                        "action_required": analysis.action_required,
+                        "action": analysis.action,
+                    }
+                    critical_alerts.append(alert)
+                    logger.critical(
+                        "[%s] CRITICAL NPA change detected at %s — threat=%d: %s",
+                        source.id, source.url, analysis.threat_score, analysis.summary[:100],
+                    )
+            else:
+                # LLM fallback: save record without score or critical flag
+                await db.save_change(
+                    source_id=source.id,
+                    url=source.url,
+                    diff_summary=None,
+                    change_type="npa",
+                    threat_score=None,
+                    npa_critical=None,
+                )
+
+        logger.info(
+            "NPA check complete: %d sources, %d critical alerts",
+            len(npa_sources), len(critical_alerts),
+        )
+        return critical_alerts
+
     @staticmethod
     def _parse_llm_response(response: str) -> list[dict]:
         """Extract JSON array from LLM response."""
-        # Try direct JSON parse
-        text = response.strip()
-
-        # Remove markdown code fences if present
-        if text.startswith("```"):
-            lines = text.split("\n")
-            text = "\n".join(lines[1:])
-            if text.endswith("```"):
-                text = text[:-3]
-            text = text.strip()
-
-        try:
-            data = json.loads(text)
-            if isinstance(data, list):
-                return data
-            return []
-        except json.JSONDecodeError:
-            # Try to find JSON array in the text
-            start = text.find("[")
-            end = text.rfind("]")
-            if start != -1 and end != -1 and end > start:
-                try:
-                    return json.loads(text[start:end + 1])
-                except json.JSONDecodeError:
-                    pass
-
-            logger.error("Failed to parse LLM response as JSON")
-            return []
+        data = parse_llm_json(response)
+        if isinstance(data, list):
+            return data
+        return []
 
     async def save_new_updates(self, updates: list[LegalUpdate]) -> int:
         """Save new updates to the knowledge base JSON file.

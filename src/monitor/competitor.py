@@ -10,7 +10,6 @@ from __future__ import annotations
 import asyncio
 import difflib
 import hashlib
-import json
 import logging
 import random
 import re
@@ -23,6 +22,7 @@ import yaml
 from bs4 import BeautifulSoup
 
 from src.llm.client import call_llm
+from src.llm.utils import parse_llm_json
 from src.storage.database import Database
 
 logger = logging.getLogger(__name__)
@@ -94,13 +94,24 @@ class DiffResult:
 
 @dataclass
 class SourceConfig:
-    """Parsed entry from sources.yaml."""
+    """Parsed entry from sources.yaml (competitors section)."""
     id: str
     name: str
     urls: list[str]
     js_render: bool = False
     llm_analyze: bool = True
     watch: list[str] = field(default_factory=list)
+
+
+@dataclass
+class NpaSourceConfig:
+    """Parsed entry from sources.yaml (npa_sources section)."""
+    id: str
+    name: str
+    url: str
+    type: str           # html_list | html_hash
+    npa_critical: bool = False
+    keywords: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -115,7 +126,7 @@ class LLMAnalysis:
 
 # ── sources.yaml loader ───────────────────────────────────────────
 
-def load_sources(path: Path = SOURCES_PATH) -> tuple[list[SourceConfig], list[dict]]:
+def load_sources(path: Path = SOURCES_PATH) -> tuple[list[SourceConfig], list[NpaSourceConfig]]:
     """Load and parse sources.yaml.
 
     Returns (competitors, npa_sources).
@@ -140,7 +151,18 @@ def load_sources(path: Path = SOURCES_PATH) -> tuple[list[SourceConfig], list[di
             )
         )
 
-    npa_sources: list[dict] = data.get("npa_sources", [])
+    npa_sources: list[NpaSourceConfig] = []
+    for item in data.get("npa_sources", []):
+        npa_sources.append(
+            NpaSourceConfig(
+                id=item["id"],
+                name=item["name"],
+                url=item["url"],
+                type=item.get("type", "html_hash"),
+                npa_critical=item.get("npa_critical", False),
+                keywords=item.get("keywords", []),
+            )
+        )
 
     logger.info(
         "Loaded sources.yaml: %d competitors, %d NPA sources",
@@ -319,31 +341,9 @@ Unified diff:
 
 def _parse_llm_analysis(response: str) -> LLMAnalysis | None:
     """Extract and validate JSON from LLM response."""
-    text = response.strip()
-
-    # Strip markdown code fences if present
-    if text.startswith("```"):
-        lines = text.split("\n")
-        text = "\n".join(lines[1:])
-        if text.endswith("```"):
-            text = text[:-3]
-        text = text.strip()
-
-    # Try direct parse
-    try:
-        data = json.loads(text)
-    except json.JSONDecodeError:
-        # Try to find JSON object inside prose
-        start = text.find("{")
-        end = text.rfind("}")
-        if start == -1 or end == -1 or end <= start:
-            logger.error("No JSON object found in LLM response")
-            return None
-        try:
-            data = json.loads(text[start:end + 1])
-        except json.JSONDecodeError:
-            logger.error("Failed to parse JSON from LLM response")
-            return None
+    data = parse_llm_json(response)
+    if not isinstance(data, dict):
+        return None
 
     # Validate and normalise fields
     valid_types = {"feature", "pricing", "ui", "npa", "minor"}

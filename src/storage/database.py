@@ -319,17 +319,37 @@ class Database:
         diff_summary: str | None,
         change_type: str,
         threat_score: int | None = None,
-        npa_critical: bool = False,
+        npa_critical: bool | None = None,
     ) -> int:
-        """Record a detected change and return its id."""
+        """Record a detected change and return its id.
+
+        npa_critical=None means LLM did not analyse the change (fallback path).
+        """
+        npa_critical_int = None if npa_critical is None else (1 if npa_critical else 0)
         cursor = await self.db.execute(
             """INSERT INTO competitor_changes
                (source_id, url, diff_summary, change_type, threat_score, npa_critical)
                VALUES (?, ?, ?, ?, ?, ?)""",
-            (source_id, url, diff_summary, change_type, threat_score, 1 if npa_critical else 0),
+            (source_id, url, diff_summary, change_type, threat_score, npa_critical_int),
         )
         await self.db.commit()
         return cursor.lastrowid  # type: ignore[return-value]
+
+    async def get_recent_snapshots(
+        self,
+        source_id: str,
+        url: str,
+        limit: int = 4,
+    ) -> list[dict]:
+        """Return the N most recent successful snapshots for source_id+url, newest first."""
+        cursor = await self.db.execute(
+            """SELECT * FROM competitor_snapshots
+               WHERE source_id = ? AND url = ? AND fetch_status = 'ok'
+               ORDER BY captured_at DESC LIMIT ?""",
+            (source_id, url, limit),
+        )
+        rows = await cursor.fetchall()
+        return [dict(row) for row in rows]
 
     async def list_pending_changes(self, limit: int = 100) -> list[dict]:
         """Return changes not yet included in a digest, sorted by threat_score DESC."""

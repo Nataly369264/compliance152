@@ -43,18 +43,21 @@ npa_sources:
     url: https://rkn.gov.ru/news/
     type: html_list
     npa_critical: true
+    keywords: [персональн, роскомнадзор, штраф, обработк, уведомлен, приказ]
 
   - id: consultant_152fz
     name: "ConsultantPlus — 152-FZ"
     url: https://www.consultant.ru/document/cons_doc_LAW_61801/
     type: html_hash
     npa_critical: true
+    keywords: [статья, пункт, изменени, поправк, федеральный закон, вступает]
 
   - id: kremlin_laws
     name: "Kremlin — new laws"
     url: http://kremlin.ru/acts/bank
     type: html_list
     npa_critical: false
+    keywords: [персональн, данные, информаци, безопасност, оператор]
 
 scheduler:
   competitor_check: "0 9 * * 1"   # every Monday 09:00
