@@ -80,6 +80,16 @@ async def reports_list(request: Request):
     })
 
 
+_SEVERITY_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
+
+
+def _severity_key(v: dict) -> int:
+    sev = v.get("severity", "medium")
+    if isinstance(sev, dict):
+        sev = sev.get("value", "medium")
+    return _SEVERITY_ORDER.get(str(sev).lower(), 9)
+
+
 @web_router.get("/reports/{report_id}")
 async def report_view(request: Request, report_id: str):
     db = await get_db()
@@ -93,6 +103,10 @@ async def report_view(request: Request, report_id: str):
             else:
                 report_data = r
             break
+    if report_data and report_data.get("violations"):
+        report_data["violations"] = sorted(
+            report_data["violations"], key=_severity_key
+        )
     return templates.TemplateResponse("report.html", {
         "request": request,
         "report": report_data,

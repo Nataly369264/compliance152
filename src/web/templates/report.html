@@ -59,6 +59,35 @@
     </div>
 </div>
 
+{% set critical_violations = report.violations | selectattr('severity', 'equalto', 'critical') | list %}
+{% if critical_violations %}
+<section>
+    <h2>ТОП-5 критических проблем</h2>
+    {% for v in critical_violations[:5] %}
+    {% set sev = v.severity|default('medium') %}
+    {% if sev is mapping %}{% set sev = sev.value|default('medium') %}{% endif %}
+    {% set sev = sev|lower %}
+    <div class="violation-card sev-{{ sev }}" style="border-left-width:4px">
+        <div class="violation-title">
+            <span class="risk-label {{ sev }}" style="font-size:.75rem;padding:2px 8px;margin-right:6px">
+                {{ sev|upper }}
+            </span>
+            {{ v.title|default(v.check_id|default('')) }}
+        </div>
+        <div class="violation-meta">
+            {% if v.law_reference %}<span>{{ v.law_reference }}</span>{% endif %}
+            {% if v.fine_range %} &mdash; <strong>{{ v.fine_range }}</strong>{% endif %}
+        </div>
+        {% if v.recommendation %}
+        <div class="violation-recommendation">
+            <strong>Рекомендация:</strong> {{ v.recommendation }}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
 {% if report.violations %}
 <section>
     <h2>Нарушения ({{ report.violations|length }})</h2>
