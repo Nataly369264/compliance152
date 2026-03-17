@@ -147,21 +147,23 @@ class ComplianceAnalyzer:
                         "Добавить чекбокс согласия на обработку ПДн рядом с формой.",
                     )
 
-        # FORM_002: consent not pre-checked
-        prechecked = [f for f in pd_forms if f.consent_checkbox_prechecked]
+        # FORM_002: consent checkbox pre-checked (separate violation from missing checkbox)
+        prechecked = [f for f in pd_forms if f.has_consent_checkbox and f.consent_checkbox_prechecked]
         self._add_check(
             "FORM_002", CheckCategory.FORMS,
             CheckStatus.PASS if not prechecked else CheckStatus.FAIL,
-            details=f"Форм с предустановленным согласием: {len(prechecked)}",
+            details=f"Форм с предотмеченным чекбоксом согласия: {len(prechecked)}",
         )
         if prechecked:
             for f in prechecked:
                 self._add_violation(
-                    "FORM_002", "Чекбокс согласия отмечен по умолчанию",
-                    f"На странице {f.page_url} чекбокс согласия предустановлен.",
-                    Severity.HIGH, CheckCategory.FORMS, f.page_url,
-                    "ст. 9 ч. 1 152-ФЗ",
-                    "Убрать предустановку чекбокса согласия.",
+                    "FORM_002", "Чекбокс согласия предотмечен по умолчанию",
+                    f"На странице {f.page_url} чекбокс согласия установлен заранее: "
+                    f"пользователь не выразил активного согласия на обработку ПДн.",
+                    Severity.CRITICAL, CheckCategory.FORMS, f.page_url,
+                    "ст. 9 ч. 4 152-ФЗ",
+                    "Убрать атрибут checked с чекбокса согласия — пользователь должен "
+                    "проставить его самостоятельно (принцип активного согласия).",
                 )
 
         # FORM_003: privacy link near form
