@@ -211,7 +211,7 @@ class ComplianceAnalyzer:
             self._add_violation(
                 "COOKIE_001", "Отсутствует cookie-баннер",
                 "На сайте не обнаружен механизм получения согласия на использование cookie.",
-                Severity.HIGH, CheckCategory.COOKIES, self.scan.url,
+                Severity.CRITICAL, CheckCategory.COOKIES, self.scan.url,
                 "ст. 9 152-ФЗ, 420-ФЗ",
                 "Установить cookie-баннер с возможностью принятия и отклонения cookie.",
             )
@@ -228,11 +228,13 @@ class ComplianceAnalyzer:
         )
         if not banner.has_decline_button:
             self._add_violation(
-                "COOKIE_002", "Нет кнопки отклонения cookie",
-                "Cookie-баннер не содержит равноценную кнопку отклонения.",
-                Severity.MEDIUM, CheckCategory.COOKIES, self.scan.url,
+                "COOKIE_002", "Cookie-баннер без возможности отказа",
+                "Cookie-баннер обнаружен, но не содержит равноценной кнопки отклонения. "
+                "Пользователь лишён возможности отказаться от необязательных cookie.",
+                Severity.HIGH, CheckCategory.COOKIES, self.scan.url,
                 "ст. 9 152-ФЗ",
-                "Добавить кнопку 'Отклонить' наравне с 'Принять'.",
+                "Добавить кнопку отказа ('Отклонить' / 'Только необходимые') "
+                "наравне с кнопкой принятия.",
             )
 
         # COOKIE_003: categories off by default

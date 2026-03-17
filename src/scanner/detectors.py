@@ -243,7 +243,11 @@ def _get_checkbox_context(cb: Tag, form_soup: Tag) -> str:
 
 def _parse_banner(el: Tag) -> CookieBannerInfo:
     accept_re = re.compile(r"(accept|принять|принимаю|agree|согласен|ок|ok|понятно|allow)", re.IGNORECASE)
-    reject_re = re.compile(r"(reject|отклонить|отказа|decline|deny|запретить|refuse)", re.IGNORECASE)
+    reject_re = re.compile(
+        r"(reject|отклонить|отказа|отказаться|не\s+соглашаюсь|"
+        r"decline|deny|запретить|refuse|only\s+necessary|только\s+необходимые)",
+        re.IGNORECASE,
+    )
     settings_re = re.compile(r"(settings|настройк|manage|управлени|preferences|подробнее|выбрать)", re.IGNORECASE)
 
     has_accept = has_reject = has_settings = False
