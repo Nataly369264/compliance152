@@ -93,6 +93,41 @@ CREATE INDEX IF NOT EXISTS idx_scans_org ON scans(organization_id);
 CREATE INDEX IF NOT EXISTS idx_reports_org ON compliance_reports(organization_id);
 CREATE INDEX IF NOT EXISTS idx_documents_org ON documents(organization_id);
 CREATE INDEX IF NOT EXISTS idx_doc_versions_doc ON document_versions(document_id);
+
+-- ── Competitor Intelligence Monitor ──────────────────────────────
+
+CREATE TABLE IF NOT EXISTS competitor_snapshots (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_id    TEXT NOT NULL,
+    url          TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    raw_text     TEXT,
+    fetch_status TEXT DEFAULT 'ok',
+    captured_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS competitor_changes (
+    id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_id          TEXT NOT NULL,
+    url                TEXT NOT NULL,
+    diff_summary       TEXT,
+    change_type        TEXT,
+    threat_score       INTEGER,
+    npa_critical       INTEGER DEFAULT 0,
+    detected_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    included_in_digest INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS digests (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    period_start DATE,
+    period_end   DATE,
+    content_md   TEXT,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_snapshots_source ON competitor_snapshots(source_id, url);
+CREATE INDEX IF NOT EXISTS idx_changes_digest ON competitor_changes(included_in_digest, detected_at);
 """
 
 
@@ -242,6 +277,125 @@ class Database:
         cursor = await self.db.execute(
             "SELECT * FROM documents WHERE organization_id = ? ORDER BY doc_type",
             (org_id,),
+        )
+        rows = await cursor.fetchall()
+        return [dict(row) for row in rows]
+
+    # ── Competitor Intelligence Monitor ──────────────────────────
+
+    async def get_last_snapshot(self, source_id: str, url: str) -> dict | None:
+        """Return the most recent snapshot for a given source_id + url."""
+        cursor = await self.db.execute(
+            """SELECT * FROM competitor_snapshots
+               WHERE source_id = ? AND url = ?
+               ORDER BY captured_at DESC LIMIT 1""",
+            (source_id, url),
+        )
+        row = await cursor.fetchone()
+        return dict(row) if row else None
+
+    async def save_snapshot(
+        self,
+        source_id: str,
+        url: str,
+        content_hash: str,
+        raw_text: str,
+        fetch_status: str = "ok",
+    ) -> int:
+        """Insert a new snapshot row and return its id."""
+        cursor = await self.db.execute(
+            """INSERT INTO competitor_snapshots
+               (source_id, url, content_hash, raw_text, fetch_status)
+               VALUES (?, ?, ?, ?, ?)""",
+            (source_id, url, content_hash, raw_text[:10240], fetch_status),
+        )
+        await self.db.commit()
+        return cursor.lastrowid  # type: ignore[return-value]
+
+    async def save_change(
+        self,
+        source_id: str,
+        url: str,
+        diff_summary: str | None,
+        change_type: str,
+        threat_score: int | None = None,
+        npa_critical: bool | None = None,
+    ) -> int:
+        """Record a detected change and return its id.
+
+        npa_critical=None means LLM did not analyse the change (fallback path).
+        """
+        npa_critical_int = None if npa_critical is None else (1 if npa_critical else 0)
+        cursor = await self.db.execute(
+            """INSERT INTO competitor_changes
+               (source_id, url, diff_summary, change_type, threat_score, npa_critical)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (source_id, url, diff_summary, change_type, threat_score, npa_critical_int),
+        )
+        await self.db.commit()
+        return cursor.lastrowid  # type: ignore[return-value]
+
+    async def get_recent_snapshots(
+        self,
+        source_id: str,
+        url: str,
+        limit: int = 4,
+    ) -> list[dict]:
+        """Return the N most recent successful snapshots for source_id+url, newest first."""
+        cursor = await self.db.execute(
+            """SELECT * FROM competitor_snapshots
+               WHERE source_id = ? AND url = ? AND fetch_status = 'ok'
+               ORDER BY captured_at DESC LIMIT ?""",
+            (source_id, url, limit),
+        )
+        rows = await cursor.fetchall()
+        return [dict(row) for row in rows]
+
+    async def list_pending_changes(self, limit: int = 100) -> list[dict]:
+        """Return changes not yet included in a digest, sorted by threat_score DESC."""
+        cursor = await self.db.execute(
+            """SELECT * FROM competitor_changes
+               WHERE included_in_digest = 0
+               ORDER BY threat_score DESC NULLS LAST, detected_at DESC
+               LIMIT ?""",
+            (limit,),
+        )
+        rows = await cursor.fetchall()
+        return [dict(row) for row in rows]
+
+    async def mark_changes_digested(self, change_ids: list[int]) -> None:
+        """Mark the given change ids as included in a digest."""
+        if not change_ids:
+            return
+        placeholders = ",".join("?" * len(change_ids))
+        await self.db.execute(
+            f"UPDATE competitor_changes SET included_in_digest = 1 WHERE id IN ({placeholders})",
+            change_ids,
+        )
+        await self.db.commit()
+
+    async def save_digest(self, period_start: str, period_end: str, content_md: str) -> int:
+        """Save a new digest and return its id."""
+        cursor = await self.db.execute(
+            """INSERT INTO digests (period_start, period_end, content_md)
+               VALUES (?, ?, ?)""",
+            (period_start, period_end, content_md),
+        )
+        await self.db.commit()
+        return cursor.lastrowid  # type: ignore[return-value]
+
+    async def get_latest_digest(self) -> dict | None:
+        """Return the most recently created digest."""
+        cursor = await self.db.execute(
+            "SELECT * FROM digests ORDER BY created_at DESC LIMIT 1"
+        )
+        row = await cursor.fetchone()
+        return dict(row) if row else None
+
+    async def list_digests(self, limit: int = 20) -> list[dict]:
+        """Return digests ordered by creation date, newest first."""
+        cursor = await self.db.execute(
+            "SELECT * FROM digests ORDER BY created_at DESC LIMIT ?", (limit,)
         )
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]

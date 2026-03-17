@@ -1,0 +1,65 @@
+# Competitor Intelligence Monitor — sources configuration
+# Добавить нового конкурента или источник НПА: дописать блок ниже.
+# Код трогать не нужно.
+
+competitors:
+  - id: quickaudit
+    name: "QuickAudit"
+    js_render: false
+    llm_analyze: true
+    urls:
+      - https://quickaudit.ru
+      - https://quickaudit.ru/pricing
+    watch: [features, pricing]
+
+  - id: saitscan
+    name: "SaitScan"
+    js_render: false
+    llm_analyze: true
+    urls:
+      - https://saitscan.ru
+      - https://saitscan.ru/price
+    watch: [features, pricing]
+
+  - id: regulaguard
+    name: "RegulaGuard"
+    js_render: false
+    llm_analyze: true
+    urls:
+      - https://www.regulaguard.ru
+    watch: [features]
+
+  - id: 1ps_152
+    name: "1PS.ru / 152-FZ"
+    js_render: false
+    llm_analyze: false   # less priority — no LLM analysis
+    urls:
+      - https://1ps.ru/instrumentyi-i-kalkulyatoryi/proverka-sajta-na-sootvetstvie-152-fz/
+    watch: [features]
+
+npa_sources:
+  - id: rkn_news
+    name: "RKN — news"
+    url: https://rkn.gov.ru/news/
+    type: html_list
+    npa_critical: true
+    keywords: [персональн, роскомнадзор, штраф, обработк, уведомлен, приказ]
+
+  - id: consultant_152fz
+    name: "ConsultantPlus — 152-FZ"
+    url: https://www.consultant.ru/document/cons_doc_LAW_61801/
+    type: html_hash
+    npa_critical: true
+    keywords: [статья, пункт, изменени, поправк, федеральный закон, вступает]
+
+  - id: kremlin_laws
+    name: "Kremlin — new laws"
+    url: http://kremlin.ru/acts/bank
+    type: html_list
+    npa_critical: false
+    keywords: [персональн, данные, информаци, безопасност, оператор]
+
+scheduler:
+  competitor_check: "0 9 * * 1"   # every Monday 09:00
+  npa_check: "0 9 * * *"          # daily 09:00
+  digest_generate: "0 10 * * 1"   # every Monday 10:00
