@@ -36,6 +36,15 @@
 - Удалён `run_umschool_scan.py` (ad-hoc скрипт под umschool.net)
 - Коммит: `remove: ad-hoc umschool script`
 
-#### Этап 2 — Расширение поиска политики ПДн (в работе)
+#### Этап 2 — Расширение поиска политики ПДн ✅
 - Проблема: не нашёл политику по /documents/privacy-policy/
-- Задача: расширить URL-паттерны и поиск по тексту ссылок
+- Причина: страница не попала в очередь (ссылка с нейтральным текстом → хвост очереди → вытеснена лимитом 50 стр.)
+- Исправлено:
+  - `_PRIVACY_LINK_TEXT_RE` расширен (+защит.данн, пользовател.соглаш, legal, terms)
+  - `_LEGAL_PATH_RE` — новый паттерн для /documents/, /legal/, /info/, /pages/ и др.
+  - `is_privacy_policy_page()` — дополнительная проверка: legal-директория + keyword в title
+  - `extract_banner_policy_links()` — новая функция, извлекает ссылки из cookie-баннера
+  - Краулер: следует ссылкам из баннера (insert в начало очереди)
+  - Краулер: `_try_fallback_privacy_urls()` — после основного обхода пробует 14 типовых путей
+- Тесты: 10/10 ✅
+- Коммит: `fix: expand privacy policy detection patterns`

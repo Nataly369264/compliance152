@@ -31,7 +31,14 @@ _CONSENT_TEXT_RE = re.compile(
     r"(согласи|персональн|обработк|пдн|consent|personal\s+data)", re.IGNORECASE)
 
 _PRIVACY_LINK_TEXT_RE = re.compile(
-    r"(полити|конфиденциальн|персональн|privacy|обработк.{0,20}данн|пдн)", re.IGNORECASE)
+    r"(полити|конфиденциальн|персональн|privacy|обработк.{0,20}данн|пдн|"
+    r"защит.{0,10}данн|пользовател.{0,15}соглаш|legal|terms)", re.IGNORECASE)
+
+# URL path segments that may host legal documents
+_LEGAL_PATH_RE = re.compile(
+    r"/(documents?|legal|info|pages?|docs?|terms|rules|politic)/",
+    re.IGNORECASE,
+)
 
 _COOKIE_BANNER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"cookie[\-_]?(banner|consent|notice|popup|bar|modal|overlay)", re.IGNORECASE),
@@ -182,14 +189,35 @@ def detect_external_scripts(soup: Tag, page_url: str) -> list[ExternalScript]:
 
 def is_privacy_policy_page(url: str, title: str | None = None) -> bool:
     """Heuristic: is this URL/title a privacy policy page?"""
-    pp_re = re.compile(
+    _pp_url_re = re.compile(
         r"(privacy|policy|politika|конфиденциальн|персональн|"
         r"personal[\-_]?data|soglashenie|pdn|обработк.{0,10}данн)", re.IGNORECASE)
-    if pp_re.search(url):
+    if _pp_url_re.search(url):
         return True
-    if title and pp_re.search(title):
+    if title and _PRIVACY_LINK_TEXT_RE.search(title):
+        return True
+    # URL under a legal docs directory + privacy keyword in title/link text
+    if _LEGAL_PATH_RE.search(url) and title and re.search(
+        r"(политик|персональн|конфиденциальн|privacy|пдн|данн|обработк)",
+        title, re.IGNORECASE,
+    ):
         return True
     return False
+
+
+def extract_banner_policy_links(soup: Tag, page_url: str) -> list[str]:
+    """Extract links to privacy/cookie policy pages from cookie banner elements."""
+    results: list[str] = []
+    for pattern in _COOKIE_BANNER_PATTERNS:
+        for el in (*soup.find_all(id=pattern), *soup.find_all(class_=pattern)):
+            for a in el.find_all("a", href=True):
+                text = a.get_text(strip=True)
+                href = a["href"]
+                if _PRIVACY_LINK_TEXT_RE.search(text) or _PRIVACY_LINK_TEXT_RE.search(href):
+                    abs_url = urljoin(page_url, href)
+                    if abs_url not in results:
+                        results.append(abs_url)
+    return results
 
 
 # ── Internal helpers ─────────────────────────────────────────────
