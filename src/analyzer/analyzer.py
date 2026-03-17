@@ -112,6 +112,7 @@ class ComplianceAnalyzer:
             fine_estimate=fine_estimate,
             llm_analysis=llm_analysis,
             summary=summary,
+            scan_limitations=self._build_scan_limitations(),
         )
 
     # ── Form checks ──────────────────────────────────────────────
@@ -497,6 +498,37 @@ class ComplianceAnalyzer:
         )
 
     # ── Helpers ───────────────────────────────────────────────────
+
+    def _build_scan_limitations(self) -> list[str]:
+        """Build list of scan limitation warnings based on what was (not) found."""
+        notes: list[str] = []
+        pd_forms = [f for f in self.scan.forms if f.collects_personal_data]
+
+        if not pd_forms:
+            notes.append(
+                "Формы: не обнаружены статичным парсером — если сайт использует "
+                "клиентский рендеринг (React/Vue/Next.js), формы могут существовать, "
+                "но рисоваться через JavaScript. Требуется ручная проверка."
+            )
+            notes.append(
+                "Чекбоксы согласия: не могут быть проверены автоматически — "
+                "требуют ручной верификации на страницах с формами."
+            )
+        else:
+            notes.append(
+                "Чекбоксы согласия: в SPA-формах (React/Vue) динамические атрибуты "
+                "могут не совпадать с HTML-снимком — рекомендуется ручная проверка."
+            )
+
+        if not self.scan.cookie_banner.found or not self.scan.cookie_banner.has_accept_button:
+            notes.append(
+                "Cookie-баннер: определяется косвенно по тегам <script src> — "
+                "если баннер монтируется JS-библиотекой (OneTrust, Cookiebot и др.), "
+                "кнопки «Принять»/«Отклонить» могут быть не распознаны. "
+                "Рекомендуется проверка в браузере."
+            )
+
+        return notes
 
     def _calculate_risk_level(self, score: int, violations: list[Violation]) -> Severity:
         critical_count = sum(1 for v in violations if v.severity == Severity.CRITICAL)
