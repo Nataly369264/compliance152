@@ -340,10 +340,23 @@ class SiteScanner:
             has_operator_name=bool(re.search(
                 r"(общество с ограниченной|акционерное общество|индивидуальный предприниматель|ООО|АО|ИП)",
                 text)),
-            has_inn_ogrn=bool(re.search(r"(инн|огрн|inn|ogrn)", text_lower)),
-            has_responsible_person=bool(re.search(
-                r"(ответственн.{0,30}(обработк|организац|персональн)|dpo|data.?protection)",
+            has_inn_ogrn=bool(re.search(
+                r"(инн\s*[:\-]?\s*\d{10,12}|огрн\s*[:\-]?\s*\d{13,15}|"
+                r"inn\s*[:\-]?\s*\d{10,12}|ogrn\s*[:\-]?\s*\d{13,15})",
                 text_lower)),
+            has_responsible_person=bool(
+                re.search(
+                    r"(ответственн.{0,30}(обработк|организац|персональн)|"
+                    r"dpo|data.?protection.?officer|"
+                    r"(обращени|запрос).{0,30}(данн|персональн))",
+                    text_lower,
+                ) and re.search(
+                    r"([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}|"
+                    r"тел[\s.:]*[\d\s\-\+\(\)]{7,}|"
+                    r"phone[\s.:]*[\d\s\-\+\(\)]{7,})",
+                    text_lower,
+                )
+            ),
             has_data_categories=bool(re.search(
                 r"(категори.{0,20}данн|перечень.{0,20}данн|обрабатыва.{0,30}данн)",
                 text_lower)),
@@ -368,7 +381,12 @@ class SiteScanner:
                 text_lower)),
             has_cookie_info=bool(re.search(r"(cookie|куки|файл.{0,10}cookie)", text_lower)),
             has_localization_statement=bool(re.search(
-                r"(территори.{0,20}(росс|рф)|на территории|server.{0,20}russia|локализац)",
+                r"(территори.{0,30}российской\s+федерации|"
+                r"территори.{0,20}(росс|рф)|"
+                r"серверах.{0,10}в\s+росс|"
+                r"хранятся.{0,10}(в\s+рф|в\s+росс)|"
+                r"российские.{0,10}серверы|"
+                r"server.{0,20}russia|локализац)",
                 text_lower)),
             has_date=bool(re.search(
                 r"(\d{2}\.\d{2}\.\d{4}|дата.{0,20}(публикац|обновлен|утвержден))",

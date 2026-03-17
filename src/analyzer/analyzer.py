@@ -306,24 +306,45 @@ class ComplianceAnalyzer:
                 "Добавить ссылку на Политику в футер каждой страницы.",
             )
 
-        # Content checks (from parsed privacy policy)
-        content_checks = [
-            ("POLICY_003", pp.has_operator_name, "Полное наименование оператора"),
-            ("POLICY_004", pp.has_inn_ogrn, "ИНН/ОГРН и адрес"),
-            ("POLICY_005", pp.has_responsible_person, "Ответственный за обработку ПДн"),
-            ("POLICY_006", pp.has_data_categories, "Категории персональных данных"),
-            ("POLICY_007", pp.has_purposes, "Цели обработки"),
-            ("POLICY_008", pp.has_legal_basis, "Правовые основания"),
-            ("POLICY_009", pp.has_retention_periods, "Сроки хранения"),
-            ("POLICY_010", pp.has_subject_rights, "Права субъектов ПДн"),
-            ("POLICY_011", pp.has_rights_procedure, "Порядок реализации прав"),
-            ("POLICY_012", pp.has_cross_border_info, "Информация о трансграничной передаче"),
-            ("POLICY_013", pp.has_security_measures, "Меры безопасности"),
-            ("POLICY_014", pp.has_cookie_info, "Информация о cookies"),
-            ("POLICY_015", pp.has_localization_statement, "Заявление о локализации данных"),
-            ("POLICY_016", pp.has_date, "Дата публикации/обновления"),
+        # Content checks: (check_id, value, title, severity, article, message, recommendation)
+        # severity=None → default HIGH; article=None → default ст. 18.1 152-ФЗ
+        content_checks: list[tuple] = [
+            ("POLICY_003", pp.has_operator_name, "Полное наименование оператора",
+             None, None, None, None),
+            ("POLICY_004", pp.has_inn_ogrn, "ИНН/ОГРН оператора",
+             Severity.MEDIUM, "ст. 18.1 152-ФЗ",
+             "В политике ПДн не указан ИНН/ОГРН оператора.",
+             "Указать ИНН (10 или 12 цифр) и ОГРН (13 или 15 цифр) оператора в тексте политики."),
+            ("POLICY_005", pp.has_responsible_person, "Контакт ответственного за обработку ПДн",
+             Severity.LOW, "ст. 18.1 152-ФЗ",
+             "Не указан контакт ответственного за обработку ПДн.",
+             "Добавить email или телефон ответственного лица / DPO для обращений по вопросам ПДн."),
+            ("POLICY_006", pp.has_data_categories, "Категории персональных данных",
+             None, None, None, None),
+            ("POLICY_007", pp.has_purposes, "Цели обработки",
+             None, None, None, None),
+            ("POLICY_008", pp.has_legal_basis, "Правовые основания",
+             None, None, None, None),
+            ("POLICY_009", pp.has_retention_periods, "Сроки хранения",
+             None, None, None, None),
+            ("POLICY_010", pp.has_subject_rights, "Права субъектов ПДн",
+             None, None, None, None),
+            ("POLICY_011", pp.has_rights_procedure, "Порядок реализации прав",
+             None, None, None, None),
+            ("POLICY_012", pp.has_cross_border_info, "Информация о трансграничной передаче",
+             None, None, None, None),
+            ("POLICY_013", pp.has_security_measures, "Меры безопасности",
+             None, None, None, None),
+            ("POLICY_014", pp.has_cookie_info, "Информация о cookies",
+             None, None, None, None),
+            ("POLICY_015", pp.has_localization_statement, "Локализация данных на территории РФ",
+             Severity.MEDIUM, "ст. 18 ч. 5 152-ФЗ",
+             "Не указана локализация данных на территории РФ (ст. 18 ч. 5).",
+             "Явно указать, что данные хранятся на серверах на территории Российской Федерации."),
+            ("POLICY_016", pp.has_date, "Дата публикации/обновления",
+             None, None, None, None),
         ]
-        for check_id, value, title in content_checks:
+        for check_id, value, title, severity, article, message, recommendation in content_checks:
             # Cross-border is N/A if not applicable
             if check_id == "POLICY_012":
                 status = CheckStatus.PASS if value else CheckStatus.WARNING
@@ -332,11 +353,13 @@ class ComplianceAnalyzer:
             self._add_check(check_id, CheckCategory.PRIVACY_POLICY, status, details=title)
             if status == CheckStatus.FAIL:
                 self._add_violation(
-                    check_id, f"В Политике отсутствует: {title}",
-                    f"Политика обработки ПДн не содержит обязательного раздела: {title}.",
-                    Severity.HIGH, CheckCategory.PRIVACY_POLICY, pp.url,
-                    "ст. 18.1 152-ФЗ",
-                    f"Добавить раздел '{title}' в Политику обработки ПДн.",
+                    check_id,
+                    message or f"В Политике отсутствует: {title}",
+                    (message or f"Политика обработки ПДн не содержит обязательного раздела: {title}."),
+                    severity or Severity.HIGH,
+                    CheckCategory.PRIVACY_POLICY, pp.url,
+                    article or "ст. 18.1 152-ФЗ",
+                    recommendation or f"Добавить раздел '{title}' в Политику обработки ПДн.",
                 )
 
         # POLICY_017: is separate page

@@ -119,6 +119,41 @@
 
 ---
 
+---
+
+## Этап 5 — Дополнить чек-лист содержимого политики ПДн (2026-03-17, сессия 2)
+
+### Проблема
+Три существующих проверки (POLICY_004, POLICY_005, POLICY_015) имели слабые regex и неверный severity (все HIGH).
+
+### Что изменено
+
+**`src/scanner/crawler.py` — `_extract_privacy_policy`:**
+
+| Поле | Было | Стало |
+|------|------|-------|
+| `has_inn_ogrn` | просто слово ИНН/ОГРН | ИНН + 10-12 цифр, ОГРН + 13-15 цифр |
+| `has_localization_statement` | базовая фраза | +серверах в России, хранятся в РФ, российские серверы |
+| `has_responsible_person` | ключевое слово DPO | DPO-слово И email/телефон в тексте |
+
+**`src/analyzer/analyzer.py` — `_check_privacy_policy`:**
+- Кортежи content_checks расширены до 7-полей (+ severity, article, message, recommendation)
+- POLICY_004: severity `HIGH → MEDIUM`, статья `ст. 18.1 152-ФЗ`
+- POLICY_005: severity `HIGH → LOW`, специфичное сообщение
+- POLICY_015: severity `HIGH → MEDIUM`, статья `ст. 18 ч. 5 152-ФЗ`
+
+### Итоговые нарушения политики
+| Код | Нарушение | Severity |
+|-----|-----------|----------|
+| POLICY_004 | В политике ПДн не указан ИНН/ОГРН оператора | MEDIUM |
+| POLICY_005 | Не указан контакт ответственного за обработку ПДн | LOW |
+| POLICY_015 | Не указана локализация данных на территории РФ | MEDIUM |
+
+### Коммит
+`fix: add INN/OGRN, data localization and DPO checks`
+
+---
+
 ## Что осталось на следующую сессию
 
 - [ ] Восстановить / проверить `tests/test_legal_updates.py` и остальные тесты (`pytest tests/` целиком)
