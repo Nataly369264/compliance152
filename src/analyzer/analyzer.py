@@ -112,6 +112,7 @@ class ComplianceAnalyzer:
             fine_estimate=fine_estimate,
             llm_analysis=llm_analysis,
             summary=summary,
+            scan_limitations=self._build_scan_limitations(),
         )
 
     # ── Form checks ──────────────────────────────────────────────
@@ -146,21 +147,23 @@ class ComplianceAnalyzer:
                         "Добавить чекбокс согласия на обработку ПДн рядом с формой.",
                     )
 
-        # FORM_002: consent not pre-checked
-        prechecked = [f for f in pd_forms if f.consent_checkbox_prechecked]
+        # FORM_002: consent checkbox pre-checked (separate violation from missing checkbox)
+        prechecked = [f for f in pd_forms if f.has_consent_checkbox and f.consent_checkbox_prechecked]
         self._add_check(
             "FORM_002", CheckCategory.FORMS,
             CheckStatus.PASS if not prechecked else CheckStatus.FAIL,
-            details=f"Форм с предустановленным согласием: {len(prechecked)}",
+            details=f"Форм с предотмеченным чекбоксом согласия: {len(prechecked)}",
         )
         if prechecked:
             for f in prechecked:
                 self._add_violation(
-                    "FORM_002", "Чекбокс согласия отмечен по умолчанию",
-                    f"На странице {f.page_url} чекбокс согласия предустановлен.",
-                    Severity.HIGH, CheckCategory.FORMS, f.page_url,
-                    "ст. 9 ч. 1 152-ФЗ",
-                    "Убрать предустановку чекбокса согласия.",
+                    "FORM_002", "Чекбокс согласия предотмечен по умолчанию",
+                    f"На странице {f.page_url} чекбокс согласия установлен заранее: "
+                    f"пользователь не выразил активного согласия на обработку ПДн.",
+                    Severity.CRITICAL, CheckCategory.FORMS, f.page_url,
+                    "ст. 9 ч. 4 152-ФЗ",
+                    "Убрать атрибут checked с чекбокса согласия — пользователь должен "
+                    "проставить его самостоятельно (принцип активного согласия).",
                 )
 
         # FORM_003: privacy link near form
@@ -208,7 +211,7 @@ class ComplianceAnalyzer:
             self._add_violation(
                 "COOKIE_001", "Отсутствует cookie-баннер",
                 "На сайте не обнаружен механизм получения согласия на использование cookie.",
-                Severity.HIGH, CheckCategory.COOKIES, self.scan.url,
+                Severity.CRITICAL, CheckCategory.COOKIES, self.scan.url,
                 "ст. 9 152-ФЗ, 420-ФЗ",
                 "Установить cookie-баннер с возможностью принятия и отклонения cookie.",
             )
@@ -225,11 +228,13 @@ class ComplianceAnalyzer:
         )
         if not banner.has_decline_button:
             self._add_violation(
-                "COOKIE_002", "Нет кнопки отклонения cookie",
-                "Cookie-баннер не содержит равноценную кнопку отклонения.",
-                Severity.MEDIUM, CheckCategory.COOKIES, self.scan.url,
+                "COOKIE_002", "Cookie-баннер без возможности отказа",
+                "Cookie-баннер обнаружен, но не содержит равноценной кнопки отклонения. "
+                "Пользователь лишён возможности отказаться от необязательных cookie.",
+                Severity.HIGH, CheckCategory.COOKIES, self.scan.url,
                 "ст. 9 152-ФЗ",
-                "Добавить кнопку 'Отклонить' наравне с 'Принять'.",
+                "Добавить кнопку отказа ('Отклонить' / 'Только необходимые') "
+                "наравне с кнопкой принятия.",
             )
 
         # COOKIE_003: categories off by default
@@ -301,24 +306,45 @@ class ComplianceAnalyzer:
                 "Добавить ссылку на Политику в футер каждой страницы.",
             )
 
-        # Content checks (from parsed privacy policy)
-        content_checks = [
-            ("POLICY_003", pp.has_operator_name, "Полное наименование оператора"),
-            ("POLICY_004", pp.has_inn_ogrn, "ИНН/ОГРН и адрес"),
-            ("POLICY_005", pp.has_responsible_person, "Ответственный за обработку ПДн"),
-            ("POLICY_006", pp.has_data_categories, "Категории персональных данных"),
-            ("POLICY_007", pp.has_purposes, "Цели обработки"),
-            ("POLICY_008", pp.has_legal_basis, "Правовые основания"),
-            ("POLICY_009", pp.has_retention_periods, "Сроки хранения"),
-            ("POLICY_010", pp.has_subject_rights, "Права субъектов ПДн"),
-            ("POLICY_011", pp.has_rights_procedure, "Порядок реализации прав"),
-            ("POLICY_012", pp.has_cross_border_info, "Информация о трансграничной передаче"),
-            ("POLICY_013", pp.has_security_measures, "Меры безопасности"),
-            ("POLICY_014", pp.has_cookie_info, "Информация о cookies"),
-            ("POLICY_015", pp.has_localization_statement, "Заявление о локализации данных"),
-            ("POLICY_016", pp.has_date, "Дата публикации/обновления"),
+        # Content checks: (check_id, value, title, severity, article, message, recommendation)
+        # severity=None → default HIGH; article=None → default ст. 18.1 152-ФЗ
+        content_checks: list[tuple] = [
+            ("POLICY_003", pp.has_operator_name, "Полное наименование оператора",
+             None, None, None, None),
+            ("POLICY_004", pp.has_inn_ogrn, "ИНН/ОГРН оператора",
+             Severity.MEDIUM, "ст. 18.1 152-ФЗ",
+             "В политике ПДн не указан ИНН/ОГРН оператора.",
+             "Указать ИНН (10 или 12 цифр) и ОГРН (13 или 15 цифр) оператора в тексте политики."),
+            ("POLICY_005", pp.has_responsible_person, "Контакт ответственного за обработку ПДн",
+             Severity.LOW, "ст. 18.1 152-ФЗ",
+             "Не указан контакт ответственного за обработку ПДн.",
+             "Добавить email или телефон ответственного лица / DPO для обращений по вопросам ПДн."),
+            ("POLICY_006", pp.has_data_categories, "Категории персональных данных",
+             None, None, None, None),
+            ("POLICY_007", pp.has_purposes, "Цели обработки",
+             None, None, None, None),
+            ("POLICY_008", pp.has_legal_basis, "Правовые основания",
+             None, None, None, None),
+            ("POLICY_009", pp.has_retention_periods, "Сроки хранения",
+             None, None, None, None),
+            ("POLICY_010", pp.has_subject_rights, "Права субъектов ПДн",
+             None, None, None, None),
+            ("POLICY_011", pp.has_rights_procedure, "Порядок реализации прав",
+             None, None, None, None),
+            ("POLICY_012", pp.has_cross_border_info, "Информация о трансграничной передаче",
+             None, None, None, None),
+            ("POLICY_013", pp.has_security_measures, "Меры безопасности",
+             None, None, None, None),
+            ("POLICY_014", pp.has_cookie_info, "Информация о cookies",
+             None, None, None, None),
+            ("POLICY_015", pp.has_localization_statement, "Локализация данных на территории РФ",
+             Severity.MEDIUM, "ст. 18 ч. 5 152-ФЗ",
+             "Не указана локализация данных на территории РФ (ст. 18 ч. 5).",
+             "Явно указать, что данные хранятся на серверах на территории Российской Федерации."),
+            ("POLICY_016", pp.has_date, "Дата публикации/обновления",
+             None, None, None, None),
         ]
-        for check_id, value, title in content_checks:
+        for check_id, value, title, severity, article, message, recommendation in content_checks:
             # Cross-border is N/A if not applicable
             if check_id == "POLICY_012":
                 status = CheckStatus.PASS if value else CheckStatus.WARNING
@@ -327,11 +353,13 @@ class ComplianceAnalyzer:
             self._add_check(check_id, CheckCategory.PRIVACY_POLICY, status, details=title)
             if status == CheckStatus.FAIL:
                 self._add_violation(
-                    check_id, f"В Политике отсутствует: {title}",
-                    f"Политика обработки ПДн не содержит обязательного раздела: {title}.",
-                    Severity.HIGH, CheckCategory.PRIVACY_POLICY, pp.url,
-                    "ст. 18.1 152-ФЗ",
-                    f"Добавить раздел '{title}' в Политику обработки ПДн.",
+                    check_id,
+                    message or f"В Политике отсутствует: {title}",
+                    (message or f"Политика обработки ПДн не содержит обязательного раздела: {title}."),
+                    severity or Severity.HIGH,
+                    CheckCategory.PRIVACY_POLICY, pp.url,
+                    article or "ст. 18.1 152-ФЗ",
+                    recommendation or f"Добавить раздел '{title}' в Политику обработки ПДн.",
                 )
 
         # POLICY_017: is separate page
@@ -497,6 +525,37 @@ class ComplianceAnalyzer:
         )
 
     # ── Helpers ───────────────────────────────────────────────────
+
+    def _build_scan_limitations(self) -> list[str]:
+        """Build list of scan limitation warnings based on what was (not) found."""
+        notes: list[str] = []
+        pd_forms = [f for f in self.scan.forms if f.collects_personal_data]
+
+        if not pd_forms:
+            notes.append(
+                "Формы: не обнаружены статичным парсером — если сайт использует "
+                "клиентский рендеринг (React/Vue/Next.js), формы могут существовать, "
+                "но рисоваться через JavaScript. Требуется ручная проверка."
+            )
+            notes.append(
+                "Чекбоксы согласия: не могут быть проверены автоматически — "
+                "требуют ручной верификации на страницах с формами."
+            )
+        else:
+            notes.append(
+                "Чекбоксы согласия: в SPA-формах (React/Vue) динамические атрибуты "
+                "могут не совпадать с HTML-снимком — рекомендуется ручная проверка."
+            )
+
+        if not self.scan.cookie_banner.found or not self.scan.cookie_banner.has_accept_button:
+            notes.append(
+                "Cookie-баннер: определяется косвенно по тегам <script src> — "
+                "если баннер монтируется JS-библиотекой (OneTrust, Cookiebot и др.), "
+                "кнопки «Принять»/«Отклонить» могут быть не распознаны. "
+                "Рекомендуется проверка в браузере."
+            )
+
+        return notes
 
     def _calculate_risk_level(self, score: int, violations: list[Violation]) -> Severity:
         critical_count = sum(1 for v in violations if v.severity == Severity.CRITICAL)

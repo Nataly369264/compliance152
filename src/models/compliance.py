@@ -83,3 +83,4 @@ class ComplianceReport(BaseModel):
     fine_estimate: FineEstimate = FineEstimate()
     llm_analysis: str | None = None  # Глубокий анализ политики от LLM
     summary: str = ""
+    scan_limitations: list[str] = []  # Предупреждения об ограничениях статичного парсера

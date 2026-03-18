@@ -16,8 +16,6 @@ __pycache__/
 /test_*.py
 /_patch.py
 
-# Сессионные файлы
-SESSION_*.md
 
 # Инструменты
 .ruff_cache/

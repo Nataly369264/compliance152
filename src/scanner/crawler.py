@@ -26,6 +26,7 @@ from src.scanner.detectors import (
     detect_footer_privacy_link,
     detect_personal_data_fields,
     detect_privacy_link,
+    extract_banner_policy_links,
     is_privacy_policy_page,
 )
 
@@ -148,6 +149,14 @@ class SiteScanner:
                             banner.analytics_before_consent = analytics_before
                             cookie_banner_info = banner
 
+                            # Follow privacy policy links from the banner
+                            for bl in extract_banner_policy_links(soup, current_url):
+                                norm_bl = self._normalize_url(bl)
+                                if (norm_bl not in visited and norm_bl not in queued
+                                        and self._is_same_domain(norm_bl, base_domain)):
+                                    queued.add(norm_bl)
+                                    to_visit.insert(0, bl)
+
                     # Privacy policy detection
                     if not privacy_policy_info.found and is_privacy_policy_page(current_url, title):
                         privacy_policy_info = self._extract_privacy_policy(
@@ -188,6 +197,12 @@ class SiteScanner:
                 if self.crawl_delay > 0 and to_visit:
                     await asyncio.sleep(self.crawl_delay)
 
+            # Fallback: try well-known privacy policy paths if still not found
+            if not privacy_policy_info.found:
+                privacy_policy_info = await self._try_fallback_privacy_urls(
+                    client, base_domain, visited, pages,
+                )
+
         # If we never found a privacy policy, try to find it from links
         if not privacy_policy_info.found:
             for page in pages:
@@ -216,6 +231,48 @@ class SiteScanner:
             pages_scanned=len(pages),
             errors=errors,
         )
+
+    async def _try_fallback_privacy_urls(
+        self,
+        client: httpx.AsyncClient,
+        base_domain: str,
+        visited: set[str],
+        pages: list[PageInfo],
+    ) -> PrivacyPolicyInfo:
+        """Try well-known privacy policy URL paths as last resort."""
+        FALLBACK_PATHS = [
+            "/privacy-policy", "/privacy_policy", "/privacy",
+            "/documents/privacy-policy", "/documents/privacy_policy",
+            "/legal/privacy", "/legal/privacy-policy",
+            "/info/privacy", "/pages/privacy-policy",
+            "/personal-data", "/personalnyye-dannyye",
+            "/politika-konfidencialnosti", "/obrabotka-personalnyh-dannyh",
+        ]
+        for path in FALLBACK_PATHS:
+            candidate = f"https://{base_domain}{path}"
+            norm = self._normalize_url(candidate)
+            if norm in visited:
+                continue
+            try:
+                resp = await client.get(candidate)
+                if resp.status_code != 200:
+                    continue
+                if "text/html" not in resp.headers.get("content-type", ""):
+                    continue
+                soup = BeautifulSoup(resp.text, "lxml")
+                title = soup.title.string.strip() if soup.title and soup.title.string else None
+                if is_privacy_policy_page(candidate, title):
+                    has_footer_link, _ = detect_footer_privacy_link(soup)
+                    pages.append(PageInfo(
+                        url=candidate,
+                        title=title,
+                        status_code=resp.status_code,
+                        has_privacy_link_in_footer=has_footer_link,
+                    ))
+                    return self._extract_privacy_policy(soup, candidate, has_footer_link)
+            except Exception as e:
+                logger.debug("Fallback privacy URL %s failed: %s", candidate, e)
+        return PrivacyPolicyInfo()
 
     def _extract_forms(self, soup: BeautifulSoup, page_url: str) -> list[FormInfo]:
         """Extract all HTML forms from a page."""
@@ -283,10 +340,23 @@ class SiteScanner:
             has_operator_name=bool(re.search(
                 r"(общество с ограниченной|акционерное общество|индивидуальный предприниматель|ООО|АО|ИП)",
                 text)),
-            has_inn_ogrn=bool(re.search(r"(инн|огрн|inn|ogrn)", text_lower)),
-            has_responsible_person=bool(re.search(
-                r"(ответственн.{0,30}(обработк|организац|персональн)|dpo|data.?protection)",
+            has_inn_ogrn=bool(re.search(
+                r"(инн\s*[:\-]?\s*\d{10,12}|огрн\s*[:\-]?\s*\d{13,15}|"
+                r"inn\s*[:\-]?\s*\d{10,12}|ogrn\s*[:\-]?\s*\d{13,15})",
                 text_lower)),
+            has_responsible_person=bool(
+                re.search(
+                    r"(ответственн.{0,30}(обработк|организац|персональн)|"
+                    r"dpo|data.?protection.?officer|"
+                    r"(обращени|запрос).{0,30}(данн|персональн))",
+                    text_lower,
+                ) and re.search(
+                    r"([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}|"
+                    r"тел[\s.:]*[\d\s\-\+\(\)]{7,}|"
+                    r"phone[\s.:]*[\d\s\-\+\(\)]{7,})",
+                    text_lower,
+                )
+            ),
             has_data_categories=bool(re.search(
                 r"(категори.{0,20}данн|перечень.{0,20}данн|обрабатыва.{0,30}данн)",
                 text_lower)),
@@ -311,7 +381,12 @@ class SiteScanner:
                 text_lower)),
             has_cookie_info=bool(re.search(r"(cookie|куки|файл.{0,10}cookie)", text_lower)),
             has_localization_statement=bool(re.search(
-                r"(территори.{0,20}(росс|рф)|на территории|server.{0,20}russia|локализац)",
+                r"(территори.{0,30}российской\s+федерации|"
+                r"территори.{0,20}(росс|рф)|"
+                r"серверах.{0,10}в\s+росс|"
+                r"хранятся.{0,10}(в\s+рф|в\s+росс)|"
+                r"российские.{0,10}серверы|"
+                r"server.{0,20}russia|локализац)",
                 text_lower)),
             has_date=bool(re.search(
                 r"(\d{2}\.\d{2}\.\d{4}|дата.{0,20}(публикац|обновлен|утвержден))",
