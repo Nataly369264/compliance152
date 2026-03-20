@@ -40,11 +40,14 @@ _LEGAL_PATH_RE = re.compile(
     re.IGNORECASE,
 )
 
-_COOKIE_BANNER_PATTERNS: list[re.Pattern[str]] = [
+# Patterns for cookie/consent banner detection by CSS class or id.
+# Named "consent" (not "gdpr") because we detect by technical marker,
+# not by legal framework — 152-FZ only, no GDPR logic.
+_CONSENT_BANNER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"cookie[\-_]?(banner|consent|notice|popup|bar|modal|overlay)", re.IGNORECASE),
     re.compile(r"cookiebot", re.IGNORECASE),
     re.compile(r"cc[\-_]?(banner|window|dialog)", re.IGNORECASE),
-    re.compile(r"gdpr[\-_]?(banner|consent|notice)", re.IGNORECASE),
+    re.compile(r"consent[\-_]?(banner|notice|modal|overlay)", re.IGNORECASE),
     re.compile(r"cookie[\-_]?law", re.IGNORECASE),
     re.compile(r"CybotCookiebot", re.IGNORECASE),
 ]
@@ -109,7 +112,7 @@ def detect_footer_privacy_link(soup: Tag) -> tuple[bool, str | None]:
 
 def detect_cookie_banner(soup: Tag) -> CookieBannerInfo:
     """Detect cookie consent banner on the page."""
-    for pattern in _COOKIE_BANNER_PATTERNS:
+    for pattern in _CONSENT_BANNER_PATTERNS:
         for el in soup.find_all(id=pattern):
             return _parse_banner(el)
         for el in soup.find_all(class_=pattern):
@@ -208,7 +211,7 @@ def is_privacy_policy_page(url: str, title: str | None = None) -> bool:
 def extract_banner_policy_links(soup: Tag, page_url: str) -> list[str]:
     """Extract links to privacy/cookie policy pages from cookie banner elements."""
     results: list[str] = []
-    for pattern in _COOKIE_BANNER_PATTERNS:
+    for pattern in _CONSENT_BANNER_PATTERNS:
         for el in (*soup.find_all(id=pattern), *soup.find_all(class_=pattern)):
             for a in el.find_all("a", href=True):
                 text = a.get_text(strip=True)

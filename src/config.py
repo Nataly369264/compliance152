@@ -46,6 +46,7 @@ DB_PATH = _get("DB_PATH", "data/compliance.db")
 MAX_PAGES = int(_get("MAX_PAGES", "100"))
 SCAN_TIMEOUT = int(_get("SCAN_TIMEOUT", "30"))
 CRAWL_DELAY = float(_get("CRAWL_DELAY", "1.0"))
+USE_PLAYWRIGHT = _get("USE_PLAYWRIGHT", "false").lower() == "true"
 
 # Web Search
 SEARCH_BACKEND = _get("SEARCH_BACKEND", "duckduckgo")  # tavily | yandex | duckduckgo

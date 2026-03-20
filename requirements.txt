@@ -9,6 +9,9 @@ httpx>=0.27
 beautifulsoup4>=4.12
 lxml>=5.0
 
+# JS-rendering (optional, requires: playwright install chromium)
+playwright>=1.44
+
 # LLM (Anthropic Claude)
 anthropic>=0.40
 
