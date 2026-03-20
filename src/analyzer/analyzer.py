@@ -26,6 +26,16 @@ from src.models.compliance import (
     Severity,
     Violation,
 )
+from src.scanner.tracker_registry import find_trackers_in_scripts
+
+# Keywords indicating cross-border data transfer in a privacy policy
+_CROSS_BORDER_KEYWORDS = [
+    "трансграничн",
+    "передача за рубеж",
+    "иностранн",
+    "третьи страны",
+    "зарубежн",
+]
 from src.models.scan import ScanResult
 
 logger = logging.getLogger(__name__)
@@ -69,6 +79,7 @@ class ComplianceAnalyzer:
         self._check_cookies()
         self._check_privacy_policy()
         self._check_technical()
+        self._check_trackers()
         self._check_regulatory()
 
         # LLM deep analysis of privacy policy text
@@ -434,6 +445,97 @@ class ComplianceAnalyzer:
             "REG_003", CheckCategory.REGULATORY, CheckStatus.MANUAL_CHECK,
             details="Требуется ручная проверка: хостинг на территории РФ",
         )
+
+    # ── Tracker checks ───────────────────────────────────────────
+
+    def _check_trackers(self) -> None:
+        """TRACKER_001: tracker found but not mentioned in policy text.
+        TRACKER_002: foreign tracker found, no cross-border transfer disclosure.
+
+        Both checks are NOT_APPLICABLE when the privacy policy is not found.
+        Source data: ScanResult.external_scripts (populated by static crawler or Playwright).
+        Legal basis: TRACKER_001 — ст. 18.1 152-ФЗ; TRACKER_002 — ст. 12 152-ФЗ.
+        """
+        pp = self.scan.privacy_policy
+        script_domains = [s.domain for s in self.scan.external_scripts if s.domain]
+        found_trackers = find_trackers_in_scripts(script_domains)
+
+        if not pp.found:
+            for check_id in ("TRACKER_001", "TRACKER_002"):
+                self._add_check(
+                    check_id, CheckCategory.TRACKERS, CheckStatus.NOT_APPLICABLE,
+                    details="Не применимо: политика обработки ПДн не найдена на сайте",
+                )
+            return
+
+        policy_text = (pp.text or "").lower()
+
+        # ── TRACKER_001 ───────────────────────────────────────────
+        if not pp.text:
+            self._add_check(
+                "TRACKER_001", CheckCategory.TRACKERS, CheckStatus.NOT_APPLICABLE,
+                details="Не применимо: текст политики ПДн недоступен для анализа",
+            )
+        else:
+            undisclosed = [
+                t for t in found_trackers
+                if not any(kw in policy_text for kw in t["keywords"])
+            ]
+            if undisclosed:
+                names = ", ".join(t["name"] for t in undisclosed)
+                self._add_check(
+                    "TRACKER_001", CheckCategory.TRACKERS, CheckStatus.FAIL,
+                    details=f"Не упомянуты в политике: {names}",
+                )
+                self._add_violation(
+                    "TRACKER_001",
+                    "Трекеры не упомянуты в политике обработки ПДн",
+                    f"На сайте подключены сервисы, обрабатывающие данные пользователей, "
+                    f"но они не упоминаются в политике обработки ПДн: {names}. "
+                    f"Субъект ПДн не был проинформирован об этих обработчиках.",
+                    Severity.HIGH, CheckCategory.TRACKERS, pp.url,
+                    "ст. 18.1 152-ФЗ",
+                    f"Добавить в политику ПДн раздел о третьих лицах, которым передаются данные, "
+                    f"с указанием каждого сервиса: {names}.",
+                )
+            else:
+                self._add_check(
+                    "TRACKER_001", CheckCategory.TRACKERS, CheckStatus.PASS,
+                    details="Все обнаруженные трекеры упомянуты в политике ПДн"
+                    if found_trackers else "Трекеры из реестра не обнаружены",
+                )
+
+        # ── TRACKER_002 ───────────────────────────────────────────
+        has_cross_border = any(kw in policy_text for kw in _CROSS_BORDER_KEYWORDS)
+        foreign_undisclosed = [
+            t for t in found_trackers
+            if t["is_foreign"] and not has_cross_border
+        ]
+        if foreign_undisclosed:
+            names = ", ".join(t["name"] for t in foreign_undisclosed)
+            self._add_check(
+                "TRACKER_002", CheckCategory.TRACKERS, CheckStatus.FAIL,
+                details=f"Иностранные трекеры без раскрытия трансграничной передачи: {names}",
+            )
+            self._add_violation(
+                "TRACKER_002",
+                "Иностранные трекеры без раскрытия трансграничной передачи данных",
+                f"На сайте подключены иностранные сервисы ({names}), передающие данные "
+                f"пользователей за рубеж, однако политика обработки ПДн не содержит "
+                f"информации о трансграничной передаче данных.",
+                Severity.HIGH, CheckCategory.TRACKERS, pp.url,
+                "ст. 12 152-ФЗ",
+                "Добавить в политику ПДн раздел о трансграничной передаче данных "
+                "с указанием стран назначения и правовых оснований передачи "
+                f"для следующих сервисов: {names}.",
+            )
+        else:
+            self._add_check(
+                "TRACKER_002", CheckCategory.TRACKERS, CheckStatus.PASS,
+                details="Трансграничная передача данных раскрыта в политике"
+                if (has_cross_border and any(t["is_foreign"] for t in found_trackers))
+                else "Иностранные трекеры из реестра не обнаружены",
+            )
 
     # ── LLM analysis ─────────────────────────────────────────────
 

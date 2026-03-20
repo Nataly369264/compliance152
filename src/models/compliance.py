@@ -28,6 +28,7 @@ class CheckCategory(str, Enum):
     PRIVACY_POLICY = "privacy_policy"
     TECHNICAL = "technical"
     REGULATORY = "regulatory"
+    TRACKERS = "trackers"
 
 
 class CheckItem(BaseModel):
