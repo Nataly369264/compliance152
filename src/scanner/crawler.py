@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 from src.knowledge.loader import get_prohibited_service_by_domain
 from src.models.scan import (
     CookieInfo,
-    FormField,
     FormInfo,
     PageInfo,
     PrivacyPolicyInfo,
@@ -20,13 +19,11 @@ from src.models.scan import (
     ScanResult,
 )
 from src.scanner.detectors import (
-    detect_consent_checkbox,
     detect_cookie_banner,
     detect_external_scripts,
     detect_footer_privacy_link,
-    detect_personal_data_fields,
-    detect_privacy_link,
     extract_banner_policy_links,
+    extract_forms,
     is_privacy_policy_page,
 )
 
@@ -275,55 +272,8 @@ class SiteScanner:
         return PrivacyPolicyInfo()
 
     def _extract_forms(self, soup: BeautifulSoup, page_url: str) -> list[FormInfo]:
-        """Extract all HTML forms from a page."""
-        forms: list[FormInfo] = []
-
-        for form in soup.find_all("form"):
-            fields: list[FormField] = []
-
-            for inp in form.find_all(["input", "textarea", "select"]):
-                input_type = inp.get("type", "text")
-                if input_type in ("hidden", "submit", "button", "reset", "image"):
-                    continue
-
-                name = inp.get("name", "")
-                label_text = None
-                inp_id = inp.get("id")
-                if inp_id:
-                    label_el = soup.find("label", attrs={"for": inp_id})
-                    if label_el:
-                        label_text = label_el.get_text(strip=True)
-
-                fields.append(FormField(
-                    name=name,
-                    field_type=input_type,
-                    label=label_text,
-                    required=inp.has_attr("required"),
-                    placeholder=inp.get("placeholder"),
-                ))
-
-            if not fields:
-                continue
-
-            pd_fields = detect_personal_data_fields(fields)
-            has_consent, prechecked, consent_text = detect_consent_checkbox(form)
-            has_privacy, privacy_url = detect_privacy_link(form, soup)
-
-            forms.append(FormInfo(
-                page_url=page_url,
-                action=form.get("action"),
-                method=form.get("method", "GET").upper(),
-                fields=fields,
-                has_consent_checkbox=has_consent,
-                consent_checkbox_prechecked=prechecked,
-                consent_text=consent_text,
-                has_privacy_link=has_privacy,
-                privacy_link_url=privacy_url,
-                collects_personal_data=bool(pd_fields),
-                personal_data_fields=pd_fields,
-            ))
-
-        return forms
+        """Delegate to detectors.extract_forms (shared with PlaywrightCrawler)."""
+        return extract_forms(soup, page_url)
 
     def _extract_privacy_policy(
         self, soup: BeautifulSoup, url: str, has_footer_link: bool,
