@@ -149,8 +149,10 @@ class PlaywrightCrawler:
                     await page.goto(
                         current_url,
                         timeout=self.timeout * 1000,
-                        wait_until="networkidle",
+                        wait_until="domcontentloaded",
                     )
+                    # Allow JS a moment to render dynamic content after DOM load
+                    await asyncio.sleep(2)
                     html = await page.content()
                     soup = BeautifulSoup(html, "lxml")
                     title = soup.title.string.strip() if soup.title and soup.title.string else None
@@ -299,8 +301,9 @@ class PlaywrightCrawler:
                     resp = await page.goto(
                         candidate,
                         timeout=self.timeout * 1000,
-                        wait_until="networkidle",
+                        wait_until="domcontentloaded",
                     )
+                    await asyncio.sleep(1)
                     if not resp or resp.status != 200:
                         continue
                     html = await page.content()

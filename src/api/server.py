@@ -15,6 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from src.analyzer.analyzer import analyze_site
+from src.config import USE_PLAYWRIGHT
 from src.export.docx_converter import MarkdownToDocxConverter
 from src.export.pdf_converter import MarkdownToPdfConverter, create_merged_pdf
 from src.generator.generator import generate_documents
@@ -27,6 +28,20 @@ from src.scheduler.jobs import create_scheduler, run_competitor_check, run_diges
 from src.storage.database import get_db
 from src.updater.updater import DocumentUpdater, process_legal_updates
 from src.web.routes import web_router
+
+
+def _build_scanner(max_pages: int) -> SiteScanner:
+    """Return PlaywrightCrawler or SiteScanner based on USE_PLAYWRIGHT env flag.
+
+    PlaywrightCrawler returns the same ScanResult interface as SiteScanner,
+    so callers need no changes beyond using this factory.
+    No auto-detection logic here — that is a separate Tech Fingerprinting task.
+    """
+    if USE_PLAYWRIGHT:
+        from src.scanner.playwright_crawler import PlaywrightCrawler
+        logger.info("Scanner mode: Playwright (USE_PLAYWRIGHT=true)")
+        return PlaywrightCrawler(max_pages=min(max_pages, 20))
+    return SiteScanner(max_pages=max_pages)
 
 
 
@@ -195,7 +210,7 @@ async def health():
 @app.post("/api/v1/scan", response_model=ScanResponse)
 async def scan_site(request: ScanRequest):
     """Scan a website and return raw scan results."""
-    scanner = SiteScanner(max_pages=request.max_pages)
+    scanner = _build_scanner(request.max_pages)
     try:
         result = await scanner.scan(request.url)
     except Exception as e:
@@ -227,7 +242,7 @@ async def scan_site(request: ScanRequest):
 async def analyze(request: AnalyzeRequest):
     """Scan + analyze a website for 152-FZ compliance."""
     # Step 1: Scan
-    scanner = SiteScanner(max_pages=request.max_pages)
+    scanner = _build_scanner(request.max_pages)
     try:
         scan_result = await scanner.scan(request.url)
     except Exception as e:

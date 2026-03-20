@@ -107,3 +107,4 @@ class ScanResult(BaseModel):
     cookie_banner: CookieBannerInfo = CookieBannerInfo()
     pages_scanned: int = 0
     errors: list[str] = []
+    scan_limitations: list[str] = []  # crawler-level notes (e.g. Playwright fallback)

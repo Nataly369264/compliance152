@@ -555,7 +555,8 @@ class ComplianceAnalyzer:
                 "Рекомендуется проверка в браузере."
             )
 
-        return notes
+        # Prepend crawler-level notes (e.g. Playwright fallback reason)
+        return self.scan.scan_limitations + notes
 
     def _calculate_risk_level(self, score: int, violations: list[Violation]) -> Severity:
         critical_count = sum(1 for v in violations if v.severity == Severity.CRITICAL)
