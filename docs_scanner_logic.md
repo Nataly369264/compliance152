@@ -315,3 +315,12 @@ jQuery, Hammer.js, Google Font API*, jsDelivr, cdnjs, DDoS-Guard, Open Graph, Cl
 | pdfplumber для PDF-политик                          | MEDIUM    |
 | urlscan.io интеграция                               | LOW       |
 | wappalyzer-next fingerprinting                      | LOW       |
+
+### Pre-existing failing tests (не трогать сейчас)
+
+| Тест                                                    | Файл                  | Суть проблемы                                                            |
+| ------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------ |
+| `test_generate_public_documents_partial_failure`        | test_generator.py     | Fallback на шаблон не возвращает `{"error": ...}` — тест ожидает ошибку |
+| `test_generate_documents_convenience_with_error`        | test_generator.py     | То же: LLM error → fallback вместо propagation в error dict             |
+| `test_no_template_generates_from_scratch`               | test_generator.py     | Кириллица в ассерте не совпадает с кодировкой вывода                    |
+| `TestMonitorParseLLMResponse::test_parse_json_embedded` | test_web_tools.py     | `LegalMonitor._parse_llm_response` не парсит JSON внутри текста         |
