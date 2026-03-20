@@ -317,6 +317,27 @@ class ComplianceAnalyzer:
                 "Добавить ссылку на Политику в футер каждой страницы.",
             )
 
+        # PDF / unreadable policy: found=True but text unavailable → skip content checks
+        if not pp.text:
+            _CONTENT_CHECKS = [
+                "POLICY_003", "POLICY_004", "POLICY_005", "POLICY_006",
+                "POLICY_007", "POLICY_008", "POLICY_009", "POLICY_010",
+                "POLICY_011", "POLICY_012", "POLICY_013", "POLICY_014",
+                "POLICY_015", "POLICY_016",
+            ]
+            for _cid in _CONTENT_CHECKS:
+                self._add_check(
+                    _cid, CheckCategory.PRIVACY_POLICY, CheckStatus.NOT_APPLICABLE,
+                    details="Не применимо: текст политики недоступен для автоматического анализа "
+                            "(PDF-документ не удалось прочитать или текст отсутствует)",
+                )
+            self._add_check(
+                "POLICY_017", CheckCategory.PRIVACY_POLICY,
+                CheckStatus.PASS if pp.is_separate_page else CheckStatus.WARNING,
+                details="Политика на отдельной странице: " + ("да" if pp.is_separate_page else "нет"),
+            )
+            return
+
         # Content checks: (check_id, value, title, severity, article, message, recommendation)
         # severity=None → default HIGH; article=None → default ст. 18.1 152-ФЗ
         content_checks: list[tuple] = [
@@ -655,6 +676,15 @@ class ComplianceAnalyzer:
                 "если баннер монтируется JS-библиотекой (OneTrust, Cookiebot и др.), "
                 "кнопки «Принять»/«Отклонить» могут быть не распознаны. "
                 "Рекомендуется проверка в браузере."
+            )
+
+        # PDF policy without extractable text
+        pp = self.scan.privacy_policy
+        if pp.found and not pp.text:
+            notes.append(
+                "Политика ПДн найдена в формате PDF, но текст не удалось извлечь "
+                "(возможно, сканированный документ или защищённый PDF). "
+                "Содержимое политики требует ручной проверки."
             )
 
         # Prepend crawler-level notes (e.g. Playwright fallback reason)

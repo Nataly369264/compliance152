@@ -24,6 +24,7 @@ apscheduler>=3.10
 # Document export
 python-docx>=1.1
 reportlab>=4.0
+pdfplumber>=0.11
 
 # Web UI
 jinja2>=3.1

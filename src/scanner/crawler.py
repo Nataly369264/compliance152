@@ -26,6 +26,11 @@ from src.scanner.detectors import (
     extract_forms,
     is_privacy_policy_page,
 )
+from src.scanner.pdf_extractor import (
+    extract_text_from_pdf,
+    is_pdf_content_type,
+    is_pdf_url,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +102,18 @@ class SiteScanner:
 
                 try:
                     resp = await client.get(current_url)
-                    if "text/html" not in resp.headers.get("content-type", ""):
+                    content_type = resp.headers.get("content-type", "")
+
+                    # PDF branch: policy document served as PDF
+                    if is_pdf_content_type(content_type) or is_pdf_url(current_url):
+                        if (not privacy_policy_info.found
+                                and is_privacy_policy_page(current_url)):
+                            privacy_policy_info = self._extract_privacy_policy_from_pdf(
+                                resp.content, current_url,
+                            )
+                        continue
+
+                    if "text/html" not in content_type:
                         continue
 
                     html = resp.text
@@ -254,7 +270,21 @@ class SiteScanner:
                 resp = await client.get(candidate)
                 if resp.status_code != 200:
                     continue
-                if "text/html" not in resp.headers.get("content-type", ""):
+                content_type = resp.headers.get("content-type", "")
+
+                # PDF fallback: well-known path returned a PDF document
+                if is_pdf_content_type(content_type) or is_pdf_url(candidate):
+                    result = self._extract_privacy_policy_from_pdf(resp.content, candidate)
+                    if result.found:
+                        pages.append(PageInfo(
+                            url=candidate,
+                            title="Политика обработки ПДн (PDF)",
+                            status_code=resp.status_code,
+                        ))
+                        return result
+                    continue
+
+                if "text/html" not in content_type:
                     continue
                 soup = BeautifulSoup(resp.text, "lxml")
                 title = soup.title.string.strip() if soup.title and soup.title.string else None
@@ -278,14 +308,41 @@ class SiteScanner:
     def _extract_privacy_policy(
         self, soup: BeautifulSoup, url: str, has_footer_link: bool,
     ) -> PrivacyPolicyInfo:
-        """Extract and analyze privacy policy content."""
+        """Extract and analyze privacy policy content from HTML."""
         text = soup.get_text(separator="\n", strip=True)
-        text_lower = text.lower()
+        return self._extract_privacy_policy_from_text(text, url, has_footer_link)
 
+    def _extract_privacy_policy_from_pdf(
+        self, content: bytes, url: str,
+    ) -> PrivacyPolicyInfo:
+        """Extract privacy policy from a PDF document.
+
+        If pdfplumber cannot extract usable text (scanned/empty PDF), returns
+        PrivacyPolicyInfo(found=True, text=None) so the analyzer can mark
+        content checks as NOT_APPLICABLE instead of generating false violations.
+        The scan_limitations field is populated by the analyzer._build_scan_limitations().
+        """
+        text = extract_text_from_pdf(content)
+        if text is None:
+            logger.info("PDF policy at %s: text not extractable (scanned or empty)", url)
+            return PrivacyPolicyInfo(
+                found=True,
+                url=url,
+                text=None,
+                is_separate_page=True,
+            )
+        # Reuse HTML extraction logic on the extracted text
+        return self._extract_privacy_policy_from_text(text, url, has_footer_link=False)
+
+    def _extract_privacy_policy_from_text(
+        self, text: str, url: str, has_footer_link: bool,
+    ) -> PrivacyPolicyInfo:
+        """Build PrivacyPolicyInfo from plain text (shared by HTML and PDF paths)."""
+        text_lower = text.lower()
         return PrivacyPolicyInfo(
             found=True,
             url=url,
-            text=text[:20000],  # Limit for LLM analysis
+            text=text[:20000],
             in_footer=has_footer_link,
             has_operator_name=bool(re.search(
                 r"(общество с ограниченной|акционерное общество|индивидуальный предприниматель|ООО|АО|ИП)",
