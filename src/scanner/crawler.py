@@ -76,7 +76,7 @@ class SiteScanner:
         all_scripts: list[dict] = []
         all_cookies: list[CookieInfo] = []
         cookie_banner_info = None
-        privacy_policy_info = PrivacyPolicyInfo()
+        pp_candidates: list[PrivacyPolicyInfo] = []
         ssl_info = SSLInfo()
         errors: list[str] = []
 
@@ -108,11 +108,12 @@ class SiteScanner:
 
                     # PDF branch: policy document served as PDF
                     if is_pdf_content_type(content_type) or is_pdf_url(current_url):
-                        if (not privacy_policy_info.found
-                                and is_privacy_policy_page(current_url)):
-                            privacy_policy_info = self._extract_privacy_policy_from_pdf(
+                        if is_privacy_policy_page(current_url):
+                            candidate = self._extract_privacy_policy_from_pdf(
                                 resp.content, current_url,
                             )
+                            if candidate.found:
+                                pp_candidates.append(candidate)
                         continue
 
                     if "text/html" not in content_type:
@@ -172,10 +173,12 @@ class SiteScanner:
                                     queued.add(norm_bl)
                                     to_visit.insert(0, bl)
 
-                    # Privacy policy detection
-                    if not privacy_policy_info.found and is_privacy_policy_page(current_url, title):
-                        privacy_policy_info = self._extract_privacy_policy(
+                    # Privacy policy detection — collect all candidates
+                    if is_privacy_policy_page(current_url, title):
+                        candidate = self._extract_privacy_policy(
                             soup, current_url, has_footer_link)
+                        if candidate.found:
+                            pp_candidates.append(candidate)
 
                     # Page info
                     pages.append(PageInfo(
@@ -212,14 +215,19 @@ class SiteScanner:
                 if self.crawl_delay > 0 and to_visit:
                     await asyncio.sleep(self.crawl_delay)
 
-            # Fallback: try well-known privacy policy paths if still not found
-            if not privacy_policy_info.found:
-                privacy_policy_info = await self._try_fallback_privacy_urls(
+            # Fallback: try well-known paths if crawl found nothing
+            if not pp_candidates:
+                fallback = await self._try_fallback_privacy_urls(
                     client, base_domain, visited, pages,
                 )
+                if fallback:
+                    pp_candidates.extend(fallback)
 
-        # If we never found a privacy policy, try to find it from links
-        if not privacy_policy_info.found:
+        # Select best candidate or fall back to URL-only marker
+        if pp_candidates:
+            privacy_policy_info = self._select_best_policy(pp_candidates)
+        else:
+            privacy_policy_info = PrivacyPolicyInfo()
             for page in pages:
                 if is_privacy_policy_page(page.url, page.title):
                     privacy_policy_info.found = True
@@ -253,55 +261,56 @@ class SiteScanner:
         base_domain: str,
         visited: set[str],
         pages: list[PageInfo],
-    ) -> PrivacyPolicyInfo:
-        """Try well-known privacy policy URL paths as last resort."""
+    ) -> list[PrivacyPolicyInfo]:
+        """Try well-known privacy policy URL paths and return all found candidates."""
         FALLBACK_PATHS = [
             "/privacy-policy", "/privacy_policy", "/privacy",
             "/documents/privacy-policy", "/documents/privacy_policy",
             "/legal/privacy", "/legal/privacy-policy",
             "/info/privacy", "/pages/privacy-policy",
-            "/personal-data", "/personalnyye-dannyye",
             "/politika-konfidencialnosti", "/obrabotka-personalnyh-dannyh",
+            "/personal-data", "/personalnyye-dannyye",
         ]
+        candidates: list[PrivacyPolicyInfo] = []
         for path in FALLBACK_PATHS:
-            candidate = f"https://{base_domain}{path}"
-            norm = self._normalize_url(candidate)
+            url = f"https://{base_domain}{path}"
+            norm = self._normalize_url(url)
             if norm in visited:
                 continue
             try:
-                resp = await client.get(candidate)
+                resp = await client.get(url)
                 if resp.status_code != 200:
                     continue
                 content_type = resp.headers.get("content-type", "")
 
                 # PDF fallback: well-known path returned a PDF document
-                if is_pdf_content_type(content_type) or is_pdf_url(candidate):
-                    result = self._extract_privacy_policy_from_pdf(resp.content, candidate)
+                if is_pdf_content_type(content_type) or is_pdf_url(url):
+                    result = self._extract_privacy_policy_from_pdf(resp.content, url)
                     if result.found:
                         pages.append(PageInfo(
-                            url=candidate,
+                            url=url,
                             title="Политика обработки ПДн (PDF)",
                             status_code=resp.status_code,
                         ))
-                        return result
+                        candidates.append(result)
                     continue
 
                 if "text/html" not in content_type:
                     continue
                 soup = BeautifulSoup(resp.text, "lxml")
                 title = soup.title.string.strip() if soup.title and soup.title.string else None
-                if is_privacy_policy_page(candidate, title):
+                if is_privacy_policy_page(url, title):
                     has_footer_link, _ = detect_footer_privacy_link(soup)
                     pages.append(PageInfo(
-                        url=candidate,
+                        url=url,
                         title=title,
                         status_code=resp.status_code,
                         has_privacy_link_in_footer=has_footer_link,
                     ))
-                    return self._extract_privacy_policy(soup, candidate, has_footer_link)
+                    candidates.append(self._extract_privacy_policy(soup, url, has_footer_link))
             except Exception as e:
-                logger.debug("Fallback privacy URL %s failed: %s", candidate, e)
-        return PrivacyPolicyInfo()
+                logger.debug("Fallback privacy URL %s failed: %s", url, e)
+        return candidates
 
     def _extract_forms(self, soup: BeautifulSoup, page_url: str) -> list[FormInfo]:
         """Delegate to detectors.extract_forms (shared with PlaywrightCrawler)."""
@@ -442,3 +451,31 @@ class SiteScanner:
     def _should_skip(url: str) -> bool:
         path = urlparse(url).path.lower()
         return any(path.endswith(ext) for ext in SKIP_EXTENSIONS)
+
+    @staticmethod
+    def _url_priority(url: str) -> int:
+        """Score URL by policy-keyword specificity (higher = better)."""
+        path = urlparse(url).path.lower()
+        if "politika" in path:
+            return 4
+        if "policy" in path:
+            return 3
+        if "privacy" in path:
+            return 2
+        if "personal" in path:
+            return 1
+        return 0
+
+    @classmethod
+    def _select_best_policy(cls, candidates: list[PrivacyPolicyInfo]) -> PrivacyPolicyInfo:
+        """Pick the best privacy policy candidate.
+
+        Priority:
+        1. Longest text (most complete document)
+        2. URL keyword score: politika > policy > privacy > personal
+        3. First found (stable tie-break)
+        """
+        return max(
+            candidates,
+            key=lambda p: (len(p.text or ""), cls._url_priority(p.url or "")),
+        )
