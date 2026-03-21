@@ -228,11 +228,21 @@ class SiteScanner:
             privacy_policy_info = self._select_best_policy(pp_candidates)
         else:
             privacy_policy_info = PrivacyPolicyInfo()
+            # 1) Pages successfully crawled (have title info)
             for page in pages:
                 if is_privacy_policy_page(page.url, page.title):
                     privacy_policy_info.found = True
                     privacy_policy_info.url = page.url
                     break
+            # 2) Visited URLs that errored during crawl (no text, URL-only)
+            if not privacy_policy_info.found:
+                policy_visited = [
+                    u for u in visited if is_privacy_policy_page(u)
+                ]
+                if policy_visited:
+                    best_url = max(policy_visited, key=self._url_priority)
+                    privacy_policy_info.found = True
+                    privacy_policy_info.url = best_url
 
         # Deduplicate external scripts
         seen_urls: set[str] = set()
