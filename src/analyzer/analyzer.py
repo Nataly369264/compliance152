@@ -23,6 +23,7 @@ from src.models.compliance import (
     ComplianceReport,
     FineEstimate,
     FineItem,
+    ScanMetadata,
     Severity,
     Violation,
 )
@@ -108,6 +109,19 @@ class ComplianceAnalyzer:
         # LLM summary
         summary = await self._generate_summary()
 
+        pp = self.scan.privacy_policy
+        scan_metadata = ScanMetadata(
+            source_url=pp.url,
+            fetched_at=pp.fetched_at,
+            content_length=pp.content_length,
+            text_hash=pp.text_hash,
+            text_truncated=(
+                pp.content_length > len(pp.text)
+                if pp.content_length is not None and pp.text is not None
+                else None
+            ),
+        ) if pp.found else None
+
         return ComplianceReport(
             id=str(uuid.uuid4()),
             site_url=self.scan.url,
@@ -124,6 +138,7 @@ class ComplianceAnalyzer:
             llm_analysis=llm_analysis,
             summary=summary,
             scan_limitations=self._build_scan_limitations(),
+            scan_metadata=scan_metadata,
         )
 
     # ── Form checks ──────────────────────────────────────────────
@@ -570,8 +585,7 @@ class ComplianceAnalyzer:
             return None
 
         try:
-            # Truncate very long policies
-            text = pp.text[:15000]
+            text = pp.text
 
             # Enhance system prompt with web context if available
             system = PRIVACY_POLICY_ANALYSIS_SYSTEM

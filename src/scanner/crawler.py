@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import re
+from datetime import datetime
 from urllib.parse import urljoin, urlparse
 
 import httpx
@@ -339,10 +341,15 @@ class SiteScanner:
     ) -> PrivacyPolicyInfo:
         """Build PrivacyPolicyInfo from plain text (shared by HTML and PDF paths)."""
         text_lower = text.lower()
+        text_hash = hashlib.sha256(text.encode("utf-8", errors="replace")).hexdigest()
+        content_length = len(text)
         return PrivacyPolicyInfo(
             found=True,
             url=url,
-            text=text[:20000],
+            text=text[:100000],
+            text_hash=text_hash,
+            fetched_at=datetime.utcnow(),
+            content_length=content_length,
             in_footer=has_footer_link,
             has_operator_name=bool(re.search(
                 r"(общество с ограниченной|акционерное общество|индивидуальный предприниматель|ООО|АО|ИП)",
