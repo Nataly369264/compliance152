@@ -182,11 +182,11 @@ async def test_generate_public_documents_partial_failure():
         results = await gen.generate_public_documents()
 
     assert len(results) == len(PUBLIC_DOCUMENTS)
-    errors = [r for r in results if "error" in r]
-    successes = [r for r in results if "error" not in r]
-    assert len(errors) == 1
+    # When LLM fails, generator falls back to template — all results are valid docs
+    fallbacks = [r for r in results if "content_md" in r and "⚠️" in r["content_md"]]
+    successes = [r for r in results if "content_md" in r and "⚠️" not in r["content_md"]]
+    assert len(fallbacks) == 1
     assert len(successes) == 2
-    assert "LLM API error" in errors[0]["error"]
 
 
 @pytest.mark.asyncio
@@ -234,7 +234,9 @@ async def test_generate_documents_convenience_with_error():
         results = await generate_documents(org, doc_types=["privacy_policy", "cookie_policy"], enable_web_verification=False)
 
     assert len(results) == 2
-    assert "error" in results[0]
+    # When LLM fails, generator falls back to template — result is a valid doc with disclaimer
+    assert "content_md" in results[0]
+    assert "⚠️" in results[0]["content_md"]
     assert results[1]["content_md"] == "# Ок"
 
 
@@ -275,13 +277,13 @@ async def test_llm_receives_template_content():
 
 @pytest.mark.asyncio
 async def test_no_template_generates_from_scratch():
-    """Documents without templates (rkn_notification etc.) get fallback instruction."""
+    """Documents without templates (employee_consent) get fallback instruction."""
     org = _make_org()
     gen = DocumentGenerator(org, enable_web_verification=False)
 
     with patch("src.generator.generator.call_llm", new_callable=AsyncMock) as mock_llm:
         mock_llm.return_value = "doc"
-        await gen.generate_document("rkn_notification")
+        await gen.generate_document("employee_consent")
 
     user_prompt = mock_llm.call_args.kwargs["user_prompt"]
     assert "Шаблон отсутствует" in user_prompt

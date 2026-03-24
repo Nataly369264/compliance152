@@ -34,7 +34,7 @@ def parse_llm_json(response: str) -> dict | list | None:
         pass
 
     # Try to extract the first complete JSON object or array from prose
-    for start_char, end_char in [("{", "}"), ("[", "]")]:
+    for start_char, end_char in [("[", "]"), ("{", "}")]:
         start = text.find(start_char)
         end = text.rfind(end_char)
         if start != -1 and end != -1 and end > start:
