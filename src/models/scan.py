@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -78,6 +80,9 @@ class PrivacyPolicyInfo(BaseModel):
     has_date: bool = False
     is_russian: bool = True
     is_separate_page: bool = False
+    text_hash: str | None = None
+    fetched_at: datetime | None = None
+    content_length: int | None = None
 
 
 class SSLInfo(BaseModel):
@@ -107,3 +112,4 @@ class ScanResult(BaseModel):
     cookie_banner: CookieBannerInfo = CookieBannerInfo()
     pages_scanned: int = 0
     errors: list[str] = []
+    scan_limitations: list[str] = []  # crawler-level notes (e.g. Playwright fallback)

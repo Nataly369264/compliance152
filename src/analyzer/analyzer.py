@@ -23,9 +23,20 @@ from src.models.compliance import (
     ComplianceReport,
     FineEstimate,
     FineItem,
+    ScanMetadata,
     Severity,
     Violation,
 )
+from src.scanner.tracker_registry import find_trackers_in_scripts
+
+# Keywords indicating cross-border data transfer in a privacy policy
+_CROSS_BORDER_KEYWORDS = [
+    "трансграничн",
+    "передача за рубеж",
+    "иностранн",
+    "третьи страны",
+    "зарубежн",
+]
 from src.models.scan import ScanResult
 
 logger = logging.getLogger(__name__)
@@ -69,6 +80,7 @@ class ComplianceAnalyzer:
         self._check_cookies()
         self._check_privacy_policy()
         self._check_technical()
+        self._check_trackers()
         self._check_regulatory()
 
         # LLM deep analysis of privacy policy text
@@ -97,6 +109,19 @@ class ComplianceAnalyzer:
         # LLM summary
         summary = await self._generate_summary()
 
+        pp = self.scan.privacy_policy
+        scan_metadata = ScanMetadata(
+            source_url=pp.url,
+            fetched_at=pp.fetched_at,
+            content_length=pp.content_length,
+            text_hash=pp.text_hash,
+            text_truncated=(
+                pp.content_length > len(pp.text)
+                if pp.content_length is not None and pp.text is not None
+                else None
+            ),
+        ) if pp.found else None
+
         return ComplianceReport(
             id=str(uuid.uuid4()),
             site_url=self.scan.url,
@@ -113,6 +138,7 @@ class ComplianceAnalyzer:
             llm_analysis=llm_analysis,
             summary=summary,
             scan_limitations=self._build_scan_limitations(),
+            scan_metadata=scan_metadata,
         )
 
     # ── Form checks ──────────────────────────────────────────────
@@ -306,6 +332,27 @@ class ComplianceAnalyzer:
                 "Добавить ссылку на Политику в футер каждой страницы.",
             )
 
+        # PDF / unreadable policy: found=True but text unavailable → skip content checks
+        if not pp.text:
+            _CONTENT_CHECKS = [
+                "POLICY_003", "POLICY_004", "POLICY_005", "POLICY_006",
+                "POLICY_007", "POLICY_008", "POLICY_009", "POLICY_010",
+                "POLICY_011", "POLICY_012", "POLICY_013", "POLICY_014",
+                "POLICY_015", "POLICY_016",
+            ]
+            for _cid in _CONTENT_CHECKS:
+                self._add_check(
+                    _cid, CheckCategory.PRIVACY_POLICY, CheckStatus.NOT_APPLICABLE,
+                    details="Не применимо: текст политики недоступен для автоматического анализа "
+                            "(PDF-документ не удалось прочитать или текст отсутствует)",
+                )
+            self._add_check(
+                "POLICY_017", CheckCategory.PRIVACY_POLICY,
+                CheckStatus.PASS if pp.is_separate_page else CheckStatus.WARNING,
+                details="Политика на отдельной странице: " + ("да" if pp.is_separate_page else "нет"),
+            )
+            return
+
         # Content checks: (check_id, value, title, severity, article, message, recommendation)
         # severity=None → default HIGH; article=None → default ст. 18.1 152-ФЗ
         content_checks: list[tuple] = [
@@ -435,6 +482,97 @@ class ComplianceAnalyzer:
             details="Требуется ручная проверка: хостинг на территории РФ",
         )
 
+    # ── Tracker checks ───────────────────────────────────────────
+
+    def _check_trackers(self) -> None:
+        """TRACKER_001: tracker found but not mentioned in policy text.
+        TRACKER_002: foreign tracker found, no cross-border transfer disclosure.
+
+        Both checks are NOT_APPLICABLE when the privacy policy is not found.
+        Source data: ScanResult.external_scripts (populated by static crawler or Playwright).
+        Legal basis: TRACKER_001 — ст. 18.1 152-ФЗ; TRACKER_002 — ст. 12 152-ФЗ.
+        """
+        pp = self.scan.privacy_policy
+        script_domains = [s.domain for s in self.scan.external_scripts if s.domain]
+        found_trackers = find_trackers_in_scripts(script_domains)
+
+        if not pp.found:
+            for check_id in ("TRACKER_001", "TRACKER_002"):
+                self._add_check(
+                    check_id, CheckCategory.TRACKERS, CheckStatus.NOT_APPLICABLE,
+                    details="Не применимо: политика обработки ПДн не найдена на сайте",
+                )
+            return
+
+        policy_text = (pp.text or "").lower()
+
+        # ── TRACKER_001 ───────────────────────────────────────────
+        if not pp.text:
+            self._add_check(
+                "TRACKER_001", CheckCategory.TRACKERS, CheckStatus.NOT_APPLICABLE,
+                details="Не применимо: текст политики ПДн недоступен для анализа",
+            )
+        else:
+            undisclosed = [
+                t for t in found_trackers
+                if not any(kw in policy_text for kw in t["keywords"])
+            ]
+            if undisclosed:
+                names = ", ".join(t["name"] for t in undisclosed)
+                self._add_check(
+                    "TRACKER_001", CheckCategory.TRACKERS, CheckStatus.FAIL,
+                    details=f"Не упомянуты в политике: {names}",
+                )
+                self._add_violation(
+                    "TRACKER_001",
+                    "Трекеры не упомянуты в политике обработки ПДн",
+                    f"На сайте подключены сервисы, обрабатывающие данные пользователей, "
+                    f"но они не упоминаются в политике обработки ПДн: {names}. "
+                    f"Субъект ПДн не был проинформирован об этих обработчиках.",
+                    Severity.HIGH, CheckCategory.TRACKERS, pp.url,
+                    "ст. 18.1 152-ФЗ",
+                    f"Добавить в политику ПДн раздел о третьих лицах, которым передаются данные, "
+                    f"с указанием каждого сервиса: {names}.",
+                )
+            else:
+                self._add_check(
+                    "TRACKER_001", CheckCategory.TRACKERS, CheckStatus.PASS,
+                    details="Все обнаруженные трекеры упомянуты в политике ПДн"
+                    if found_trackers else "Трекеры из реестра не обнаружены",
+                )
+
+        # ── TRACKER_002 ───────────────────────────────────────────
+        has_cross_border = any(kw in policy_text for kw in _CROSS_BORDER_KEYWORDS)
+        foreign_undisclosed = [
+            t for t in found_trackers
+            if t["is_foreign"] and not has_cross_border
+        ]
+        if foreign_undisclosed:
+            names = ", ".join(t["name"] for t in foreign_undisclosed)
+            self._add_check(
+                "TRACKER_002", CheckCategory.TRACKERS, CheckStatus.FAIL,
+                details=f"Иностранные трекеры без раскрытия трансграничной передачи: {names}",
+            )
+            self._add_violation(
+                "TRACKER_002",
+                "Иностранные трекеры без раскрытия трансграничной передачи данных",
+                f"На сайте подключены иностранные сервисы ({names}), передающие данные "
+                f"пользователей за рубеж, однако политика обработки ПДн не содержит "
+                f"информации о трансграничной передаче данных.",
+                Severity.HIGH, CheckCategory.TRACKERS, pp.url,
+                "ст. 12 152-ФЗ",
+                "Добавить в политику ПДн раздел о трансграничной передаче данных "
+                "с указанием стран назначения и правовых оснований передачи "
+                f"для следующих сервисов: {names}.",
+            )
+        else:
+            self._add_check(
+                "TRACKER_002", CheckCategory.TRACKERS, CheckStatus.PASS,
+                details="Трансграничная передача данных раскрыта в политике"
+                if (has_cross_border and any(t["is_foreign"] for t in found_trackers))
+                else "Иностранные трекеры из реестра не обнаружены",
+            )
+
     # ── LLM analysis ─────────────────────────────────────────────
 
     async def _analyze_policy_with_llm(self) -> str | None:
@@ -447,8 +585,7 @@ class ComplianceAnalyzer:
             return None
 
         try:
-            # Truncate very long policies
-            text = pp.text[:15000]
+            text = pp.text
 
             # Enhance system prompt with web context if available
             system = PRIVACY_POLICY_ANALYSIS_SYSTEM
@@ -555,7 +692,17 @@ class ComplianceAnalyzer:
                 "Рекомендуется проверка в браузере."
             )
 
-        return notes
+        # PDF policy without extractable text
+        pp = self.scan.privacy_policy
+        if pp.found and not pp.text:
+            notes.append(
+                "Политика ПДн найдена в формате PDF, но текст не удалось извлечь "
+                "(возможно, сканированный документ или защищённый PDF). "
+                "Содержимое политики требует ручной проверки."
+            )
+
+        # Prepend crawler-level notes (e.g. Playwright fallback reason)
+        return self.scan.scan_limitations + notes
 
     def _calculate_risk_level(self, score: int, violations: list[Violation]) -> Severity:
         critical_count = sum(1 for v in violations if v.severity == Severity.CRITICAL)

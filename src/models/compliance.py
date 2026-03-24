@@ -28,6 +28,7 @@ class CheckCategory(str, Enum):
     PRIVACY_POLICY = "privacy_policy"
     TECHNICAL = "technical"
     REGULATORY = "regulatory"
+    TRACKERS = "trackers"
 
 
 class CheckItem(BaseModel):
@@ -60,6 +61,14 @@ class FineEstimate(BaseModel):
     breakdown: list[FineItem] = []
 
 
+class ScanMetadata(BaseModel):
+    source_url: str | None = None
+    fetched_at: datetime | None = None
+    content_length: int | None = None
+    text_hash: str | None = None
+    text_truncated: bool | None = None
+
+
 class FineItem(BaseModel):
     violation: str
     min_fine: int
@@ -84,3 +93,4 @@ class ComplianceReport(BaseModel):
     llm_analysis: str | None = None  # Глубокий анализ политики от LLM
     summary: str = ""
     scan_limitations: list[str] = []  # Предупреждения об ограничениях статичного парсера
+    scan_metadata: ScanMetadata | None = None

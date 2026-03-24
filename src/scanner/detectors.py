@@ -7,7 +7,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import Tag
 
-from src.models.scan import CookieBannerInfo, ExternalScript, FormField
+from src.models.scan import CookieBannerInfo, ExternalScript, FormField, FormInfo
 
 logger = logging.getLogger(__name__)
 
@@ -40,14 +40,73 @@ _LEGAL_PATH_RE = re.compile(
     re.IGNORECASE,
 )
 
-_COOKIE_BANNER_PATTERNS: list[re.Pattern[str]] = [
+# Patterns for cookie/consent banner detection by CSS class or id.
+# Named "consent" (not "gdpr") because we detect by technical marker,
+# not by legal framework — 152-FZ only, no GDPR logic.
+_CONSENT_BANNER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"cookie[\-_]?(banner|consent|notice|popup|bar|modal|overlay)", re.IGNORECASE),
     re.compile(r"cookiebot", re.IGNORECASE),
     re.compile(r"cc[\-_]?(banner|window|dialog)", re.IGNORECASE),
-    re.compile(r"gdpr[\-_]?(banner|consent|notice)", re.IGNORECASE),
+    re.compile(r"consent[\-_]?(banner|notice|modal|overlay)", re.IGNORECASE),
     re.compile(r"cookie[\-_]?law", re.IGNORECASE),
     re.compile(r"CybotCookiebot", re.IGNORECASE),
 ]
+
+
+def extract_forms(soup: Tag, page_url: str) -> list[FormInfo]:
+    """Extract all HTML forms from a page and annotate with 152-FZ relevant data.
+
+    Shared by SiteScanner (crawler.py) and PlaywrightCrawler (playwright_crawler.py)
+    so both crawlers produce identical FormInfo output without duplicating logic.
+    """
+    forms: list[FormInfo] = []
+
+    for form in soup.find_all("form"):
+        fields: list[FormField] = []
+
+        for inp in form.find_all(["input", "textarea", "select"]):
+            input_type = inp.get("type", "text")
+            if input_type in ("hidden", "submit", "button", "reset", "image"):
+                continue
+
+            name = inp.get("name", "")
+            label_text = None
+            inp_id = inp.get("id")
+            if inp_id:
+                label_el = soup.find("label", attrs={"for": inp_id})
+                if label_el:
+                    label_text = label_el.get_text(strip=True)
+
+            fields.append(FormField(
+                name=name,
+                field_type=input_type,
+                label=label_text,
+                required=inp.has_attr("required"),
+                placeholder=inp.get("placeholder"),
+            ))
+
+        if not fields:
+            continue
+
+        pd_fields = detect_personal_data_fields(fields)
+        has_consent, prechecked, consent_text = detect_consent_checkbox(form)
+        has_privacy, privacy_url = detect_privacy_link(form, soup)
+
+        forms.append(FormInfo(
+            page_url=page_url,
+            action=form.get("action"),
+            method=form.get("method", "GET").upper(),
+            fields=fields,
+            has_consent_checkbox=has_consent,
+            consent_checkbox_prechecked=prechecked,
+            consent_text=consent_text,
+            has_privacy_link=has_privacy,
+            privacy_link_url=privacy_url,
+            collects_personal_data=bool(pd_fields),
+            personal_data_fields=pd_fields,
+        ))
+
+    return forms
 
 
 def detect_personal_data_fields(fields: list[FormField]) -> list[str]:
@@ -109,7 +168,7 @@ def detect_footer_privacy_link(soup: Tag) -> tuple[bool, str | None]:
 
 def detect_cookie_banner(soup: Tag) -> CookieBannerInfo:
     """Detect cookie consent banner on the page."""
-    for pattern in _COOKIE_BANNER_PATTERNS:
+    for pattern in _CONSENT_BANNER_PATTERNS:
         for el in soup.find_all(id=pattern):
             return _parse_banner(el)
         for el in soup.find_all(class_=pattern):
@@ -208,7 +267,7 @@ def is_privacy_policy_page(url: str, title: str | None = None) -> bool:
 def extract_banner_policy_links(soup: Tag, page_url: str) -> list[str]:
     """Extract links to privacy/cookie policy pages from cookie banner elements."""
     results: list[str] = []
-    for pattern in _COOKIE_BANNER_PATTERNS:
+    for pattern in _CONSENT_BANNER_PATTERNS:
         for el in (*soup.find_all(id=pattern), *soup.find_all(class_=pattern)):
             for a in el.find_all("a", href=True):
                 text = a.get_text(strip=True)
