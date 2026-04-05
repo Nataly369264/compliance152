@@ -320,7 +320,66 @@ jQuery, Hammer.js, Google Font API*, jsDelivr, cdnjs, DDoS-Guard, Open Graph, Cl
 | pdfplumber для PDF-политик                          | HIGH — следующий |
 | Явная обработка 403/429 → scan_limitations          | MEDIUM           |
 | urlscan.io интеграция                               | LOW              |
-| wappalyzer-next fingerprinting                      | LOW              |
+| wappalyzer-next fingerprinting                      | LOW — план готов |
+
+---
+
+### План интеграции: wappalyzer-next (26.03.2026)
+
+**Цель:** автоматически определять технологии сайта (CMS, аналитику, трекеры) по HTML и заголовкам ответа — без внешних API-запросов.
+
+**Пакет:** [`wappalyzer-next`](https://github.com/webscraperapi/wappalyzer) — Python, локальный, open-source.
+
+#### Шаг 1 — Установка
+```
+pip install wappalyzer-next
+```
+Добавить в `requirements.txt`:
+```
+wappalyzer-next>=0.4
+```
+
+#### Шаг 2 — Поле в ScanResult (`src/models/scan.py`)
+Добавить поле в класс `ScanResult`:
+```python
+technologies: list[str] = []  # detected by Wappalyzer fingerprinting
+```
+
+#### Шаг 3 — Интеграция в PlaywrightCrawler (`src/scanner/playwright_crawler.py`)
+В методе `_crawl()`, после получения `html` и `headers` страницы (на главной странице, `len(visited) == 0`):
+```python
+from Wappalyzer import Wappalyzer, WebPage
+wappalyzer = Wappalyzer.latest()
+response_headers = await page.evaluate("() => Object.fromEntries(Object.entries({}))") # заголовки через Playwright response
+webpage = WebPage(current_url, html, headers)
+detected = wappalyzer.analyze(webpage)
+# сохранить в result, передать в ScanResult
+```
+Заголовки ответа в Playwright доступны через `response.headers` (объект `Response` из `page.goto()`).
+
+#### Шаг 4 — Интеграция в SiteScanner (`src/scanner/crawler.py`)
+Аналогично: после `response = await client.get(url)` взять `response.headers` и `response.text`.
+
+#### Шаг 5 — Использование в анализаторе (`src/analyzer/analyzer.py`)
+Wappalyzer даёт список технологий, например: `{"Google Analytics", "Yandex.Metrika", "React", "Tilda"}`.
+
+Применение:
+- Если в `technologies` есть трекер (Google Analytics, Meta Pixel и т.д.), а в политике он не упомянут → усиливает TRACKER_001 (HIGH, ст. 18.1)
+- Если иностранный сервис (Meta, Google) → усиливает TRACKER_002 (HIGH, ст. 12)
+- Тип CMS/фреймворка (React, Next.js, Vue) → подсказка для отчёта: «сайт использует SPA, часть контента может быть не обнаружена статичным сканером»
+
+#### Шаг 6 — Тесты
+- `tests/test_playwright_crawler.py` — мок Wappalyzer, проверить что `technologies` попадает в `ScanResult`
+- `tests/test_analyzer.py` — проверить что технология-трекер без упоминания в политике → TRACKER_001
+
+#### Возможные проблемы
+- База fingerprints грузится ~1с при первом запуске (кешируется). Некритично.
+- `wappalyzer-next` не обновляется часто. Если устарел — альтернатива: [`webtech`](https://github.com/ShielderSec/webtech).
+- Для точного определения нужны HTTP-заголовки (`X-Powered-By`, `Server` и т.д.) — в Playwright они доступны, в httpx тоже.
+
+**Оценка:** 1.5–2 часа с тестами.
+
+---
 
 ### Pre-existing failing tests (не трогать сейчас)
 
