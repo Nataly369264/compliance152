@@ -1,0 +1,170 @@
+# PATTERNS.md — Реестр решений и паттернов
+
+---
+
+### Крупные российские сайты блокируют SiteScanner (httpx) через WAF
+
+**Контекст:** тестирование сканера на реальных сайтах (2026-04-04).
+
+**Проблема:** SiteScanner (httpx) не проходит через WAF/anti-bot защиту на крупных e-commerce и госсайтах:
+- Wildberries: HTTP 498 + JS-challenge → `illegal status line` в httpx (CASE-001)
+- Ozon: HTTP 403 (Cloudflare/WAF) → страница засчитывается как просканированная, ошибка не фиксируется (CASE-003)
+- DNS Shop: HTTP 401 (Qrator WAF) → то же молчаливое поведение (CASE-005)
+
+**Решение:** для сайтов с WAF обязательно использовать PlaywrightCrawler (headless Chromium). httpx-сканер пригоден только для сайтов без бот-защиты или для быстрой проверки небольших сайтов.
+
+**Где применено:** `src/scanner/crawler.py` (SiteScanner), `src/scanner/playwright_crawler.py` (PlaywrightCrawler)
+
+**Когда пригодится снова:** при добавлении новых сайтов в тестовую матрицу — сначала проверять наличие WAF через curl (`HTTP 401/403/498`), и если есть — сразу использовать Playwright.
+
+**Сопутствующие баги (не паттерн, но важно):**
+- 4xx-ответы httpx не фиксируются в `errors[]` и засчитываются в `pages_scanned` — «молчаливый провал»
+- `str(ConnectTimeout)` = `''` → в `errors[]` запись вида `"url: "` без типа исключения
+
+---
+
+### AsyncClient mock для SiteScanner smoke-тестов
+
+**Контекст:** написание smoke-тестов для `SiteScanner.scan()` без реальных HTTP-запросов.
+
+**Проблема:** `scan()` создаёт `httpx.AsyncClient` через `async with` внутри метода — патчить клиент напрямую нельзя, нужно патчить точку создания. Кроме того, метод делает два типа запросов: `HEAD` (для `_check_ssl`) и `GET` (для страниц).
+
+**Решение:** патчить `src.scanner.crawler.httpx.AsyncClient`, возвращая `AsyncMock`, у которого `__aenter__` возвращает сам себя, а `head` и `get` — разные заготовленные ответы.
+
+```python
+mock_client = AsyncMock()
+mock_client.head = AsyncMock(return_value=ssl_resp)
+mock_client.get = AsyncMock(return_value=main_resp)
+mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+mock_client.__aexit__ = AsyncMock(return_value=False)
+
+with patch("src.scanner.crawler.httpx.AsyncClient", return_value=mock_client):
+    result = await scanner.scan("https://example.com")
+```
+
+**Где применено:** `tests/test_crawler.py` — все тесты групп A, B, C.
+
+**Когда пригодится снова:** любой тест, покрывающий метод, который создаёт `httpx.AsyncClient` внутри себя через `async with`. Паттерн — патчить в модуле-потребителе, не в `httpx`.
+
+---
+
+### asyncio_mode = "auto" — без @pytest.mark.asyncio
+
+**Контекст:** проект использует `pytest-asyncio` с настройкой `asyncio_mode = "auto"` в `pyproject.toml`.
+
+**Проблема:** нет необходимости декорировать каждый `async def test_*` через `@pytest.mark.asyncio`.
+
+**Решение:** все async-тесты запускаются автоматически. Декоратор не нужен — без него чище и короче.
+
+**Где применено:** `tests/test_crawler.py`.
+
+**Когда пригодится снова:** при добавлении новых async-тестов в этот проект. Проверить `pyproject.toml` → `[tool.pytest.ini_options]` → `asyncio_mode`.
+
+---
+
+### «Готово в паспорте» ≠ «готово в Git» — урок 2026-04-05
+
+**Контекст:** при подготовке к валидационному прогону сканера на эталонном сайте 
+обнаружили, что в рабочей копии накопилось 13 modified-файлов + 4 untracked 
+от предыдущих 2–3 сессий. Суммарно ~800 добавленных строк кода: весь Этап 5 
+(CONSENT_001–005, _check_consent, 8 тестов) и весь Этап 6.1–6.4 (utils.py, 
+smoke-тесты, детекторы OneTrust/CookieYes, перехват запросов в Playwright). 
+В PROJECT_PASSPORT.md эта работа была отмечена как `✅ Готово`, `199 passed / 0 failed` — 
+и это было правдой фактически, но неправдой формально: в Git ничего не было.
+
+**Проблема:** паспорт проекта как источник правды разошёлся с Git. При взгляде 
+на паспорт создавалось ощущение, что всё в порядке. На самом деле 800 строк 
+рабочего кода жили на одном диске, без резервной копии, без истории, без возможности 
+откатить изменения. Одна неудачная команда (`git reset --hard`, `git clean -fd`, 
+переключение ветки с конфликтом) — и работа исчезла бы без следа.
+
+**Причина:** в процессе не было двух ритуалов — проверки `git status` в начале 
+сессии и в конце. Claude Code писал «готово», пользователь видел в паспорте «готово», 
+никто не смотрел в `git log`. Разрыв нарастал 2–3 сессии, пока мы не наткнулись 
+на него случайно при подготовке к другой задаче.
+
+**Решение:** переписан §13 `CLAUDE_CODE_RULES.md` — добавлены ритуалы начала 
+и конца сессии (обязательный `git status`/`git log` с резюме), правило «перед 
+коммитом — pytest», правило «паспорт говорит готово только когда коммит в origin». 
+Дополнительно в блок «Как использовать этот файл» добавлен автозапуск ритуала 
+начала — Claude Code выполняет его сразу после прочтения правил, без отдельной 
+команды пользователя.
+
+**Где применено:** `CLAUDE_CODE_RULES.md` §13 и финальный блок.
+
+**Когда пригодится снова:** этот урок — не про Git и не про сканер. Он про любое 
+расхождение между «источником правды на бумаге» (паспорт, чеклист, README) 
+и «реальным состоянием системы» (Git, база данных, развёрнутый сервис). 
+Как только появляется такой разрыв — появляется риск тихой потери работы. 
+Лечение одно: процедура, которая регулярно сверяет бумажный источник с реальным.
+
+---
+
+### Рассинхронизация _extract_privacy_policy между краулерами
+
+**Контекст:** рефакторинг 6.2 — сравнение двух реализаций `_extract_privacy_policy` в `crawler.py` и `playwright_crawler.py`.
+
+**Проблема:** комментарий `# identical to crawler.py` в `playwright_crawler.py` ложный. Реальные отличия:
+- Truncation текста: `text[:20_000]` (Playwright) vs `text[:100_000]` (SiteScanner)
+- В Playwright-версии отсутствуют поля: `text_hash`, `fetched_at`, `content_length`
+- Это означает, что JS-скан даёт менее полный `PrivacyPolicyInfo`, чем статический
+
+**Где обнаружено:** задача 6.2, сравнение файлов `src/scanner/crawler.py` и `src/scanner/playwright_crawler.py`.
+
+**Когда пригодится снова:** при добавлении новых полей в `PrivacyPolicyInfo` — нужно синхронно обновлять оба краулера. Рекомендуется вынести логику в `_extract_privacy_policy_from_text` (уже есть в crawler.py) и использовать оттуда.
+
+---
+
+### _try_fallback_privacy_urls — одинаковое название, разная природа
+
+**Контекст:** рефакторинг 6.2 — анализ кандидатов на вынос в utils.
+
+**Проблема:** метод есть в обоих краулерах, называется одинаково — похоже на дубль, который нужно вынести.
+
+**Решение:** НЕ выносить. Методы принципиально разные: разный транспорт (httpx vs Playwright context), разный API ответа (`resp.status_code` vs `resp.status`), наличие PDF-ветки только в crawler.py, разный возвращаемый тип (`list[PrivacyPolicyInfo]` vs один `PrivacyPolicyInfo`). Одинаковое название — это совпадение назначения, а не дублирование кода.
+
+**Когда пригодится снова:** при оценке кандидатов на вынос — одинаковое название ≠ дубль. Сначала сравнить сигнатуры и транспорт.
+
+---
+
+### Мок Playwright page.on('request') для тестирования перехвата запросов
+
+**Контекст:** тестирование `PlaywrightCrawler._crawl()` без реального браузера.
+
+**Проблема:** `page.on('request', handler)` регистрирует sync callback, который Playwright вызывает при каждом сетевом запросе во время `goto()`. Стандартный `AsyncMock` не умеет «стрелять» событиями — handler не вызывается, `request_domains` остаётся пустым.
+
+**Решение:** `_MockPage` — минимальный класс-заглушка:
+- `on(event, handler)` — сохраняет handler в dict
+- `goto(url, ...)` — вызывает сохранённый handler вручную для каждого URL из fixture
+
+```python
+class _MockPage:
+    def on(self, event: str, handler) -> None:
+        self._handlers[event] = handler
+
+    async def goto(self, url: str, **kwargs):
+        for req_url in self._request_urls:
+            req = MagicMock()
+            req.url = req_url
+            if "request" in self._handlers:
+                self._handlers["request"](req)
+        return MagicMock(status=200)
+```
+
+**Где применено:** `tests/test_playwright_crawler.py`.
+
+**Когда пригодится снова:** любой тест Playwright-кода с `page.on()` — request, response, dialog, navigation events. Общий паттерн: `on()` сохраняет, триггер-метод (`goto()`/`click()`) вызывает.
+
+---
+
+### PlaywrightCrawler + page.content() = JS-формы без изменений в детекторах
+
+**Контекст:** задача 6.4 — добавление поддержки JS-форм (Tilda, Bitrix) и JS-баннеров (OneTrust, CookieYes).
+
+**Проблема:** казалось, что `extract_forms()` не найдёт формы Tilda/Bitrix, потому что они монтируются через JavaScript и отсутствуют в исходном HTML.
+
+**Решение:** PlaywrightCrawler уже вызывает `html = await page.content()` после `await asyncio.sleep(2)` — это **рендеренный DOM** после выполнения JS. BeautifulSoup получает полный DOM, включая все JS-монтированные элементы. Стандартный `soup.find_all("form")` в `extract_forms()` находит Tilda (`<div class="t-form"><form ...>`) и Bitrix (`<div class="b24-form"><form ...>`) без каких-либо изменений в детекторах.
+
+**Где применено:** `src/scanner/playwright_crawler.py:154`, `src/scanner/detectors.py` — `extract_forms()`.
+
+**Когда пригодится снова:** при любом обсуждении «нужен ли отдельный JS-form detector» — нет, не нужен. Вся магия в `page.content()`, который возвращает пост-JS DOM. Отдельный детектор для JS-форм был бы избыточным усложнением.
