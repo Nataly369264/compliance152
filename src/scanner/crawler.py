@@ -33,17 +33,16 @@ from src.scanner.pdf_extractor import (
     is_pdf_content_type,
     is_pdf_url,
 )
+from src.scanner.utils import (
+    FALLBACK_PRIVACY_PATHS,
+    SKIP_EXTENSIONS,
+    is_same_domain,
+    is_valid_policy_text,
+    normalize_url,
+    should_skip,
+)
 
 logger = logging.getLogger(__name__)
-
-SKIP_EXTENSIONS = frozenset({
-    ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", ".ico",
-    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    ".zip", ".rar", ".tar", ".gz",
-    ".mp3", ".mp4", ".avi", ".mov", ".wmv",
-    ".woff", ".woff2", ".ttf", ".eot",
-    ".css", ".js", ".json", ".xml",
-})
 
 
 class SiteScanner:
@@ -69,7 +68,7 @@ class SiteScanner:
 
         visited: set[str] = set()
         to_visit: list[str] = [url]
-        queued: set[str] = {self._normalize_url(url)}  # tracks what's already in to_visit
+        queued: set[str] = {normalize_url(url)}  # tracks what's already in to_visit
 
         pages: list[PageInfo] = []
         all_forms: list[FormInfo] = []
@@ -91,13 +90,13 @@ class SiteScanner:
 
             while to_visit and len(visited) < self.max_pages:
                 current_url = to_visit.pop(0)
-                normalized = self._normalize_url(current_url)
+                normalized = normalize_url(current_url)
 
                 if normalized in visited:
                     continue
-                if not self._is_same_domain(normalized, base_domain):
+                if not is_same_domain(normalized, base_domain):
                     continue
-                if self._should_skip(normalized):
+                if should_skip(normalized):
                     continue
 
                 visited.add(normalized)
@@ -167,9 +166,9 @@ class SiteScanner:
 
                             # Follow privacy policy links from the banner
                             for bl in extract_banner_policy_links(soup, current_url):
-                                norm_bl = self._normalize_url(bl)
+                                norm_bl = normalize_url(bl)
                                 if (norm_bl not in visited and norm_bl not in queued
-                                        and self._is_same_domain(norm_bl, base_domain)):
+                                        and is_same_domain(norm_bl, base_domain)):
                                     queued.add(norm_bl)
                                     to_visit.insert(0, bl)
 
@@ -194,11 +193,11 @@ class SiteScanner:
                     for a in soup.find_all("a", href=True):
                         href = a["href"]
                         abs_url = urljoin(current_url, href)
-                        norm = self._normalize_url(abs_url)
+                        norm = normalize_url(abs_url)
                         if (
                             norm not in visited
                             and norm not in queued
-                            and self._is_same_domain(norm, base_domain)
+                            and is_same_domain(norm, base_domain)
                         ):
                             queued.add(norm)
                             # Prioritize privacy policy pages
@@ -210,7 +209,7 @@ class SiteScanner:
 
                 except Exception as e:
                     logger.warning("Error scanning %s: %s", current_url, e)
-                    errors.append(f"{current_url}: {e}")
+                    errors.append(f"{current_url}: {type(e).__name__}: {e}")
 
                 if self.crawl_delay > 0 and to_visit:
                     await asyncio.sleep(self.crawl_delay)
@@ -273,18 +272,10 @@ class SiteScanner:
         pages: list[PageInfo],
     ) -> list[PrivacyPolicyInfo]:
         """Try well-known privacy policy URL paths and return all found candidates."""
-        FALLBACK_PATHS = [
-            "/privacy-policy", "/privacy_policy", "/privacy",
-            "/documents/privacy-policy", "/documents/privacy_policy",
-            "/legal/privacy", "/legal/privacy-policy",
-            "/info/privacy", "/pages/privacy-policy",
-            "/politika-konfidencialnosti", "/obrabotka-personalnyh-dannyh",
-            "/personal-data", "/personalnyye-dannyye",
-        ]
         candidates: list[PrivacyPolicyInfo] = []
-        for path in FALLBACK_PATHS:
+        for path in FALLBACK_PRIVACY_PATHS:
             url = f"https://{base_domain}{path}"
-            norm = self._normalize_url(url)
+            norm = normalize_url(url)
             if norm in visited:
                 continue
             try:
@@ -445,22 +436,15 @@ class SiteScanner:
 
     @staticmethod
     def _normalize_url(url: str) -> str:
-        parsed = urlparse(url)
-        # Remove fragment and trailing slash
-        path = parsed.path.rstrip("/") or "/"
-        return f"{parsed.scheme}://{parsed.netloc}{path}"
+        return normalize_url(url)
 
     @staticmethod
     def _is_same_domain(url: str, base_domain: str) -> bool:
-        def _strip_www(domain: str) -> str:
-            return domain[4:] if domain.startswith("www.") else domain
-        netloc = urlparse(url).netloc.lower()
-        return _strip_www(netloc) == _strip_www(base_domain)
+        return is_same_domain(url, base_domain)
 
     @staticmethod
     def _should_skip(url: str) -> bool:
-        path = urlparse(url).path.lower()
-        return any(path.endswith(ext) for ext in SKIP_EXTENSIONS)
+        return should_skip(url)
 
     @staticmethod
     def _url_priority(url: str) -> int:
@@ -484,8 +468,14 @@ class SiteScanner:
         1. Longest text (most complete document)
         2. URL keyword score: politika > policy > privacy > personal
         3. First found (stable tie-break)
+
+        Candidates with text that fails validation (too short or not Russian)
+        are discarded — they are likely WAF challenge pages or JS stubs.
         """
-        return max(
+        best = max(
             candidates,
             key=lambda p: (len(p.text or ""), cls._url_priority(p.url or "")),
         )
+        if not is_valid_policy_text(best.text, best.is_russian):
+            return PrivacyPolicyInfo()
+        return best

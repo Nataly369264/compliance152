@@ -31,26 +31,16 @@ from src.scanner.detectors import (
     extract_forms,
     is_privacy_policy_page,
 )
+from src.scanner.tracker_registry import find_trackers_in_scripts
+from src.scanner.utils import (
+    FALLBACK_PRIVACY_PATHS,
+    is_same_domain,
+    is_valid_policy_text,
+    normalize_url,
+    should_skip,
+)
 
 logger = logging.getLogger(__name__)
-
-_FALLBACK_PRIVACY_PATHS = [
-    "/privacy-policy", "/privacy_policy", "/privacy",
-    "/documents/privacy-policy", "/documents/privacy_policy",
-    "/legal/privacy", "/legal/privacy-policy",
-    "/info/privacy", "/pages/privacy-policy",
-    "/personal-data", "/personalnyye-dannyye",
-    "/politika-konfidencialnosti", "/obrabotka-personalnyh-dannyh",
-]
-
-_SKIP_EXTENSIONS = frozenset({
-    ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", ".ico",
-    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    ".zip", ".rar", ".tar", ".gz",
-    ".mp3", ".mp4", ".avi", ".mov", ".wmv",
-    ".woff", ".woff2", ".ttf", ".eot",
-    ".css", ".js", ".json", ".xml",
-})
 
 
 class PlaywrightCrawler:
@@ -94,7 +84,7 @@ class PlaywrightCrawler:
             async with async_playwright() as pw:
                 browser = await pw.chromium.launch(headless=True)
                 context = await browser.new_context(
-                    user_agent="Compliance152Bot/0.1 (+https://compliance152.ru)",
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     ignore_https_errors=False,
                 )
                 try:
@@ -114,7 +104,7 @@ class PlaywrightCrawler:
 
         visited: set[str] = set()
         to_visit: list[str] = [url]
-        queued: set[str] = {self._normalize_url(url)}
+        queued: set[str] = {normalize_url(url)}
 
         pages: list[PageInfo] = []
         all_forms: list[FormInfo] = []
@@ -132,13 +122,13 @@ class PlaywrightCrawler:
 
         while to_visit and len(visited) < self.max_pages:
             current_url = to_visit.pop(0)
-            normalized = self._normalize_url(current_url)
+            normalized = normalize_url(current_url)
 
             if normalized in visited:
                 continue
-            if not self._is_same_domain(normalized, base_domain):
+            if not is_same_domain(normalized, base_domain):
                 continue
-            if self._should_skip(normalized):
+            if should_skip(normalized):
                 continue
 
             visited.add(normalized)
@@ -146,6 +136,16 @@ class PlaywrightCrawler:
             try:
                 page = await context.new_page()
                 try:
+                    # Collect all request domains during page load
+                    request_domains: set[str] = set()
+
+                    def _on_request(request) -> None:
+                        domain = urlparse(request.url).netloc.lower()
+                        if domain:
+                            request_domains.add(domain)
+
+                    page.on("request", _on_request)
+
                     await page.goto(
                         current_url,
                         timeout=self.timeout * 1000,
@@ -188,27 +188,24 @@ class PlaywrightCrawler:
                     if cookie_banner_info is None:
                         banner = detect_cookie_banner(soup)
                         if banner.found:
-                            analytics_re = re.compile(
-                                r"(google-analytics|googletagmanager|mc\.yandex\.ru|metrika)",
-                                re.IGNORECASE,
-                            )
-                            banner.analytics_before_consent = any(
-                                analytics_re.search(s.url) for s in ext_scripts
-                            )
+                            tracker_hits = find_trackers_in_scripts(list(request_domains))
+                            banner.analytics_before_consent = bool(tracker_hits)
                             cookie_banner_info = banner
 
                             for bl in extract_banner_policy_links(soup, current_url):
-                                norm_bl = self._normalize_url(bl)
+                                norm_bl = normalize_url(bl)
                                 if (norm_bl not in visited and norm_bl not in queued
-                                        and self._is_same_domain(norm_bl, base_domain)):
+                                        and is_same_domain(norm_bl, base_domain)):
                                     queued.add(norm_bl)
                                     to_visit.insert(0, bl)
 
                     # Privacy policy
                     if not privacy_policy_info.found and is_privacy_policy_page(current_url, title):
-                        privacy_policy_info = self._extract_privacy_policy(
+                        candidate = self._extract_privacy_policy(
                             soup, current_url, has_footer_link,
                         )
+                        if is_valid_policy_text(candidate.text, candidate.is_russian):
+                            privacy_policy_info = candidate
 
                     pages.append(PageInfo(
                         url=current_url,
@@ -222,9 +219,9 @@ class PlaywrightCrawler:
                     # Discover links
                     for a in soup.find_all("a", href=True):
                         abs_url = urljoin(current_url, a["href"])
-                        norm = self._normalize_url(abs_url)
+                        norm = normalize_url(abs_url)
                         if (norm not in visited and norm not in queued
-                                and self._is_same_domain(norm, base_domain)):
+                                and is_same_domain(norm, base_domain)):
                             queued.add(norm)
                             link_text = a.get_text(separator=" ", strip=True)
                             if is_privacy_policy_page(abs_url, link_text):
@@ -234,13 +231,13 @@ class PlaywrightCrawler:
 
                 except PlaywrightError as page_err:
                     logger.warning("Playwright page error %s: %s", current_url, page_err)
-                    errors.append(f"{current_url}: {page_err}")
+                    errors.append(f"{current_url}: {type(page_err).__name__}: {page_err}")
                 finally:
                     await page.close()
 
             except Exception as e:
                 logger.warning("Error scanning %s: %s", current_url, e)
-                errors.append(f"{current_url}: {e}")
+                errors.append(f"{current_url}: {type(e).__name__}: {e}")
 
             if self.crawl_delay > 0 and to_visit:
                 await asyncio.sleep(self.crawl_delay)
@@ -290,9 +287,9 @@ class PlaywrightCrawler:
         pages: list[PageInfo],
     ) -> PrivacyPolicyInfo:
         """Try well-known privacy policy URL paths as last resort."""
-        for path in _FALLBACK_PRIVACY_PATHS:
+        for path in FALLBACK_PRIVACY_PATHS:
             candidate = f"https://{base_domain}{path}"
-            norm = self._normalize_url(candidate)
+            norm = normalize_url(candidate)
             if norm in visited:
                 continue
             try:
@@ -311,13 +308,16 @@ class PlaywrightCrawler:
                     title = soup.title.string.strip() if soup.title and soup.title.string else None
                     if is_privacy_policy_page(candidate, title):
                         has_footer_link, _ = detect_footer_privacy_link(soup)
+                        result = self._extract_privacy_policy(soup, candidate, has_footer_link)
+                        if not is_valid_policy_text(result.text, result.is_russian):
+                            continue
                         pages.append(PageInfo(
                             url=candidate,
                             title=title,
                             status_code=200,
                             has_privacy_link_in_footer=has_footer_link,
                         ))
-                        return self._extract_privacy_policy(soup, candidate, has_footer_link)
+                        return result
                 finally:
                     await page.close()
             except Exception as e:
@@ -413,22 +413,3 @@ class PlaywrightCrawler:
             is_separate_page=True,
         )
 
-    # ── URL helpers (identical to crawler.py) ────────────────────
-
-    @staticmethod
-    def _normalize_url(url: str) -> str:
-        parsed = urlparse(url)
-        path = parsed.path.rstrip("/") or "/"
-        return f"{parsed.scheme}://{parsed.netloc}{path}"
-
-    @staticmethod
-    def _is_same_domain(url: str, base_domain: str) -> bool:
-        def _strip_www(domain: str) -> str:
-            return domain[4:] if domain.startswith("www.") else domain
-        netloc = urlparse(url).netloc.lower()
-        return _strip_www(netloc) == _strip_www(base_domain)
-
-    @staticmethod
-    def _should_skip(url: str) -> bool:
-        path = urlparse(url).path.lower()
-        return any(path.endswith(ext) for ext in _SKIP_EXTENSIONS)
