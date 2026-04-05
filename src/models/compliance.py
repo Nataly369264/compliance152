@@ -29,6 +29,7 @@ class CheckCategory(str, Enum):
     TECHNICAL = "technical"
     REGULATORY = "regulatory"
     TRACKERS = "trackers"
+    CONSENT = "consent"
 
 
 class CheckItem(BaseModel):
