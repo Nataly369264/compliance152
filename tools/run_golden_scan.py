@@ -22,6 +22,9 @@ from pathlib import Path
 # Ensure project root is on sys.path when run as a script
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from src.analyzer.analyzer import ComplianceAnalyzer
 from src.scanner.crawler import SiteScanner
 
