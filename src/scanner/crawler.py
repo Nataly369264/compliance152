@@ -29,10 +29,10 @@ from src.scanner.detectors import (
     is_privacy_policy_page,
 )
 from src.scanner.pdf_extractor import (
-    extract_text_from_pdf,
     is_pdf_content_type,
     is_pdf_url,
 )
+from src.scanner.pdf_extractors import extract_pdf_text
 from src.scanner.utils import (
     FALLBACK_PRIVACY_PATHS,
     SKIP_EXTENSIONS,
@@ -335,17 +335,20 @@ class SiteScanner:
         content checks as NOT_APPLICABLE instead of generating false violations.
         The scan_limitations field is populated by the analyzer._build_scan_limitations().
         """
-        text = extract_text_from_pdf(content)
-        if text is None:
+        extraction = extract_pdf_text(content)
+        if extraction.text is None:
             logger.info("PDF policy at %s: text not extractable (scanned or empty)", url)
             return PrivacyPolicyInfo(
                 found=True,
                 url=url,
                 text=None,
                 is_separate_page=True,
+                extraction_method=extraction.method,
             )
         # Reuse HTML extraction logic on the extracted text
-        return self._extract_privacy_policy_from_text(text, url, has_footer_link=False)
+        result = self._extract_privacy_policy_from_text(extraction.text, url, has_footer_link=False)
+        result.extraction_method = extraction.method
+        return result
 
     def _extract_privacy_policy_from_text(
         self, text: str, url: str, has_footer_link: bool,

@@ -31,6 +31,8 @@ from src.scanner.detectors import (
     extract_forms,
     is_privacy_policy_page,
 )
+from src.scanner.pdf_extractor import is_pdf_content_type, is_pdf_url
+from src.scanner.pdf_extractors import extract_pdf_text
 from src.scanner.tracker_registry import find_trackers_in_scripts
 from src.scanner.utils import (
     FALLBACK_PRIVACY_PATHS,
@@ -147,11 +149,34 @@ class PlaywrightCrawler:
 
                     page.on("request", _on_request)
 
-                    await page.goto(
+                    pw_resp = await page.goto(
                         current_url,
                         timeout=self.timeout * 1000,
                         wait_until="domcontentloaded",
                     )
+
+                    # PDF branch: policy document served as PDF
+                    resp_content_type = (
+                        pw_resp.headers.get("content-type", "") if pw_resp else ""
+                    )
+                    if is_pdf_content_type(resp_content_type) or is_pdf_url(current_url):
+                        if is_privacy_policy_page(current_url) and not privacy_policy_info.found:
+                            pdf_bytes = await pw_resp.body() if pw_resp else b""
+                            extraction = extract_pdf_text(pdf_bytes)
+                            privacy_policy_info = PrivacyPolicyInfo(
+                                found=True,
+                                url=current_url,
+                                text=extraction.text,
+                                is_separate_page=True,
+                                extraction_method=extraction.method,
+                            )
+                        pages.append(PageInfo(
+                            url=current_url,
+                            title=None,
+                            status_code=pw_resp.status if pw_resp else 0,
+                        ))
+                        continue
+
                     # Allow JS a moment to render dynamic content after DOM load
                     await asyncio.sleep(2)
                     html = await page.content()

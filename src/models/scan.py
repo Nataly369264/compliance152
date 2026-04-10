@@ -83,6 +83,7 @@ class PrivacyPolicyInfo(BaseModel):
     text_hash: str | None = None
     fetched_at: datetime | None = None
     content_length: int | None = None
+    extraction_method: str = "pdfplumber"
 
 
 class SSLInfo(BaseModel):

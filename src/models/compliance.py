@@ -68,6 +68,7 @@ class ScanMetadata(BaseModel):
     content_length: int | None = None
     text_hash: str | None = None
     text_truncated: bool | None = None
+    extraction_method: str = "pdfplumber"
 
 
 class FineItem(BaseModel):

@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 
 from src.models.scan import PrivacyPolicyInfo
 from src.scanner.crawler import SiteScanner
+from src.scanner.pdf_extractors import ExtractionResult
 
 
 # ── HTML fixtures ────────────────────────────────────────────────────────────
@@ -325,7 +326,8 @@ async def test_pdf_policy_link_not_skipped_by_site_scanner():
 
     scanner2 = SiteScanner(max_pages=2, timeout=5, crawl_delay=0)
     with patch("src.scanner.crawler.httpx.AsyncClient", return_value=mock_client):
-        with patch("src.scanner.crawler.extract_text_from_pdf", return_value=valid_policy_text):
+        with patch("src.scanner.crawler.extract_pdf_text",
+                   return_value=ExtractionResult(text=valid_policy_text, method="pdfplumber")):
             result = await scanner2.scan("https://example.com")
 
     # Verify the PDF URL was actually fetched (not filtered by should_skip)

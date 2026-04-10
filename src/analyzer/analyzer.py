@@ -122,6 +122,7 @@ class ComplianceAnalyzer:
                 if pp.content_length is not None and pp.text is not None
                 else None
             ),
+            extraction_method=pp.extraction_method,
         ) if pp.found else None
 
         return ComplianceReport(
