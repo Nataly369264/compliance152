@@ -128,6 +128,17 @@
 - **Причина:** неизвестна; возможные варианты: (1) `OPENROUTER_MODEL` не подхватывается из `.env` при запуске скриптом напрямую; (2) OpenRouter fallback на free-tier при несоответствии ключа и модели; (3) `src/llm/client.py` игнорирует конфиг и хардкодит модель
 - **Статус:** открыт — требует отдельной диагностики в следующей сессии
 
+### CASE-008: el-ed.ru — Yandex Vision OCR возвращает HTTP 404 (сервис не активирован)
+- ★ **Дата:** 2026-04-11
+- ★ **URL:** https://el-ed.ru (PDF: `/wp-content/themes/egeland/docs/policy.pdf`)
+- ★ **Категория:** other (конфигурация облачного сервиса)
+- ★ **Что произошло:** `YandexVisionExtractor` отправил запрос на `ocr.api.cloud.yandex.net/ocr/v1/recognizeFile`, получил HTTP 404 с пустым телом. Политика осталась `manual_review_needed`.
+- ★ **Что ожидалось:** Vision OCR извлекает текст из PDF, `pp.found=true`, `extraction_method="yandex_vision"`
+- **Краулер:** SiteScanner (httpx)
+- **Причина:** предположительно одно из двух: (1) `YANDEX_FOLDER_ID` в `.env` — это старый Yandex XML user ID, а не Cloud folder ID; (2) сервис Vision OCR не активирован для этого каталога Yandex Cloud
+- **Диагностика:** проверить в Yandex Cloud Console → каталог → убедиться что folder ID совпадает с `.env` и сервис Vision OCR включён; у сервисного аккаунта должна быть роль `ai.vision.user` именно в этом каталоге
+- **Статус:** открыт — код реализован корректно (тесты с mock проходят), блокер — конфигурация Yandex Cloud
+
 ### CASE-007: `_select_best_policy` — преждевременная фильтрация `max()` до валидации
 - ★ **Дата:** 2026-04-10
 - ★ **URL:** n/a (архитектурная находка)

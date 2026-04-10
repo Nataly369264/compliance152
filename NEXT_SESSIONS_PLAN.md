@@ -25,7 +25,22 @@ pdfminer.six. Сессия 1 переписана и разделена на 1.1
 
 ---
 
-## Сессия 1.2 — Реализация YandexVisionExtractor
+## Сессия 1.2 — Реализация YandexVisionExtractor ⚠️ Требует доработки: CASE-008
+
+**Статус (2026-04-11):** код реализован и протестирован (209 passed). Реальный
+прогон на el-ed.ru показал HTTP 404 от Vision OCR — предположительно неверный
+`YANDEX_FOLDER_ID` (старый Yandex XML user ID вместо Cloud folder ID) или
+сервис Vision OCR не активирован для этого каталога. Критерий успеха
+`pp.found=true` и `is_valid_policy_text=true` на реальном PDF не достигнут.
+
+**Что нужно сделать перед закрытием сессии 1.2:**
+1. В Yandex Cloud Console → проверить folder ID каталога (не путать с XML user)
+2. Убедиться что Vision OCR сервис активирован для этого каталога
+3. Убедиться что сервисный аккаунт имеет роль `ai.vision.user` в этом каталоге
+4. Исправить `YANDEX_FOLDER_ID` в `.env`, повторить `python tools/run_golden_scan.py`
+5. Убедиться в логах: нет `HTTP 404`, есть `extracted N chars via Yandex Vision OCR`
+
+
 
 **Приоритет:** критический. Это первая «настоящая» сессия по новым правилам §14.
 **Ожидаемая длина:** 1 сессия.

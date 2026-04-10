@@ -45,6 +45,27 @@ LLM (OpenRouter / gemini-2.5-pro) — формирует текстовый ан
     ↓
 Web UI (/check) — отображает результат пользователю
 
+Рабочий процесс.
+
+### Правило handover между сессиями чата (Claude в claude.ai)
+
+В конце каждой сессии чата Claude генерирует файл 
+SESSION_HANDOVER_<YYYY-MM-DD>.md в формате:
+
+- Краткий контекст сессии (что обсуждали, что решали)
+- Принятые решения (кратко, со ссылками на DEC-NNN если применимо)
+- Открытые вопросы / отложенные задачи
+- Что принести в следующую сессию (явный список файлов)
+- Любые важные нюансы для «следующей меня» — то, что не очевидно 
+  из коммитов и проектных документов
+
+Триггер: Claude генерирует handover самостоятельно, когда 
+становится понятно, что сессия завершается (пользователь 
+прощается, или явно говорит «закругляемся», или контекст 
+подходит к пределу). Не нужно отдельно просить.
+
+Файл сохраняется локально вместе с другими документами проекта 
+(не в Git, по аналогии с SESSION_*.md).
 
 Текущий статус (март 2026)
 ✅ Готово
@@ -137,6 +158,23 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 - Добавлен автозапуск ритуала начала сессии в блок «Как использовать этот файл»
 - Урок зафиксирован в `PATTERNS.md`
 
+### 2026-04-11 — Сессия 1.2: реализация YandexVisionExtractor
+
+- **`YandexVisionExtractor` реализован** в `src/scanner/pdf_extractors.py`:
+  HTTP-клиент к `ocr.api.cloud.yandex.net/ocr/v1/recognizeFile`, 2 ретрая
+  с экспоненциальной задержкой, fallback в `manual_review_needed` при ошибке
+- **`.env.example` обновлён:** добавлены `YANDEX_VISION_API_KEY` и `YANDEX_FOLDER_ID`
+- **`tools/run_golden_scan.py`:** добавлен `load_dotenv()` с явным путём к `.env`
+- **5 новых тестов** `YandexVisionExtractor` (happy path, retry, 5xx, empty, credentials)
+- **CASE-008 открыт:** Vision OCR возвращает HTTP 404 на el-ed.ru — предположительно
+  неверный `YANDEX_FOLDER_ID` или сервис не активирован в Yandex Cloud Console.
+  Код реализован корректно, блокер — конфигурация облака.
+- Тесты: 204 → 209 passed, 5 коммитов в origin (`d032c26`..`db612dd`)
+- **Следующий шаг — Сессия 1.2 (продолжение):** устранить CASE-008 (проверить
+  folder ID и активацию Vision OCR в Yandex Cloud Console), затем повторить прогон
+
+**Документы:** PASSPORT (обновлено), NEXT_SESSIONS_PLAN (обновлено — 1.2 в статус «требует доработки по CASE-008»), CASES (CASE-008). DECISIONS, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+
 🔲 В работе / Следующие шаги
 → **[ПРИОРИТЕТ]** Исследовать pp.found=false на el-ed.ru:
      (1) проверить, что политика физически доступна через httpx (curl-тест);
@@ -182,7 +220,7 @@ python -m uvicorn src.api.server:app --host 0.0.0.0 --port 9000
 http://127.0.0.1:9000/check
 
 Репозиторий
-https://github.com/Nataly369264/compliance152 (приватный)
+https://github.com/Nataly369264/compliance152 (открытый)
 
 Команда
 
@@ -192,7 +230,7 @@ https://github.com/Nataly369264/compliance152 (приватный)
 
 Claude Code — разработка и исправление багов
 
-Perplexity — стратегия сессий, контроль контекста
+Perplexity/Claude(claude.ai) — стратегия сессий, контроль контекста
 
 Известные особенности
 Windows-прокси: httpx.Client(trust_env=False) — обязательно
