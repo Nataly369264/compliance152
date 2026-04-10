@@ -96,7 +96,8 @@ class SiteScanner:
                     continue
                 if not is_same_domain(normalized, base_domain):
                     continue
-                if should_skip(normalized):
+                # Privacy policy PDFs bypass the skip filter (Bug A fix)
+                if should_skip(normalized) and not is_privacy_policy_page(current_url):
                     continue
 
                 visited.add(normalized)
