@@ -19,6 +19,8 @@ from dataclasses import dataclass
 from io import BytesIO
 from typing import Protocol
 
+import httpx
+
 logger = logging.getLogger(__name__)
 
 _MIN_USABLE_TEXT_LEN = 50
@@ -134,7 +136,6 @@ class YandexVisionExtractor:
             if attempt > 0:
                 time.sleep(_RETRY_BASE_DELAY * (2 ** (attempt - 1)))
             try:
-                import httpx
                 with httpx.Client(timeout=30.0, trust_env=False) as client:
                     resp = client.post(_YANDEX_OCR_URL, json=payload, headers=headers)
 
@@ -180,10 +181,6 @@ class YandexVisionExtractor:
                     text=full_text[:20000], method="yandex_vision", error=None
                 )
 
-            except ImportError:
-                return ExtractionResult(
-                    text=None, method="yandex_vision", error="httpx_not_installed"
-                )
             except Exception as e:
                 last_error = f"network_error: {type(e).__name__}"
                 logger.warning(

@@ -1,14 +1,14 @@
 """Tests for pdf_extractors.py cascade + analyzer manual_review_needed behavior."""
 from __future__ import annotations
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from src.analyzer.analyzer import ComplianceAnalyzer
 from src.models.compliance import CheckCategory, CheckItem, CheckStatus, Severity
 from src.models.scan import PrivacyPolicyInfo, ScanResult
-from src.scanner.pdf_extractors import ExtractionResult, extract_pdf_text
+from src.scanner.pdf_extractors import ExtractionResult, YandexVisionExtractor, extract_pdf_text
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -102,3 +102,115 @@ def test_score_excludes_manual_review_needed_from_denominator():
 
     assert total == 7, f"Ожидался знаменатель 7, получен {total}"
     assert score == 71, f"Ожидался score 71%, получен {score}%"
+
+
+# ── YandexVisionExtractor ─────────────────────────────────────────────────────
+
+_LONG_RUSSIAN_TEXT = "многопользовательского " * 30  # >50 chars, 20+ consecutive cyrillic
+
+
+def _mock_resp(status_code: int, json_body: dict | None = None) -> MagicMock:
+    """Build a mock httpx.Response."""
+    resp = MagicMock()
+    resp.status_code = status_code
+    resp.json.return_value = json_body or {}
+    return resp
+
+
+def _vision_ok_body(text: str) -> dict:
+    return {"result": {"textAnnotation": {"fullText": text}}}
+
+
+def _make_client_mock(responses: list) -> MagicMock:
+    """Client mock that returns responses in sequence for each .post() call."""
+    client = MagicMock()
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=False)
+    client.post = MagicMock(side_effect=responses)
+    return client
+
+
+# (d) Happy path: Vision returns valid text → method="yandex_vision", text returned
+
+def test_yandex_vision_happy_path(monkeypatch):
+    monkeypatch.setenv("YANDEX_VISION_API_KEY", "test-key")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
+
+    client_mock = _make_client_mock([_mock_resp(200, _vision_ok_body(_LONG_RUSSIAN_TEXT))])
+    with patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock):
+        result = YandexVisionExtractor().extract(b"%PDF-fake")
+
+    assert result.text is not None
+    assert result.method == "yandex_vision"
+    assert result.error is None
+    assert "многопользовательского" in result.text
+
+
+# (e) Network error on first attempt, success on second → retry works
+
+def test_yandex_vision_retry_on_network_error(monkeypatch):
+    monkeypatch.setenv("YANDEX_VISION_API_KEY", "test-key")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
+
+    import httpx as _httpx
+    network_err = _httpx.TransportError("connection reset")
+    success_resp = _mock_resp(200, _vision_ok_body(_LONG_RUSSIAN_TEXT))
+
+    client_mock = _make_client_mock([network_err, success_resp])
+    with (
+        patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock),
+        patch("src.scanner.pdf_extractors.time.sleep"),  # skip actual delay
+    ):
+        result = YandexVisionExtractor().extract(b"%PDF-fake")
+
+    assert result.text is not None
+    assert result.method == "yandex_vision"
+    assert client_mock.post.call_count == 2
+
+
+# (f) 5xx on both attempts → return None with last error
+
+def test_yandex_vision_5xx_both_attempts_returns_none(monkeypatch):
+    monkeypatch.setenv("YANDEX_VISION_API_KEY", "test-key")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
+
+    client_mock = _make_client_mock([_mock_resp(503), _mock_resp(503)])
+    with (
+        patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock),
+        patch("src.scanner.pdf_extractors.time.sleep"),
+    ):
+        result = YandexVisionExtractor().extract(b"%PDF-fake")
+
+    assert result.text is None
+    assert result.method == "yandex_vision"
+    assert "503" in result.error
+    assert client_mock.post.call_count == 2
+
+
+# (g) Vision returns empty text → error="empty_text", no retry
+
+def test_yandex_vision_empty_text_returns_none(monkeypatch):
+    monkeypatch.setenv("YANDEX_VISION_API_KEY", "test-key")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
+
+    client_mock = _make_client_mock([_mock_resp(200, _vision_ok_body(""))])
+    with patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock):
+        result = YandexVisionExtractor().extract(b"%PDF-fake")
+
+    assert result.text is None
+    assert result.error == "empty_text"
+    assert client_mock.post.call_count == 1  # no retry on empty text
+
+
+# (h) Missing credentials → immediate error, no HTTP call
+
+def test_yandex_vision_missing_credentials_no_http_call(monkeypatch):
+    monkeypatch.delenv("YANDEX_VISION_API_KEY", raising=False)
+    monkeypatch.delenv("YANDEX_FOLDER_ID", raising=False)
+
+    with patch("src.scanner.pdf_extractors.httpx.Client") as mock_cls:
+        result = YandexVisionExtractor().extract(b"%PDF-fake")
+
+    assert result.text is None
+    assert result.error == "missing_credentials"
+    mock_cls.assert_not_called()
