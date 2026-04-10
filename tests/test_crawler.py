@@ -283,3 +283,56 @@ def test_should_skip_pdf():
 
 def test_should_skip_html_not_skipped():
     assert SiteScanner._should_skip("https://example.com/page") is False
+
+
+# ── Group E: Bug A regression — PDF policy links ────────────────────────────
+
+HTML_WITH_PDF_POLICY_LINK = """
+<html><body>
+  <a href="https://example.com/wp-content/policy.pdf">Политика конфиденциальности</a>
+</body></html>
+"""
+
+
+async def test_pdf_policy_link_not_skipped_by_site_scanner():
+    """Regression Bug A: PDF link with policy anchor text is not filtered by should_skip().
+
+    Before the fix, should_skip() filtered .pdf URLs unconditionally so the PDF
+    policy was never fetched. After the fix, privacy policy PDFs bypass the filter.
+    """
+    main_resp = _make_response(HTML_WITH_PDF_POLICY_LINK)
+    ssl_resp = _make_ssl_response()
+
+    pdf_resp = MagicMock(spec=httpx.Response)
+    pdf_resp.status_code = 200
+    pdf_resp.headers = {"content-type": "application/pdf"}
+    pdf_resp.content = b"%PDF-1.4 fake"
+    pdf_resp.cookies = {}
+
+    def get_side_effect(url, **kwargs):
+        if "policy.pdf" in url:
+            return pdf_resp
+        return main_resp
+
+    mock_client = AsyncMock()
+    mock_client.head = AsyncMock(return_value=ssl_resp)
+    mock_client.get = AsyncMock(side_effect=get_side_effect)
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+
+    # "многопользовательского" = 22 consecutive Cyrillic chars → is_russian=True
+    valid_policy_text = "политика конфиденциальности многопользовательского сервиса " * 50
+
+    scanner2 = SiteScanner(max_pages=2, timeout=5, crawl_delay=0)
+    with patch("src.scanner.crawler.httpx.AsyncClient", return_value=mock_client):
+        with patch("src.scanner.crawler.extract_text_from_pdf", return_value=valid_policy_text):
+            result = await scanner2.scan("https://example.com")
+
+    # Verify the PDF URL was actually fetched (not filtered by should_skip)
+    fetched_urls = [str(call.args[0]) for call in mock_client.get.call_args_list]
+    assert any("policy.pdf" in u for u in fetched_urls), (
+        "PDF policy URL was filtered by should_skip — Bug A regression"
+    )
+    assert result.privacy_policy.found is True
+    assert result.privacy_policy.url is not None
+    assert "policy.pdf" in result.privacy_policy.url

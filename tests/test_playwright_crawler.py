@@ -1,7 +1,7 @@
 """Smoke-tests for PlaywrightCrawler._crawl() — no real browser required."""
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -141,3 +141,59 @@ async def test_no_banner_tracker_requests_do_not_set_flag(crawler):
 
     assert result.cookie_banner.found is False
     assert result.cookie_banner.analytics_before_consent is False
+
+
+# ── Test 5: Bug A regression — PDF policy links not skipped ──────────────────
+
+HTML_WITH_PDF_POLICY_LINK = """
+<html><body>
+  <a href="https://example.com/wp-content/policy.pdf">Политика конфиденциальности</a>
+</body></html>
+"""
+
+
+async def test_pdf_policy_link_not_skipped_by_playwright_crawler():
+    """Regression Bug A: PDF policy link must not be filtered by should_skip() in _crawl().
+
+    Before the fix, should_skip() filtered .pdf URLs unconditionally so the PDF
+    policy URL was never visited. After the fix, it bypasses the filter.
+    """
+    visited_urls: list[str] = []
+
+    class _TrackingPage:
+        def __init__(self, html: str) -> None:
+            self._html = html
+            self._handlers: dict = {}
+
+        def on(self, event: str, handler) -> None:
+            self._handlers[event] = handler
+
+        async def goto(self, url: str, **kwargs) -> MagicMock:
+            visited_urls.append(url)
+            return MagicMock(status=200)
+
+        async def content(self) -> str:
+            return self._html
+
+        async def close(self) -> None:
+            pass
+
+    call_count = [0]
+    main_page = _TrackingPage(HTML_WITH_PDF_POLICY_LINK)
+    pdf_page = _TrackingPage("<html><body>PDF placeholder</body></html>")
+
+    async def new_page_side_effect():
+        call_count[0] += 1
+        return main_page if call_count[0] == 1 else pdf_page
+
+    context = MagicMock()
+    context.new_page = AsyncMock(side_effect=new_page_side_effect)
+    context.cookies = AsyncMock(return_value=[])
+
+    pw_crawler = PlaywrightCrawler(max_pages=2, timeout=5, crawl_delay=0)
+    with patch("src.scanner.playwright_crawler.asyncio.sleep", new=AsyncMock()):
+        result = await pw_crawler._crawl(context, "https://example.com", "example.com")
+
+    assert any("policy.pdf" in u for u in visited_urls), (
+        "PDF policy URL was filtered by should_skip — Bug A regression"
+    )
