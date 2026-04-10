@@ -91,7 +91,13 @@ class ComplianceAnalyzer:
             llm_analysis = await self._analyze_policy_with_llm()
 
         # Calculate scores
-        total = len(self.checklist)
+        # MANUAL_REVIEW_NEEDED checks are excluded from the denominator — the
+        # policy was found by URL but text is unreadable, so we cannot assess
+        # content compliance and these checks must not penalise the score.
+        total = sum(
+            1 for c in self.checklist
+            if c.status != CheckStatus.MANUAL_REVIEW_NEEDED
+        )
         passed = sum(1 for c in self.checklist if c.status == CheckStatus.PASS)
         failed = sum(1 for c in self.checklist if c.status == CheckStatus.FAIL)
         warnings = sum(1 for c in self.checklist if c.status == CheckStatus.WARNING)
@@ -481,7 +487,9 @@ class ComplianceAnalyzer:
                 category=CheckCategory.PRIVACY_POLICY,
             )
 
-        # PDF / unreadable policy: found=True but text unavailable → skip content checks
+        # PDF / unreadable policy: found=True but text unavailable → manual_review_needed
+        # for content checks. These are excluded from the score denominator so the
+        # site is not penalised for a technically valid (but unreadable) policy.
         if not pp.text:
             _CONTENT_CHECKS = [
                 "POLICY_003", "POLICY_004", "POLICY_005", "POLICY_006",
@@ -491,9 +499,9 @@ class ComplianceAnalyzer:
             ]
             for _cid in _CONTENT_CHECKS:
                 self._add_check(
-                    _cid, CheckCategory.PRIVACY_POLICY, CheckStatus.NOT_APPLICABLE,
-                    details="Не применимо: текст политики недоступен для автоматического анализа "
-                            "(PDF-документ не удалось прочитать или текст отсутствует)",
+                    _cid, CheckCategory.PRIVACY_POLICY, CheckStatus.MANUAL_REVIEW_NEEDED,
+                    details="Требуется ручная проверка: текст политики недоступен для "
+                            "автоматического анализа (PDF-документ не удалось прочитать)",
                 )
             self._add_check(
                 "POLICY_017", CheckCategory.PRIVACY_POLICY,

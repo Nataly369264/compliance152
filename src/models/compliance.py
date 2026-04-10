@@ -20,6 +20,7 @@ class CheckStatus(str, Enum):
     WARNING = "warning"
     NOT_APPLICABLE = "not_applicable"
     MANUAL_CHECK = "manual_check"
+    MANUAL_REVIEW_NEEDED = "manual_review_needed"
 
 
 class CheckCategory(str, Enum):
