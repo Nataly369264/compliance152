@@ -168,3 +168,26 @@ class _MockPage:
 **Где применено:** `src/scanner/playwright_crawler.py:154`, `src/scanner/detectors.py` — `extract_forms()`.
 
 **Когда пригодится снова:** при любом обсуждении «нужен ли отдельный JS-form detector» — нет, не нужен. Вся магия в `page.content()`, который возвращает пост-JS DOM. Отдельный детектор для JS-форм был бы избыточным усложнением.
+
+---
+
+### PDF → постраничный PNG для OCR API с лимитом 1 страница/запрос
+
+**Контекст:** интеграция с Yandex Cloud Vision OCR API (сессия 1.2, CASE-008).
+
+**Проблема:** Yandex Vision OCR API (`recognizeText`) принимает ровно 1 страницу за запрос. Отправка multi-page PDF целиком даёт HTTP 400: `"Request pages N, service page limit is 1"`. Разбить PDF на 1-страничные PDF-файлы не получается без дополнительных зависимостей (нужен `pypdf`, которого нет в проекте).
+
+**Решение:** использовать `pdfplumber.to_image(resolution=200)` для рендеринга каждой страницы в PIL Image, сохранять в PNG bytes и отправлять каждую страницу отдельным запросом с `mimeType: "image/png"`. Результаты страниц склеиваются через `\n`.
+
+```python
+with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
+    for page in pdf.pages[:MAX_PAGES]:
+        buf = BytesIO()
+        page.to_image(resolution=200).save(buf, format="PNG")
+        png_bytes = buf.getvalue()
+        # отправить png_bytes с mimeType: "image/png"
+```
+
+**Где применено:** `src/scanner/pdf_extractors.py` — `YandexVisionExtractor._recognize_page()`.
+
+**Когда пригодится снова:** при интеграции с любым OCR API, который имеет лимит страниц (Google Vision, AWS Textract и др.). Если `pypdf`/`pdfrw` появятся в проекте — можно вернуться к разбивке PDF на 1-страничные PDF (меньше данных, нет потери качества от растеризации).

@@ -1,16 +1,14 @@
 {
   "run_info": {
     "url": "https://el-ed.ru",
-    "run_at": "2026-04-10T21:58:46.176607Z",
+    "run_at": "2026-04-12T09:14:40.466472Z",
     "scanner": "SiteScanner (httpx)",
     "llm_enabled": true
   },
   "scan_result": {
     "url": "https://el-ed.ru",
     "pages_scanned": 47,
-    "errors": [
-      "https://el-ed.ru/wp-content/themes/egeland/docs/reviews-policy.pdf: RemoteProtocolError: Server disconnected without sending a response."
-    ],
+    "errors": [],
     "privacy_policy": {
       "found": false,
       "url": null,
@@ -1975,7 +1973,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/",
+        "page_url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -1987,7 +1985,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/",
+        "page_url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -1999,7 +1997,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/",
+        "page_url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -2011,7 +2009,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/",
+        "page_url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/",
         "collects_personal_data": false,
         "personal_data_fields": [],
         "has_consent_checkbox": true,
@@ -2020,7 +2018,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/",
+        "page_url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -2032,7 +2030,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/",
+        "page_url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -2044,7 +2042,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/",
+        "page_url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -2056,7 +2054,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/",
+        "page_url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/",
         "collects_personal_data": false,
         "personal_data_fields": [],
         "has_consent_checkbox": true,
@@ -2065,7 +2063,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/",
+        "page_url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -2077,7 +2075,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/",
+        "page_url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -2089,7 +2087,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/",
+        "page_url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/",
         "collects_personal_data": true,
         "personal_data_fields": [
           "name",
@@ -2101,7 +2099,7 @@
         "has_marketing_checkbox": false
       },
       {
-        "page_url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/",
+        "page_url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/",
         "collects_personal_data": false,
         "personal_data_fields": [],
         "has_consent_checkbox": true,
@@ -2530,25 +2528,25 @@
         "external_scripts_count": 6
       },
       {
-        "url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/",
+        "url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/",
         "status_code": 200,
-        "title": "Как подать документы в вуз онлайн: пошаговая инструкция",
+        "title": "8 интересных музеев Москвы для юных исследователей",
         "has_privacy_link_in_footer": true,
         "forms_count": 4,
         "external_scripts_count": 6
       },
       {
-        "url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/",
+        "url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/",
         "status_code": 200,
-        "title": "Как сдать ОГЭ по географии: советы и рекомендации",
+        "title": "Интересные музеи Казани для юных исследователей",
         "has_privacy_link_in_footer": true,
         "forms_count": 4,
         "external_scripts_count": 6
       },
       {
-        "url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/",
+        "url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/",
         "status_code": 200,
-        "title": "Хобби которые могут стать профессией и приносить доход",
+        "title": "Площадь треугольника для подготовки к ЕГЭ: примеры",
         "has_privacy_link_in_footer": true,
         "forms_count": 4,
         "external_scripts_count": 6
@@ -2556,7 +2554,7 @@
     ]
   },
   "compliance_report": {
-    "id": "cc209d32-37ef-439e-92b4-796676d41058",
+    "id": "9cbb7a66-6c32-4599-a120-69b82ffa7190",
     "overall_score": 21,
     "risk_level": "critical",
     "total_checks": 42,
@@ -3057,21 +3055,21 @@
         "title": "Форма без согласия на обработку ПДн",
         "severity": "critical",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/"
+        "page_url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/"
       },
       {
         "check_id": "FORM_001",
         "title": "Форма без согласия на обработку ПДн",
         "severity": "critical",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/"
+        "page_url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/"
       },
       {
         "check_id": "FORM_001",
         "title": "Форма без согласия на обработку ПДн",
         "severity": "critical",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/"
+        "page_url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/"
       },
       {
         "check_id": "FORM_002",
@@ -3799,42 +3797,42 @@
         "title": "Чекбокс согласия предотмечен по умолчанию",
         "severity": "high",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/"
+        "page_url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/"
       },
       {
         "check_id": "FORM_002",
         "title": "Чекбокс согласия предотмечен по умолчанию",
         "severity": "high",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/kak-podat-dokumenty-v-vuz-onlajn-v-2026-godu/"
+        "page_url": "https://el-ed.ru/blog/8-interesnyh-muzeev-moskvy/"
       },
       {
         "check_id": "FORM_002",
         "title": "Чекбокс согласия предотмечен по умолчанию",
         "severity": "high",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/"
+        "page_url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/"
       },
       {
         "check_id": "FORM_002",
         "title": "Чекбокс согласия предотмечен по умолчанию",
         "severity": "high",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-geografii-gotovimsya-sistemno-i-dobivaemsya-rezultata/"
+        "page_url": "https://el-ed.ru/blog/samye-interesnye-muzei-kazani-dlya-shkolnikov/"
       },
       {
         "check_id": "FORM_002",
         "title": "Чекбокс согласия предотмечен по умолчанию",
         "severity": "high",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/"
+        "page_url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/"
       },
       {
         "check_id": "FORM_002",
         "title": "Чекбокс согласия предотмечен по умолчанию",
         "severity": "high",
         "category": "forms",
-        "page_url": "https://el-ed.ru/blog/hobbi-kotorye-mogut-stat-professiej-rukovodstvo-dlya-vypusknikov/"
+        "page_url": "https://el-ed.ru/blog/kurs-ploshhad-treugolnika-dlya-podgotovki-k-ege/"
       },
       {
         "check_id": "CONSENT_001",
@@ -3898,6 +3896,6 @@
       "max_total": 7760000
     },
     "llm_analysis": null,
-    "summary": "## Резюме состояния соответствия\n\nСайт имеет множественные нарушения требований 152-ФЗ: обнаружено 24 формы без согласия на обработку ПДн, отсутствует политика конфиденциальности, используются запрещённые внешние сервисы. Несмотря на наличие HTTPS и cookie-баннера, общий уровень защиты персональных данных не соответствует законодательству.\n\n## Топ-5 критических проблем\n\n1. **Отсутствие согласия на обработку ПДн** (24 формы): Добавить чекбокс согласия с текстом о согласии на обработку персональных данных в соответствии с 152-ФЗ. С 01.09.2025 согласие должно быть отдельным документом.\n\n2. **Отсутствие политики конфиденциальности**: Разработать и опубликовать политику обработки ПДн с указанием целей, сроков хранения, прав субъектов данных.\n\n3. **Использование запрещённых внешних сервисов**: Заменить 4 обнаруженных зарубежных сервиса на российские аналоги или обеспечить локализацию данных в РФ до 01.07.2025.\n\n4. **Неполное информирование субъектов данных**: Добавить информацию о правах субъектов данных (доступ, исправление, удаление) на страницах с формами.\n\n5. **Отсутствие реестра обработок ПДн**: Создать внутренний реестр всех операций с персональными данными для контроля и аудита.\n\n## Оценка рисков и штрафов\n\n**Общий уровень риска: КРИТИЧЕСКИЙ** - множественные нарушения могут привести к проверкам Роскомнадзора.\n\n**Потенциальные штрафы:**\n- За 24 формы без согласия: 24 × 700 000 руб. = 16 800 000 руб. (повторно до 36 000 000 руб.)\n- За отсутствие политики: до 75 000 руб.\n- За использование зарубежных сервисов после 01.07.2025: до 1 000 000 руб.\n\n**Общий потенциальный штраф:** до 52 000 000 руб. при повторных нарушениях."
+    "summary": "## Резюме состояния соответствия\nСайт el-ed.ru имеет множественные нарушения требований 152-ФЗ по обработке персональных данных. Обнаружено 24 формы сбора ПДн без согласия пользователей, отсутствует политика конфиденциальности, что создаёт высокий риск административной ответственности.\n\n## Топ-5 критических проблем\n\n1. **Отсутствие согласия на обработку ПДн** (24 форм)\n   - **Рекомендация**: Добавить чекбоксы согласия на каждой форме, ссылку на политику конфиденциальности. С 01.09.2025 согласие должно быть отдельным документом.\n\n2. **Отсутствие политики конфиденциальности**\n   - **Рекомендация**: Разработать и опубликовать политику обработки ПДн с указанием целей, сроков хранения, прав субъектов данных.\n\n3. **Использование запрещённых внешних сервисов**\n   - **Рекомендация**: С 01.07.2025 запретить использование зарубежных сервисов без локализации данных в РФ. Проверить и заменить на российские аналоги.\n\n4. **Недостаточная защита персональных данных**\n   - **Рекомендация**: Внедрить шифрование данных, доступ по паролю, регулярные аудиты безопасности.\n\n5. **Отсутствие документированных процедур**\n   - **Рекомендация**: Разработать локальные акты по обработке ПДн, инструкции для сотрудников, журналы регистрации действий.\n\n## Оценка риска и потенциальные штрафы\n**Уровень риска: КРИТИЧЕСКИЙ** - множественные нарушения создают угрозу штрафов до 3% годовой выручки (макс. 500 млн руб.) за утечку данных и до 1 500 000 руб. за повторные нарушения при обработке без согласия. Требуется немедленное устранение нарушений."
   }
 }

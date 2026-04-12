@@ -128,16 +128,19 @@
 - **Причина:** неизвестна; возможные варианты: (1) `OPENROUTER_MODEL` не подхватывается из `.env` при запуске скриптом напрямую; (2) OpenRouter fallback на free-tier при несоответствии ключа и модели; (3) `src/llm/client.py` игнорирует конфиг и хардкодит модель
 - **Статус:** открыт — требует отдельной диагностики в следующей сессии
 
-### CASE-008: el-ed.ru — Yandex Vision OCR возвращает HTTP 404 (сервис не активирован)
+### CASE-008: el-ed.ru — Yandex Vision OCR: неверный endpoint + лимит страниц API
 - ★ **Дата:** 2026-04-11
 - ★ **URL:** https://el-ed.ru (PDF: `/wp-content/themes/egeland/docs/policy.pdf`)
-- ★ **Категория:** other (конфигурация облачного сервиса)
-- ★ **Что произошло:** `YandexVisionExtractor` отправил запрос на `ocr.api.cloud.yandex.net/ocr/v1/recognizeFile`, получил HTTP 404 с пустым телом. Политика осталась `manual_review_needed`.
-- ★ **Что ожидалось:** Vision OCR извлекает текст из PDF, `pp.found=true`, `extraction_method="yandex_vision"`
+- ★ **Категория:** other
+- ★ **Что произошло:** `YandexVisionExtractor` отправлял запрос на `recognizeFile` — HTTP 404. После смены URL на `recognizeText` — HTTP 400: `"Request pages 14, service page limit is 1"`. Политика оставалась `manual_review_needed`.
+- ★ **Что ожидалось:** Vision OCR извлекает текст из PDF, `error=None`, `extraction_method="yandex_vision"`
 - **Краулер:** SiteScanner (httpx)
-- **Причина:** предположительно одно из двух: (1) `YANDEX_FOLDER_ID` в `.env` — это старый Yandex XML user ID, а не Cloud folder ID; (2) сервис Vision OCR не активирован для этого каталога Yandex Cloud
-- **Диагностика:** проверить в Yandex Cloud Console → каталог → убедиться что folder ID совпадает с `.env` и сервис Vision OCR включён; у сервисного аккаунта должна быть роль `ai.vision.user` именно в этом каталоге
-- **Статус:** открыт — код реализован корректно (тесты с mock проходят), блокер — конфигурация Yandex Cloud
+- **Причина (установлена):** два последовательных бага:
+  1. Неверный URL: `recognizeFile` не существует, правильный endpoint — `recognizeText`
+  2. API принимает ровно **1 страницу за запрос**; `policy.pdf` содержит 14 страниц → HTTP 400
+- **Решение:** URL исправлен; `YandexVisionExtractor` переработан: PDF рендерится постранично в PNG через `pdfplumber.to_image(resolution=200)`, каждая страница отправляется отдельным запросом (DEC-006)
+- **Результат после фикса:** `policy.pdf` (14 стр., 328 KB) → 20 000 символов, `error=None`. Начало текста: «Политика обработки персональных данных. г. Иркутск. редакция от 15.05.2025 г.»
+- **Статус:** исправлено в сессии 2026-04-12 (коммит `559dfa3`)
 
 ### CASE-007: `_select_best_policy` — преждевременная фильтрация `max()` до валидации
 - ★ **Дата:** 2026-04-10
