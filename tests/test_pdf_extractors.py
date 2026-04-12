@@ -130,6 +130,24 @@ def _make_client_mock(responses: list) -> MagicMock:
     return client
 
 
+def _make_page_mock() -> MagicMock:
+    """Build a mock pdfplumber.Page that renders to empty PNG bytes."""
+    page = MagicMock()
+    img = MagicMock()
+    img.save = MagicMock()  # writes nothing; BytesIO stays empty (b"")
+    page.to_image.return_value = img
+    return page
+
+
+def _make_pdf_mock(pages: list) -> MagicMock:
+    """Build a mock pdfplumber PDF context manager."""
+    pdf_cm = MagicMock()
+    pdf_cm.__enter__ = MagicMock(return_value=pdf_cm)
+    pdf_cm.__exit__ = MagicMock(return_value=False)
+    pdf_cm.pages = pages
+    return pdf_cm
+
+
 # (d) Happy path: Vision returns valid text → method="yandex_vision", text returned
 
 def test_yandex_vision_happy_path(monkeypatch):
@@ -137,7 +155,11 @@ def test_yandex_vision_happy_path(monkeypatch):
     monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
 
     client_mock = _make_client_mock([_mock_resp(200, _vision_ok_body(_LONG_RUSSIAN_TEXT))])
-    with patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock):
+    pdf_mock = _make_pdf_mock([_make_page_mock()])
+    with (
+        patch("pdfplumber.open", return_value=pdf_mock),
+        patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock),
+    ):
         result = YandexVisionExtractor().extract(b"%PDF-fake")
 
     assert result.text is not None
@@ -157,7 +179,9 @@ def test_yandex_vision_retry_on_network_error(monkeypatch):
     success_resp = _mock_resp(200, _vision_ok_body(_LONG_RUSSIAN_TEXT))
 
     client_mock = _make_client_mock([network_err, success_resp])
+    pdf_mock = _make_pdf_mock([_make_page_mock()])
     with (
+        patch("pdfplumber.open", return_value=pdf_mock),
         patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock),
         patch("src.scanner.pdf_extractors.time.sleep"),  # skip actual delay
     ):
@@ -168,6 +192,30 @@ def test_yandex_vision_retry_on_network_error(monkeypatch):
     assert client_mock.post.call_count == 2
 
 
+# (e2) Network error on first two attempts, success on third → 3-attempt retry works
+
+def test_yandex_vision_retry_network_3_attempts(monkeypatch):
+    monkeypatch.setenv("YANDEX_VISION_API_KEY", "test-key")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
+
+    import httpx as _httpx
+    network_err = _httpx.TransportError("connection reset")
+    success_resp = _mock_resp(200, _vision_ok_body(_LONG_RUSSIAN_TEXT))
+
+    client_mock = _make_client_mock([network_err, network_err, success_resp])
+    pdf_mock = _make_pdf_mock([_make_page_mock()])
+    with (
+        patch("pdfplumber.open", return_value=pdf_mock),
+        patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock),
+        patch("src.scanner.pdf_extractors.time.sleep"),
+    ):
+        result = YandexVisionExtractor().extract(b"%PDF-fake")
+
+    assert result.text is not None
+    assert result.method == "yandex_vision"
+    assert client_mock.post.call_count == 3  # two network errors + one success
+
+
 # (f) 5xx on both attempts → return None with last error
 
 def test_yandex_vision_5xx_both_attempts_returns_none(monkeypatch):
@@ -175,7 +223,9 @@ def test_yandex_vision_5xx_both_attempts_returns_none(monkeypatch):
     monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
 
     client_mock = _make_client_mock([_mock_resp(503), _mock_resp(503)])
+    pdf_mock = _make_pdf_mock([_make_page_mock()])
     with (
+        patch("pdfplumber.open", return_value=pdf_mock),
         patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock),
         patch("src.scanner.pdf_extractors.time.sleep"),
     ):
@@ -194,7 +244,11 @@ def test_yandex_vision_empty_text_returns_none(monkeypatch):
     monkeypatch.setenv("YANDEX_FOLDER_ID", "test-folder")
 
     client_mock = _make_client_mock([_mock_resp(200, _vision_ok_body(""))])
-    with patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock):
+    pdf_mock = _make_pdf_mock([_make_page_mock()])
+    with (
+        patch("pdfplumber.open", return_value=pdf_mock),
+        patch("src.scanner.pdf_extractors.httpx.Client", return_value=client_mock),
+    ):
         result = YandexVisionExtractor().extract(b"%PDF-fake")
 
     assert result.text is None
@@ -202,15 +256,19 @@ def test_yandex_vision_empty_text_returns_none(monkeypatch):
     assert client_mock.post.call_count == 1  # no retry on empty text
 
 
-# (h) Missing credentials → immediate error, no HTTP call
+# (h) Missing credentials → immediate error, no HTTP call, no pdfplumber call
 
 def test_yandex_vision_missing_credentials_no_http_call(monkeypatch):
     monkeypatch.delenv("YANDEX_VISION_API_KEY", raising=False)
     monkeypatch.delenv("YANDEX_FOLDER_ID", raising=False)
 
-    with patch("src.scanner.pdf_extractors.httpx.Client") as mock_cls:
+    with (
+        patch("src.scanner.pdf_extractors.httpx.Client") as mock_cls,
+        patch("pdfplumber.open") as mock_pdf,
+    ):
         result = YandexVisionExtractor().extract(b"%PDF-fake")
 
     assert result.text is None
     assert result.error == "missing_credentials"
     mock_cls.assert_not_called()
+    mock_pdf.assert_not_called()

@@ -85,26 +85,33 @@ class PdfplumberExtractor:
         return ExtractionResult(text=text[:20000], method="pdfplumber", error=None)
 
 
-_YANDEX_OCR_URL = "https://ocr.api.cloud.yandex.net/ocr/v1/recognizeFile"
-_RETRY_ATTEMPTS = 2
-_RETRY_BASE_DELAY = 2.0  # seconds; doubles each retry
+_YANDEX_OCR_URL = "https://ocr.api.cloud.yandex.net/ocr/v1/recognizeText"
+_RETRY_ATTEMPTS = 2          # HTTP 5xx: max attempts
+_RETRY_ATTEMPTS_NETWORK = 3  # network errors (ConnectTimeout, ReadTimeout): max attempts
+_RETRY_BASE_DELAY = 2.0      # seconds; doubles each retry
+_PAGE_DELAY = 0.3            # seconds between pages to avoid rate limiting
 
 
 class YandexVisionExtractor:
     """OCR-based PDF extraction via Yandex Cloud OCR API.
 
-    Sends the PDF as base64 content to Yandex Vision OCR and extracts the
-    full text from the response. See DEC-004 for rationale.
+    Splits the PDF into individual pages, renders each page to a PNG image
+    at resolution=200, and sends one image per API request. Required because
+    the API enforces a hard limit of 1 page per request.
+
+    See DEC-004 for rationale and CASE-008 for the el-ed.ru 400 diagnosis.
 
     Requires env vars: YANDEX_VISION_API_KEY, YANDEX_FOLDER_ID.
     If missing → ExtractionResult(text=None, error="missing_credentials").
 
-    Retry policy:
-        - 2 attempts total, exponential backoff (2s between retries)
-        - Retries on network errors and HTTP 5xx
-        - No retry on HTTP 4xx (configuration problem, retrying won't help)
-        - No retry if Vision returns empty text (deterministic result)
+    Retry policy (per page):
+        - HTTP 5xx: 2 attempts total, exponential backoff (2s between retries)
+        - Network errors (ConnectTimeout, ReadTimeout): 3 attempts total
+        - No retry on HTTP 4xx (configuration problem, abort immediately)
+        - 0.3s pause between pages to avoid rate limiting
     """
+
+    MAX_PAGES = 8  # process at most this many pages per PDF
 
     def extract(self, pdf_bytes: bytes) -> ExtractionResult:
         api_key = os.environ.get("YANDEX_VISION_API_KEY", "").strip()
@@ -118,9 +125,75 @@ class YandexVisionExtractor:
                 text=None, method="yandex_vision", error="missing_credentials"
             )
 
-        content_b64 = base64.b64encode(pdf_bytes).decode("ascii")
+        # Render PDF pages → PNG images (one per page, API limit = 1 page/request)
+        try:
+            import pdfplumber
+            with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
+                pages = pdf.pages[: self.MAX_PAGES]
+                total = len(pages)
+                page_images: list[bytes] = []
+                for page in pages:
+                    buf = BytesIO()
+                    page.to_image(resolution=200).save(buf, format="PNG")
+                    page_images.append(buf.getvalue())
+        except ImportError:
+            logger.warning("YandexVisionExtractor: pdfplumber not installed")
+            return ExtractionResult(
+                text=None, method="yandex_vision", error="pdfplumber_not_installed"
+            )
+        except Exception as e:
+            logger.warning("YandexVisionExtractor: failed to render PDF pages: %s", e)
+            return ExtractionResult(
+                text=None, method="yandex_vision", error=f"pdf_render_error: {e}"
+            )
+
+        if not page_images:
+            return ExtractionResult(text=None, method="yandex_vision", error="empty_pdf")
+
+        # Recognize each page via OCR API
+        page_texts: list[str] = []
+        last_error: str = "unknown"
+
+        for page_num, png_bytes in enumerate(page_images, 1):
+            if page_num > 1:
+                time.sleep(_PAGE_DELAY)
+
+            text, error = self._recognize_page(
+                png_bytes, api_key, folder_id, page_num, total
+            )
+            if error is not None and error.startswith("http_4"):
+                # 4xx = configuration/auth problem → abort immediately, no point continuing
+                return ExtractionResult(text=None, method="yandex_vision", error=error)
+            if text is not None:
+                page_texts.append(text)
+            else:
+                last_error = error or "unknown"
+
+        if not page_texts:
+            return ExtractionResult(text=None, method="yandex_vision", error=last_error)
+
+        full_text = "\n".join(page_texts).strip()
+        if len(full_text) < _MIN_USABLE_TEXT_LEN:
+            return ExtractionResult(text=None, method="yandex_vision", error="empty_text")
+
+        logger.info(
+            "YandexVisionExtractor: extracted %d chars from %d/%d pages",
+            len(full_text), len(page_texts), total,
+        )
+        return ExtractionResult(text=full_text[:20000], method="yandex_vision", error=None)
+
+    def _recognize_page(
+        self,
+        png_bytes: bytes,
+        api_key: str,
+        folder_id: str,
+        page_num: int,
+        total: int,
+    ) -> tuple[str | None, str | None]:
+        """Send one page PNG to Yandex OCR API. Returns (text, error)."""
+        content_b64 = base64.b64encode(png_bytes).decode("ascii")
         payload = {
-            "mimeType": "application/pdf",
+            "mimeType": "image/png",
             "languageCodes": ["ru", "en"],
             "model": "page",
             "content": content_b64,
@@ -132,7 +205,7 @@ class YandexVisionExtractor:
         }
 
         last_error: str = "unknown"
-        for attempt in range(_RETRY_ATTEMPTS):
+        for attempt in range(_RETRY_ATTEMPTS_NETWORK):
             if attempt > 0:
                 time.sleep(_RETRY_BASE_DELAY * (2 ** (attempt - 1)))
             try:
@@ -141,54 +214,45 @@ class YandexVisionExtractor:
 
                 if 400 <= resp.status_code < 500:
                     logger.warning(
-                        "YandexVisionExtractor: HTTP %d (no retry)", resp.status_code
+                        "YandexVisionExtractor: page %d/%d HTTP %d (no retry)",
+                        page_num, total, resp.status_code,
                     )
-                    return ExtractionResult(
-                        text=None,
-                        method="yandex_vision",
-                        error=f"http_{resp.status_code}",
-                    )
+                    return None, f"http_{resp.status_code}"
 
                 if resp.status_code != 200:
                     last_error = f"http_{resp.status_code}"
                     logger.warning(
-                        "YandexVisionExtractor: HTTP %d, attempt %d/%d",
-                        resp.status_code, attempt + 1, _RETRY_ATTEMPTS,
+                        "YandexVisionExtractor: page %d/%d HTTP %d, attempt %d/%d",
+                        page_num, total, resp.status_code, attempt + 1, _RETRY_ATTEMPTS,
                     )
+                    if attempt + 1 >= _RETRY_ATTEMPTS:
+                        break  # HTTP 5xx: stop after _RETRY_ATTEMPTS tries
                     continue
 
                 data = resp.json()
-                full_text: str = (
+                text: str = (
                     (data.get("result") or {})
                     .get("textAnnotation", {})
                     .get("fullText", "")
                 ) or ""
 
-                if len(full_text.strip()) < _MIN_USABLE_TEXT_LEN:
-                    logger.info(
-                        "YandexVisionExtractor: Vision returned empty/short text (%d chars)",
-                        len(full_text),
-                    )
-                    return ExtractionResult(
-                        text=None, method="yandex_vision", error="empty_text"
-                    )
-
                 logger.info(
-                    "YandexVisionExtractor: extracted %d chars via Yandex Vision OCR",
-                    len(full_text),
+                    "YandexOCR: page %d/%d OK (%d chars)", page_num, total, len(text)
                 )
-                return ExtractionResult(
-                    text=full_text[:20000], method="yandex_vision", error=None
-                )
+                return text, None
 
             except Exception as e:
                 last_error = f"network_error: {type(e).__name__}"
                 logger.warning(
-                    "YandexVisionExtractor: %s, attempt %d/%d",
-                    last_error, attempt + 1, _RETRY_ATTEMPTS,
+                    "YandexVisionExtractor: page %d/%d %s, attempt %d/%d",
+                    page_num, total, last_error, attempt + 1, _RETRY_ATTEMPTS_NETWORK,
                 )
 
-        return ExtractionResult(text=None, method="yandex_vision", error=last_error)
+        logger.warning(
+            "YandexVisionExtractor: page %d/%d failed after %d attempts: %s",
+            page_num, total, _RETRY_ATTEMPTS, last_error,
+        )
+        return None, last_error
 
 
 def _is_russian(text: str) -> bool:
