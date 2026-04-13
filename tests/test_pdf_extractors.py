@@ -272,3 +272,32 @@ def test_yandex_vision_missing_credentials_no_http_call(monkeypatch):
     assert result.error == "missing_credentials"
     mock_cls.assert_not_called()
     mock_pdf.assert_not_called()
+
+
+# ── _is_russian ───────────────────────────────────────────────────────────────
+
+from src.scanner.pdf_extractors import _is_russian  # noqa: E402
+
+
+def test_is_russian_ocr_style_text():
+    """OCR text with spaces between words must be recognised as Russian."""
+    ocr_text = "политика обработки персональных данных " * 5  # 200+ Cyrillic chars, spaces
+    assert _is_russian(ocr_text) is True
+
+
+def test_is_russian_empty_string():
+    assert _is_russian("") is False
+
+
+def test_is_russian_latin_text():
+    assert _is_russian("This is a plain English privacy policy text." * 5) is False
+
+
+def test_is_russian_short_cyrillic_below_threshold():
+    """Fewer than 50 Cyrillic characters must not pass even at 100% ratio."""
+    assert _is_russian("привет мир") is False  # 9 Cyrillic chars
+
+
+def test_is_russian_long_machine_text_still_passes():
+    """Original machine-extracted text (long words, no spaces) must still pass."""
+    assert _is_russian("многопользовательского " * 10) is True  # 200 Cyrillic chars

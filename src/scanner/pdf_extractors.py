@@ -256,8 +256,16 @@ class YandexVisionExtractor:
 
 
 def _is_russian(text: str) -> bool:
-    """Return True if text contains a sequence of 20+ consecutive Cyrillic characters."""
-    return bool(re.search(r"[а-яА-ЯёЁ]{20,}", text))
+    """Return True if the text is predominantly Russian (Cyrillic).
+
+    Counts the share of Cyrillic letters among all alphabetic characters.
+    Requires at least 50% Cyrillic and at least 50 Cyrillic characters total
+    (the latter guards against short fragments that pass the ratio check by chance).
+    Works correctly for OCR output where words are separated by spaces and newlines.
+    """
+    cyrillic = sum(1 for c in text if "\u0400" <= c <= "\u04FF")
+    alpha = sum(1 for c in text if c.isalpha())
+    return alpha > 0 and cyrillic / alpha >= 0.5 and cyrillic >= 50
 
 
 def extract_pdf_text(pdf_bytes: bytes) -> ExtractionResult:
