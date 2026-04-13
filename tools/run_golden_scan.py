@@ -50,7 +50,8 @@ def _resolve_output_path(url: str) -> Path:
     If that file exists: <host>_YYYY-MM-DD_v2.json, _v3, … until a free slot.
     Never overwrites an existing file.
     """
-    host = (urlparse(url).hostname or "unknown").split(".")[0]
+    normalized = url if url.startswith(("http://", "https://")) else "https://" + url
+    host = (urlparse(normalized).hostname or "unknown").split(".")[0]
     date_str = datetime.now().strftime("%Y-%m-%d")
     candidate = GOLDEN_RUNS_DIR / f"{host}_{date_str}.json"
     if not candidate.exists():
