@@ -32,7 +32,7 @@ from src.scanner.pdf_extractor import (
     is_pdf_content_type,
     is_pdf_url,
 )
-from src.scanner.pdf_extractors import extract_pdf_text
+from src.scanner.pdf_extractors import _is_russian as _is_russian_text, extract_pdf_text
 from src.scanner.utils import (
     FALLBACK_PRIVACY_PATHS,
     SKIP_EXTENSIONS,
@@ -419,7 +419,7 @@ class SiteScanner:
             has_date=bool(re.search(
                 r"(\d{2}\.\d{2}\.\d{4}|дата.{0,20}(публикац|обновлен|утвержден))",
                 text_lower)),
-            is_russian=bool(re.search(r"[а-яА-ЯёЁ]{20,}", text)),
+            is_russian=_is_russian_text(text),
             is_separate_page=True,
         )
 
