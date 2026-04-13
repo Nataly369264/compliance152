@@ -192,6 +192,19 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 
 **Документы:** PASSPORT (обновлено), NEXT_SESSIONS_PLAN (1.2 → ✅ Выполнено), DECISIONS (DEC-006), CASES (CASE-008 закрыт), PATTERNS (паттерн PDF→PNG для OCR). GOLDEN_SET_MAPPING, RULES — не трогались.
 
+### 2026-04-12 — Сессия 1.3: Дорожка А — внешняя память проекта через MCP filesystem
+
+- Принято DEC-007: внешняя память через MCP filesystem без Obsidian (вариант 2 из `TRACK_A_PLAN.md`). Решает главную боль проекта — потерю лимитов на ручной перенос контекста между чатами.
+- На машине пользователя настроен MCP-сервер `compliance152` через `@modelcontextprotocol/server-filesystem` (запуск через `npx -y`). Конфиг положен по нестандартному пути Store-версии Claude Desktop: `C:\Users\ЗС\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json`. Существующие `preferences` в конфиге сохранены.
+- Функциональный тест пройден: Claude Desktop видит корень проекта `C:\Projects\compliance152` и успешно вызывает `list_directory`. Ручное прикладывание файлов в новые чаты больше не требуется.
+- Попытка перехода со Store-версии Claude Desktop на standalone не удалась: APPX-пакет с `SignatureKind: Developer` не удаляется стандартными средствами. Обход найден, детали в CASE-009. Удаление Store-версии — не блокер, переложено в backlog.
+- В корень проекта добавлены `TRACK_A_PLAN.md` и `NEW_SESSION_BRIEFING.md` — полный контекст задачи и обоснование выбора варианта 2.
+- Известное ограничение Claude Code, вскрытое в этой сессии: падает при попытке выполнить `Get-Process claude | Stop-Process`. Обход — процессы Claude Desktop завершает пользователь вручную в PowerShell. Зафиксировано в CASE-009.
+
+**Статус дорожек:** А ✅ закрыта. Б (корпус нормативки) и В (аудит кода сканера) — по прежнему порядку, после обкатки MCP на одной-двух реальных сессиях.
+
+**Документы:** PASSPORT (обновлено), NEXT_SESSIONS_PLAN (сессия 1.3 добавлена как ✅ Выполнено), DECISIONS (DEC-007), CASES (CASE-009), PATTERNS (паттерн «Запись JSON-конфига с Windows-путями из PowerShell»). GOLDEN_SET_MAPPING, RULES — не трогались.
+
 🔲 В работе / Следующие шаги
 → **[ПРИОРИТЕТ]** Исследовать pp.found=false на el-ed.ru:
      (1) проверить, что политика физически доступна через httpx (curl-тест);
