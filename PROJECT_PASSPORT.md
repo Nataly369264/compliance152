@@ -219,13 +219,11 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 - `pp.found=True` ✅, score 21% → **39%**, каскад снят с 16 строк → 2, совпало 12/34.
 - Остаток: `_select_best_policy` выбирает `reviews-policy.pdf` вместо `policy.pdf` — POLICY_003–016 остаются в `manual_review_needed`. CASE-011 открыт, сессия 2.0 не закрыта.
 
-**Документы:** PASSPORT (обновлено), NEXT_SESSIONS_PLAN (итог 2.0 + сессия 2.1 добавлена), CASES (CASE-011). DECISIONS, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
-
+**Документы:** PASSPORT (обновлено), NEXT_SESSIONS_PLAN (итог 2.1 + сессия 2.2 добавлена), CASES (CASE-011 закрыт), RULES (§15 — не записан, планируется в сессии 2.2). DECISIONS, PATTERNS, GOLDEN_SET_MAPPING — не трогались.
 
 🔲 В работе / Следующие шаги
-→ **[ПРИОРИТЕТ] Сессия 2.1** — диагностика и фикс CASE-011:
-     `_select_best_policy` выбирает `reviews-policy.pdf` вместо `policy.pdf`.
-     Задача: логирование кандидатов → прогон → диагноз → фикс.
+→ **[ПРИОРИТЕТ] Сессия 2.2** — финальный прогон v4 на el-ed.ru + §15 в RULES.
+     Ожидаем score ≥55% и закрытие сессий 2.0/2.1.
 
 Этап 6 (продолжение):
   → Синхронизация _extract_privacy_policy между краулерами
