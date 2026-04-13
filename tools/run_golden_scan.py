@@ -1,11 +1,15 @@
 """Golden set validation scan runner.
 
 Usage:
-    python -m tools.run_golden_scan [URL] [OUTPUT_JSON]
+    python -m tools.run_golden_scan [URL]
 
 Defaults:
-    URL         = https://el-ed.ru
-    OUTPUT_JSON = tests/fixtures/golden_runs/el-ed_2026-04-06.json
+    URL = https://el-ed.ru
+
+Output is always saved to tests/fixtures/golden_runs/ with a dated filename:
+    <host>_YYYY-MM-DD.json
+If that file already exists, a version suffix is added (_v2, _v3, …).
+Existing files are never overwritten.
 
 Runs SiteScanner (httpx, no Playwright) + ComplianceAnalyzer (full LLM)
 and saves the raw combined result as JSON. Does NOT modify any src/ files.
@@ -18,6 +22,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 # Ensure project root is on sys.path when run as a script
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -35,7 +40,26 @@ logging.basicConfig(
 logger = logging.getLogger("golden_scan")
 
 DEFAULT_URL = "https://el-ed.ru"
-DEFAULT_OUTPUT = Path("tests/fixtures/golden_runs/el-ed_2026-04-06.json")
+GOLDEN_RUNS_DIR = Path("tests/fixtures/golden_runs")
+
+
+def _resolve_output_path(url: str) -> Path:
+    """Return a non-conflicting path in GOLDEN_RUNS_DIR.
+
+    Format: <host>_YYYY-MM-DD.json
+    If that file exists: <host>_YYYY-MM-DD_v2.json, _v3, … until a free slot.
+    Never overwrites an existing file.
+    """
+    host = (urlparse(url).hostname or "unknown").split(".")[0]
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    candidate = GOLDEN_RUNS_DIR / f"{host}_{date_str}.json"
+    if not candidate.exists():
+        return candidate
+    for v in range(2, 1000):
+        candidate = GOLDEN_RUNS_DIR / f"{host}_{date_str}_v{v}.json"
+        if not candidate.exists():
+            return candidate
+    raise RuntimeError(f"No free slot for golden run: {host} {date_str}")
 
 
 async def run(url: str, output_path: Path) -> None:
@@ -202,7 +226,7 @@ async def run(url: str, output_path: Path) -> None:
 
 def main() -> None:
     url = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_URL
-    output_path = Path(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_OUTPUT
+    output_path = _resolve_output_path(url)
     asyncio.run(run(url, output_path))
 
 
