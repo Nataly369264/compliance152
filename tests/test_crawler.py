@@ -214,6 +214,27 @@ def test_select_best_policy_prefers_longer_text():
     assert result is long
 
 
+def test_select_best_policy_skips_invalid_longer_candidate():
+    """_select_best_policy: longer candidate that fails validation must not block
+    a shorter but valid candidate — regression for CASE-007."""
+    # Longer but invalid: is_russian=False simulates a non-Russian OCR result
+    long_invalid = PrivacyPolicyInfo(
+        found=True,
+        url="https://example.com/reviews-policy.pdf",
+        text="B" * 8000,
+        is_russian=False,
+    )
+    # Shorter but valid: is_russian=True (default) and len >= 500
+    short_valid = PrivacyPolicyInfo(
+        found=True,
+        url="https://example.com/policy.pdf",
+        text="А" * 600,  # Cyrillic А, is_russian defaults to True
+        is_russian=True,
+    )
+    result = SiteScanner._select_best_policy([long_invalid, short_valid])
+    assert result is short_valid
+
+
 # ── Group C: Cookie banner detection ────────────────────────────────────────
 
 async def test_cookie_banner_detected(scanner):

@@ -473,13 +473,15 @@ class SiteScanner:
         2. URL keyword score: politika > policy > privacy > personal
         3. First found (stable tie-break)
 
-        Candidates with text that fails validation (too short or not Russian)
-        are discarded — they are likely WAF challenge pages or JS stubs.
+        All candidates are validated first; only those passing is_valid_policy_text
+        are considered. This ensures a long-but-invalid candidate (e.g. a WAF
+        challenge page or a non-Russian OCR result) does not block a shorter but
+        valid candidate from being selected.
         """
-        best = max(
-            candidates,
+        valid = [c for c in candidates if is_valid_policy_text(c.text, c.is_russian)]
+        if not valid:
+            return PrivacyPolicyInfo()
+        return max(
+            valid,
             key=lambda p: (len(p.text or ""), cls._url_priority(p.url or "")),
         )
-        if not is_valid_policy_text(best.text, best.is_russian):
-            return PrivacyPolicyInfo()
-        return best
