@@ -243,6 +243,15 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 
 **Документы:** PASSPORT (обновлено), NEXT_SESSIONS_PLAN (сессия 2.3 добавлена как ✅ Выполнено). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
+### 2026-04-14 — Сессия 2.4: ускорение тестов (js_render_delay)
+
+- `js_render_delay` вынесен как параметр `PlaywrightCrawler.__init__` (default 2.0, в тестах 0).
+- `asyncio.sleep(2)` в `_crawl` и `asyncio.sleep(1)` в `_try_fallback_privacy_urls` заменены на `self.js_render_delay` / `self.js_render_delay / 2`.
+- Продакшн-поведение не изменилось (дефолт 2.0). Тесты: **219 passed, 56 с → 11 с (×5)**.
+- Коммит: `17aaf7a` — в origin.
+
+**Документы:** PASSPORT (обновлено). NEXT_SESSIONS_PLAN, DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+
 Этап 6 (продолжение):
   → Синхронизация _extract_privacy_policy между краулерами
      (truncation 20k vs 100k, отсутствуют text_hash/fetched_at/content_length)
