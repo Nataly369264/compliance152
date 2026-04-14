@@ -268,14 +268,20 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 
 **Документы:** PASSPORT (обновлено). NEXT_SESSIONS_PLAN (обновлено — задача D помечена выполненной). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
-Этап 6 (продолжение):
-  → Синхронизация _extract_privacy_policy между краулерами
-     (truncation 20k vs 100k, отсутствуют text_hash/fetched_at/content_length)
-  → Ускорение тестов: asyncio.sleep(2) в _crawl() увеличивает время прогона (~15 сек)
+### 2026-04-14 — Сессия 2.5: автоматический fallback SiteScanner → PlaywrightCrawler (задача E)
+
+- **DEC-002 реализован:** `_is_poor_result()` + `_scan_with_fallback()` добавлены в `src/api/server.py`.
+- Критерии «плохого» результата: `pages_scanned==0`, или `"HTTP 4"` в `errors[]`, или `privacy_policy.found=False`.
+- При `USE_PLAYWRIGHT=false` (дефолт) эндпоинты `/scan` и `/analyze` используют автофаллбэк. При `USE_PLAYWRIGHT=true` — прямой Playwright как раньше.
+- Диагностика: при срабатывании fallback добавляется запись в `scan_limitations` (пользователю не видна — DEC-005).
+- Тесты: **221 → 232 passed, 0 failed**. 11 новых тестов в `tests/test_orchestrator.py`.
+- Коммит: `48d5dcd`.
+
+**Документы:** PASSPORT (обновлено), DECISIONS (DEC-002 → ✅ Реализовано). NEXT_SESSIONS_PLAN, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
 Краулер — следующие задачи (из сессии 2026-04-05):
   → ~~(D) Корректный учёт 4xx-ответов~~ ✅ Выполнено 2026-04-14
-  → (E) Автоматический fallback SiteScanner → PlaywrightCrawler при плохом результате (DEC-002)
+  → ~~(E) Автоматический fallback SiteScanner → PlaywrightCrawler при плохом результате (DEC-002)~~ ✅ Выполнено 2026-04-14
   → (F) Stealth-режим Playwright: --disable-blink-features=AutomationControlled,
          скрытие navigator.webdriver — для сайтов с bot fingerprinting (CASE-002)
 

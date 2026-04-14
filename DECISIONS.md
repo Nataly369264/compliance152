@@ -56,15 +56,17 @@
 
 ---
 
-### DEC-002: Автоматический fallback SiteScanner → PlaywrightCrawler
+### DEC-002: Автоматический fallback SiteScanner → PlaywrightCrawler ✅ Реализовано
 - **Дата:** 2026-04-05
+- **Реализовано:** 2026-04-14 (сессия 2.5, коммит `48d5dcd`)
 - **Контекст:** тестирование показало, что SiteScanner возвращает «плохой» результат (0 страниц, 4xx, пустой текст политики) на крупных сайтах без явной ошибки для пользователя. Ручная кнопка «попробовать в браузерном режиме» не подходит — пользователь не поймёт зачем.
 - **Варианты:**
   - (А) Ручная кнопка — требует от пользователя понимания разницы краулеров, большинство уйдут с пустым результатом
   - **(Б) Автоматический fallback** ✓
-- **Решение:** вариант Б. Если SiteScanner вернул «плохой» результат — автоматически перезапускать через PlaywrightCrawler. Критерии плохого результата: `pages_scanned=0`, или наличие 4xx в errors, или `privacy_policy.found=False` при `pages_scanned≥1` и `text_len<100`.
-- **Компромиссы:** двойное время сканирования в худшем случае; нужна защита от бесконечного fallback (только один уровень).
-- **Связанные файлы:** `src/api/server.py` (`_build_scanner`), `src/scanner/crawler.py`, `src/scanner/playwright_crawler.py`
+- **Решение:** вариант Б. Если SiteScanner вернул «плохой» результат — автоматически перезапускать через PlaywrightCrawler. Критерии: `pages_scanned=0`, или `"HTTP 4"` в `errors[]`, или `privacy_policy.found=False` при `pages_scanned≥1`.
+- **Реализация:** `_is_poor_result()` + `_scan_with_fallback()` в `src/api/server.py`. При `USE_PLAYWRIGHT=false` (дефолт) — автоматический fallback. При `USE_PLAYWRIGHT=true` — прямой Playwright как раньше (ручной режим для заведомо JS-heavy сайтов). Одна запись добавляется в `scan_limitations` для диагностики.
+- **Компромиссы:** двойное время сканирования в худшем случае; только один уровень fallback — PlaywrightCrawler уже имеет свой обратный fallback на SiteScanner.
+- **Связанные файлы:** `src/api/server.py` (`_is_poor_result`, `_scan_with_fallback`), `tests/test_orchestrator.py` (11 тестов)
 
 ---
 
