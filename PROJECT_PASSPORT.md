@@ -283,6 +283,7 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
   → ~~(D) Корректный учёт 4xx-ответов~~ ✅ Выполнено 2026-04-14
   → ~~(E) Автоматический fallback SiteScanner → PlaywrightCrawler при плохом результате (DEC-002)~~ ✅ Выполнено 2026-04-14
   → ~~(F) Stealth-режим Playwright: --disable-blink-features=AutomationControlled, скрытие navigator.webdriver~~ ✅ Выполнено 2026-04-14 (CASE-002 частично закрыт)
+  → ⚠️ Техдолг F: Stealth-режим покрывает navigator.webdriver и AutomationControlled. Для сайтов с глубоким fingerprinting (Canvas, WebGL, Plugins) может потребоваться расширение — проверить на реальном Tinkoff перед тем как закрывать CASE-002 полностью.
 
 wappalyzer-next — интеграция для определения технологий по заголовкам ответа
   → план зафиксирован в docs_scanner_logic.md
