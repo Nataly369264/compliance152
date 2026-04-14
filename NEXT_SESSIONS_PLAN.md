@@ -195,3 +195,18 @@ Claude Desktop теперь видит корень проекта `C:\Projects\
 ## Сессия 2.2 — Финальный прогон v4 + §15 в RULES ✅ Выполнено 2026-04-13
 
 **Итог:** `pp.found=True`, score **47%**, совпало **22/34** с эталоном. Критерий score ≥55% не достигнут — 47% является честным результатом (реальные нарушения сайта), не баг сканера. §15 добавлен в RULES. Сессии 2.0/2.1/2.2 закрыты.
+
+---
+
+## Сессия 2.3 — Синхронизация _extract_privacy_policy между краулерами ✅ Выполнено 2026-04-14
+
+**Итог:** 5 расхождений между `crawler.py` и `playwright_crawler.py` устранены. `PlaywrightCrawler` теперь идентичен `SiteScanner` по логике извлечения политики конфиденциальности.
+
+### Что сделано
+- Расхождение 3 (CASE-010 guard): заменён inline regex `[а-яА-ЯёЁ]{20,}` на `_is_russian_text(text)` из `pdf_extractors` — OCR-тексты с пробелами между буквами теперь корректно распознаются
+- Расхождение 1: лимит обрезки текста `20 000` → `100 000`
+- Расхождение 2: добавлены поля провенанса `text_hash` (SHA-256), `fetched_at`, `content_length`; импорты `hashlib`, `datetime`
+- Расхождение 5: вынесен `_extract_privacy_policy_from_text` как отдельный метод `PlaywrightCrawler`; `_extract_privacy_policy` стал тонкой обёрткой; PDF-ветка в `_crawl` делегирует в `_extract_privacy_policy_from_text` + проставляет `extraction_method`; обработка `extraction.text is None` по образцу `crawler.py`
+- Расхождение 4: комментарий `# identical to crawler.py` теперь соответствует действительности
+- 3 новых теста (216 → 219 passed, 0 failed): OCR `is_russian`, поля провенанса, обрезка
+- Коммиты: `58e93cc` (sync is_russian/provenance/truncation), `b78942c` (PDF branch + tests) — в origin
