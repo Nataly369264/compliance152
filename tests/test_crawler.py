@@ -359,3 +359,47 @@ async def test_pdf_policy_link_not_skipped_by_site_scanner():
     assert result.privacy_policy.found is True
     assert result.privacy_policy.url is not None
     assert "policy.pdf" in result.privacy_policy.url
+
+
+# ── Group F: 4xx responses excluded from pages_scanned ──────────────────────
+
+async def test_403_not_counted_in_pages(scanner):
+    """Page returning 403 → not added to pages, URL logged in errors."""
+    resp_403 = MagicMock(spec=httpx.Response)
+    resp_403.status_code = 403
+    resp_403.headers = {"content-type": "text/html"}
+
+    ssl_resp = _make_ssl_response()
+
+    mock_client = AsyncMock()
+    mock_client.head = AsyncMock(return_value=ssl_resp)
+    mock_client.get = AsyncMock(return_value=resp_403)
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+
+    with patch("src.scanner.crawler.httpx.AsyncClient", return_value=mock_client):
+        result = await scanner.scan("https://example.com")
+
+    assert result.pages_scanned == 0
+    assert any("403" in e for e in result.errors)
+
+
+async def test_404_not_counted_in_pages(scanner):
+    """Page returning 404 → not added to pages, URL logged in errors."""
+    resp_404 = MagicMock(spec=httpx.Response)
+    resp_404.status_code = 404
+    resp_404.headers = {"content-type": "text/html"}
+
+    ssl_resp = _make_ssl_response()
+
+    mock_client = AsyncMock()
+    mock_client.head = AsyncMock(return_value=ssl_resp)
+    mock_client.get = AsyncMock(return_value=resp_404)
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+
+    with patch("src.scanner.crawler.httpx.AsyncClient", return_value=mock_client):
+        result = await scanner.scan("https://example.com")
+
+    assert result.pages_scanned == 0
+    assert any("404" in e for e in result.errors)

@@ -104,6 +104,11 @@ class SiteScanner:
 
                 try:
                     resp = await client.get(current_url)
+
+                    if 400 <= resp.status_code < 500:
+                        errors.append(f"{current_url}: HTTP {resp.status_code}")
+                        continue
+
                     content_type = resp.headers.get("content-type", "")
 
                     # PDF branch: policy document served as PDF
