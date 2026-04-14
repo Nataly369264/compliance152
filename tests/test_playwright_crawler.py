@@ -67,7 +67,7 @@ def _make_context(page: _MockPage) -> MagicMock:
 
 @pytest.fixture
 def crawler() -> PlaywrightCrawler:
-    return PlaywrightCrawler(max_pages=1, timeout=5, crawl_delay=0)
+    return PlaywrightCrawler(max_pages=1, timeout=5, crawl_delay=0, js_render_delay=0)
 
 
 # ── Test 1: нет трекеров → analytics_before_consent == False ─────────────────
@@ -190,7 +190,7 @@ async def test_pdf_policy_link_not_skipped_by_playwright_crawler():
     context.new_page = AsyncMock(side_effect=new_page_side_effect)
     context.cookies = AsyncMock(return_value=[])
 
-    pw_crawler = PlaywrightCrawler(max_pages=2, timeout=5, crawl_delay=0)
+    pw_crawler = PlaywrightCrawler(max_pages=2, timeout=5, crawl_delay=0, js_render_delay=0)
     with patch("src.scanner.playwright_crawler.asyncio.sleep", new=AsyncMock()):
         result = await pw_crawler._crawl(context, "https://example.com", "example.com")
 

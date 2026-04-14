@@ -65,10 +65,12 @@ class PlaywrightCrawler:
         max_pages: int = 20,
         timeout: int = 30,
         crawl_delay: float = 1.0,
+        js_render_delay: float = 2.0,
     ):
         self.max_pages = max_pages
         self.timeout = timeout
         self.crawl_delay = crawl_delay
+        self.js_render_delay = js_render_delay
 
     async def scan(self, url: str) -> ScanResult:
         """Scan a JS-rendered website and return structured ScanResult."""
@@ -186,7 +188,7 @@ class PlaywrightCrawler:
                         continue
 
                     # Allow JS a moment to render dynamic content after DOM load
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(self.js_render_delay)
                     html = await page.content()
                     soup = BeautifulSoup(html, "lxml")
                     title = soup.title.string.strip() if soup.title and soup.title.string else None
@@ -334,7 +336,7 @@ class PlaywrightCrawler:
                         timeout=self.timeout * 1000,
                         wait_until="domcontentloaded",
                     )
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(self.js_render_delay / 2)
                     if not resp or resp.status != 200:
                         continue
                     html = await page.content()
