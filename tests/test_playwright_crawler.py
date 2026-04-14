@@ -197,3 +197,66 @@ async def test_pdf_policy_link_not_skipped_by_playwright_crawler():
     assert any("policy.pdf" in u for u in visited_urls), (
         "PDF policy URL was filtered by should_skip — Bug A regression"
     )
+
+
+# ── Test 6: CASE-010 regression — is_russian via _is_russian_text ─────────────
+
+def test_is_russian_ocr_spaced_text(crawler):
+    """Regression CASE-010: OCR text with spaces between Cyrillic letters gives is_russian=True.
+
+    The old inline regex r'[а-яА-ЯёЁ]{20,}' required 20+ consecutive Cyrillic chars
+    and returned False for OCR output like 'П о л и т и к а'.
+    _is_russian_text counts Cyrillic share among all alpha chars — works correctly.
+    """
+    from bs4 import BeautifulSoup
+
+    # Simulate OCR output: each Cyrillic letter separated by space
+    ocr_text = (
+        "П о л и т и к а к о н ф и д е н ц и а л ь н о с т и "
+        "о р г а н и з а ц и и п о о б р а б о т к е "
+        "п е р с о н а л ь н ы х д а н н ы х"
+    )
+    soup = BeautifulSoup(f"<html><body><p>{ocr_text}</p></body></html>", "lxml")
+    result = crawler._extract_privacy_policy(soup, "https://example.com/policy", has_footer_link=False)
+
+    assert result.is_russian is True, (
+        "OCR-текст с пробелами между буквами должен давать is_russian=True"
+    )
+
+
+# ── Test 7: provenance fields populated ──────────────────────────────────────
+
+def test_extract_privacy_policy_provenance_fields(crawler):
+    """_extract_privacy_policy must return non-empty text_hash, fetched_at, content_length."""
+    from bs4 import BeautifulSoup
+    from datetime import datetime
+
+    text = "Политика конфиденциальности. " * 10
+    soup = BeautifulSoup(f"<html><body><p>{text}</p></body></html>", "lxml")
+    result = crawler._extract_privacy_policy(soup, "https://example.com/policy", has_footer_link=False)
+
+    assert result.text_hash is not None and len(result.text_hash) == 64, (
+        "text_hash должен быть SHA-256 hex (64 символа)"
+    )
+    assert result.fetched_at is not None and isinstance(result.fetched_at, datetime), (
+        "fetched_at должен быть объектом datetime"
+    )
+    assert result.content_length is not None and result.content_length > 0, (
+        "content_length должен быть > 0"
+    )
+
+
+# ── Test 8: truncation at 100 000, not 20 000 ────────────────────────────────
+
+def test_extract_privacy_policy_truncation_limit(crawler):
+    """Text longer than 20 000 chars must not be truncated at 20 000 (limit is 100 000)."""
+    from bs4 import BeautifulSoup
+
+    # 25 000 Cyrillic chars — above old limit (20 000), below new limit (100 000)
+    long_text = "а" * 25_000
+    soup = BeautifulSoup(f"<html><body><p>{long_text}</p></body></html>", "lxml")
+    result = crawler._extract_privacy_policy(soup, "https://example.com/policy", has_footer_link=False)
+
+    assert len(result.text) > 20_000, (
+        "Текст 25 000 символов не должен обрезаться на 20 000 — лимит теперь 100 000"
+    )
