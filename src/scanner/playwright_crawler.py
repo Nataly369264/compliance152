@@ -8,8 +8,10 @@ Requires: playwright install chromium  (one-time setup after pip install)
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import re
+from datetime import datetime
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -32,7 +34,7 @@ from src.scanner.detectors import (
     is_privacy_policy_page,
 )
 from src.scanner.pdf_extractor import is_pdf_content_type, is_pdf_url
-from src.scanner.pdf_extractors import extract_pdf_text
+from src.scanner.pdf_extractors import _is_russian as _is_russian_text, extract_pdf_text
 from src.scanner.tracker_registry import find_trackers_in_scripts
 from src.scanner.utils import (
     FALLBACK_PRIVACY_PATHS,
@@ -163,13 +165,19 @@ class PlaywrightCrawler:
                         if is_privacy_policy_page(current_url) and not privacy_policy_info.found:
                             pdf_bytes = await pw_resp.body() if pw_resp else b""
                             extraction = extract_pdf_text(pdf_bytes)
-                            privacy_policy_info = PrivacyPolicyInfo(
-                                found=True,
-                                url=current_url,
-                                text=extraction.text,
-                                is_separate_page=True,
-                                extraction_method=extraction.method,
-                            )
+                            if extraction.text is not None:
+                                privacy_policy_info = self._extract_privacy_policy_from_text(
+                                    extraction.text, current_url, has_footer_link=False,
+                                )
+                                privacy_policy_info.extraction_method = extraction.method
+                            else:
+                                privacy_policy_info = PrivacyPolicyInfo(
+                                    found=True,
+                                    url=current_url,
+                                    text=None,
+                                    is_separate_page=True,
+                                    extraction_method=extraction.method,
+                                )
                         pages.append(PageInfo(
                             url=current_url,
                             title=None,
@@ -374,12 +382,22 @@ class PlaywrightCrawler:
     ) -> PrivacyPolicyInfo:
         """Extract and analyze privacy policy content."""
         text = soup.get_text(separator="\n", strip=True)
-        text_lower = text.lower()
+        return self._extract_privacy_policy_from_text(text, url, has_footer_link)
 
+    def _extract_privacy_policy_from_text(
+        self, text: str, url: str, has_footer_link: bool,
+    ) -> PrivacyPolicyInfo:
+        """Build PrivacyPolicyInfo from plain text (shared by HTML and PDF paths)."""
+        text_lower = text.lower()
+        text_hash = hashlib.sha256(text.encode("utf-8", errors="replace")).hexdigest()
+        content_length = len(text)
         return PrivacyPolicyInfo(
             found=True,
             url=url,
-            text=text[:20000],
+            text=text[:100000],
+            text_hash=text_hash,
+            fetched_at=datetime.utcnow(),
+            content_length=content_length,
             in_footer=has_footer_link,
             has_operator_name=bool(re.search(
                 r"(общество с ограниченной|акционерное общество|индивидуальный предприниматель|ООО|АО|ИП)",
@@ -435,7 +453,7 @@ class PlaywrightCrawler:
             has_date=bool(re.search(
                 r"(\d{2}\.\d{2}\.\d{4}|дата.{0,20}(публикац|обновлен|утвержден))",
                 text_lower)),
-            is_russian=bool(re.search(r"[а-яА-ЯёЁ]{20,}", text)),
+            is_russian=_is_russian_text(text),
             is_separate_page=True,
         )
 
