@@ -1,7 +1,7 @@
 
 PROJECT PASSPORT — Compliance 152-ФЗ
 
-**Последнее обновление:** 2026-04-14, техническая правка — ускорение test_truncates_long_text (~6s → ~1s), 219 passed
+**Последнее обновление:** 2026-04-14, технические правки — ускорение test_truncates_long_text + учёт 4xx-ответов, 221 passed
 
 Суть проекта
 AI-сканер сайтов на соответствие требованиям 152-ФЗ «О персональных данных». Автоматически проверяет сайт, выявляет нарушения, рассчитывает штрафы по КоАП и генерирует пакет документов для устранения нарушений.
@@ -259,13 +259,22 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 - Результат: `test_truncates_long_text` ~6 с → **~1 с**. Тесты: **219 passed**.
 - Коммит: `58172e5`.
 
+### 2026-04-14 — Техническая правка: учёт 4xx-ответов (задача D)
+
+- В `SiteScanner.scan()` (`src/scanner/crawler.py`) добавлена проверка после `resp = await client.get(...)`: если `400 ≤ status_code < 500` — URL логируется в `errors[]`, страница не добавляется в `pages`. До правки 403/404/429 тихо попадали в `pages_scanned`.
+- Fallback-метод `_try_fallback_privacy_urls` — не тронут, там уже `status_code != 200: continue`.
+- 2 новых теста: `test_403_not_counted_in_pages`, `test_404_not_counted_in_pages`. Тесты: **219 → 221 passed**.
+- Коммит: `689929e`.
+
+**Документы:** PASSPORT (обновлено). NEXT_SESSIONS_PLAN (обновлено — задача D помечена выполненной). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+
 Этап 6 (продолжение):
   → Синхронизация _extract_privacy_policy между краулерами
      (truncation 20k vs 100k, отсутствуют text_hash/fetched_at/content_length)
   → Ускорение тестов: asyncio.sleep(2) в _crawl() увеличивает время прогона (~15 сек)
 
 Краулер — следующие задачи (из сессии 2026-04-05):
-  → (D) Корректный учёт 4xx-ответов: в pages_scanned не засчитывать, в errors фиксировать
+  → ~~(D) Корректный учёт 4xx-ответов~~ ✅ Выполнено 2026-04-14
   → (E) Автоматический fallback SiteScanner → PlaywrightCrawler при плохом результате (DEC-002)
   → (F) Stealth-режим Playwright: --disable-blink-features=AutomationControlled,
          скрытие navigator.webdriver — для сайтов с bot fingerprinting (CASE-002)

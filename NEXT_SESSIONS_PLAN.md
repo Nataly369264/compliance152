@@ -210,3 +210,12 @@ Claude Desktop теперь видит корень проекта `C:\Projects\
 - Расхождение 4: комментарий `# identical to crawler.py` теперь соответствует действительности
 - 3 новых теста (216 → 219 passed, 0 failed): OCR `is_russian`, поля провенанса, обрезка
 - Коммиты: `58e93cc` (sync is_russian/provenance/truncation), `b78942c` (PDF branch + tests) — в origin
+
+---
+
+## Технические правки 2026-04-14 ✅ Выполнено 2026-04-14
+
+Две изолированные правки без номера сессии (задачи из backlog).
+
+- **Ускорение test_truncates_long_text** (`src/llm/web_tools.py`): входной HTML обрезается до `MAX_PAGE_TEXT * 20` (240 000 символов) до парсинга BeautifulSoup. Тест: ~6 с → ~1 с. Коммит `58172e5`.
+- **Учёт 4xx-ответов** (`src/scanner/crawler.py`): 403/404/429 логируются в `errors[]` и не попадают в `pages_scanned`. 2 новых теста. Тесты: 219 → 221 passed. Коммит `689929e`.
