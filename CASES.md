@@ -79,7 +79,8 @@
 - **Причина:** страница политики рендерится через JavaScript; httpx получает пустой HTML без контента; `is_russian=False` → score за содержание политики = 0 несмотря на наличие ссылки
 - **PlaywrightCrawler (до смены UA):** тот же текст-заглушка (`text_len=6722`, `is_russian=False`). Детектирует бота по UA `Compliance152Bot/0.1`.
 - **PlaywrightCrawler (после смены UA на Chrome/120):** результат идентичен — `text_len=6722`, `is_russian=False`. Смена UA не помогла. Причина: Tinkoff детектирует headless-режим через `navigator.webdriver=true` — это стандартное свойство Playwright, не зависящее от UA. Нужен stealth-режим: запуск с `--disable-blink-features=AutomationControlled` + патч `navigator.webdriver`.
-- **Статус:** открыт — требуется stealth-режим Playwright, не просто смена UA
+- **Stealth-режим реализован (2026-04-14):** добавлен `--disable-blink-features=AutomationControlled` в `chromium.launch` + `add_init_script` для патча `navigator.webdriver → undefined`. Тесты: 9 и 10 в `test_playwright_crawler.py`.
+- **Статус:** частично закрыт — stealth-режим реализован, полный обход Tinkoff требует дополнительной проверки на реальном сайте
 
 ### CASE-003: ozon.ru — HTTP 403, страница засчитана как просканированная без ошибки
 - ★ **Дата:** 2026-04-04

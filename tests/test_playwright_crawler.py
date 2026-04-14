@@ -260,3 +260,70 @@ def test_extract_privacy_policy_truncation_limit(crawler):
     assert len(result.text) > 20_000, (
         "Текст 25 000 символов не должен обрезаться на 20 000 — лимит теперь 100 000"
     )
+
+
+# ── Stealth helpers ──────────────────────────────────────────────────────────
+
+def _make_stealth_pw_mock():
+    """Return (mock_async_playwright, mock_chromium, mock_context) for stealth tests."""
+    mock_page = MagicMock()
+    mock_page.on = MagicMock()
+    mock_page.goto = AsyncMock(return_value=MagicMock(status=200, headers={}))
+    mock_page.content = AsyncMock(return_value="<html><body></body></html>")
+    mock_page.close = AsyncMock()
+
+    mock_context = MagicMock()
+    mock_context.add_init_script = AsyncMock()
+    mock_context.cookies = AsyncMock(return_value=[])
+    mock_context.new_page = AsyncMock(return_value=mock_page)
+
+    mock_browser = MagicMock()
+    mock_browser.new_context = AsyncMock(return_value=mock_context)
+    mock_browser.close = AsyncMock()
+
+    mock_chromium = MagicMock()
+    mock_chromium.launch = AsyncMock(return_value=mock_browser)
+
+    mock_pw = MagicMock()
+    mock_pw.chromium = mock_chromium
+
+    mock_pw_cm = MagicMock()
+    mock_pw_cm.__aenter__ = AsyncMock(return_value=mock_pw)
+    mock_pw_cm.__aexit__ = AsyncMock(return_value=False)
+
+    mock_async_playwright = MagicMock(return_value=mock_pw_cm)
+    return mock_async_playwright, mock_chromium, mock_context
+
+
+# ── Test 9: stealth — --disable-blink-features=AutomationControlled ──────────
+
+async def test_stealth_launch_includes_automation_controlled_arg():
+    """chromium.launch must pass --disable-blink-features=AutomationControlled in args."""
+    mock_apw, mock_chromium, _ = _make_stealth_pw_mock()
+
+    with patch("playwright.async_api.async_playwright", mock_apw):
+        with patch("src.scanner.playwright_crawler.asyncio.sleep", new=AsyncMock()):
+            crawler = PlaywrightCrawler(max_pages=1, timeout=5, crawl_delay=0, js_render_delay=0)
+            await crawler.scan("https://example.com")
+
+    mock_chromium.launch.assert_called_once()
+    launch_args = mock_chromium.launch.call_args.kwargs.get("args", [])
+    assert "--disable-blink-features=AutomationControlled" in launch_args, (
+        "chromium.launch должен передавать --disable-blink-features=AutomationControlled"
+    )
+
+
+# ── Test 10: stealth — add_init_script patches navigator.webdriver ───────────
+
+async def test_stealth_add_init_script_patches_navigator_webdriver():
+    """context.add_init_script must be called with the navigator.webdriver patch."""
+    mock_apw, _, mock_context = _make_stealth_pw_mock()
+
+    with patch("playwright.async_api.async_playwright", mock_apw):
+        with patch("src.scanner.playwright_crawler.asyncio.sleep", new=AsyncMock()):
+            crawler = PlaywrightCrawler(max_pages=1, timeout=5, crawl_delay=0, js_render_delay=0)
+            await crawler.scan("https://example.com")
+
+    mock_context.add_init_script.assert_called_once_with(
+        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+    )
