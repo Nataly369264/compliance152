@@ -287,6 +287,14 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 
 **Документы:** PASSPORT (обновлено), CASES (CASE-002 частично закрыт). NEXT_SESSIONS_PLAN, DECISIONS, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
+### 2026-04-15 — Валидационный прогон + CASE-006
+
+- **Валидационный прогон el-ed.ru:** запущен `tools/run_golden_scan.py`, результаты `el-ed_2026-04-15.json` и `el-ed_2026-04-15_v3.json` (с `google/gemini-2.5-pro`). Score: **47% (20/42)**, `pp.found=True`. Delta vs v4: 0 — ожидаемо, задачи D/E/F касаются Playwright, прогон идёт через SiteScanner (httpx). Тесты: 234 passed, 0 failed.
+- **CASE-006 закрыт:** причина — в `.env` было значение `OPENROUTER_MODEL=openrouter/free` (случайная бесплатная модель). Исправлено вручную: `OPENROUTER_MODEL=google/gemini-2.5-pro`. Score после смены модели не изменился — LLM влияет на качество текстового summary, а не на числовой score чеклиста. `.env` в `.gitignore`.
+- Коммиты: `544ec64` (golden run), `88238ae` (CASES.md — CASE-006 закрыт).
+
+**Документы:** PASSPORT (обновлено), NEXT_SESSIONS_PLAN (пункты 1 и 2 помечены выполненными), CASES (CASE-006 закрыт). DECISIONS, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+
 wappalyzer-next — интеграция для определения технологий по заголовкам ответа
   → план зафиксирован в docs_scanner_logic.md
 
