@@ -27,3 +27,7 @@ dist/
 # macOS
 .DS_Store
 .claude/worktrees/
+
+# Локальные сессионные заметки (не в git)
+docs/sessions/
+docs/tasks/
