@@ -59,7 +59,18 @@
     </div>
 </div>
 
-{% set critical_violations = report.violations | selectattr('severity', 'equalto', 'critical') | list %}
+{% set ns = namespace(seen=[], deduped=[], counts={}) %}
+{% for v in report.violations | selectattr('severity', 'equalto', 'critical') | list %}
+  {% set cid = v.check_id | default('') %}
+  {% if cid not in ns.seen %}
+    {% set _ = ns.seen.append(cid) %}
+    {% set _ = ns.deduped.append(v) %}
+    {% set _ = ns.counts.update({cid: 1}) %}
+  {% else %}
+    {% set _ = ns.counts.update({cid: ns.counts[cid] + 1}) %}
+  {% endif %}
+{% endfor %}
+{% set critical_violations = ns.deduped %}
 {% if critical_violations %}
 <section>
     <h2>ТОП-5 критических проблем</h2>
@@ -67,12 +78,17 @@
     {% set sev = v.severity|default('medium') %}
     {% if sev is mapping %}{% set sev = sev.value|default('medium') %}{% endif %}
     {% set sev = sev|lower %}
+    {% set cid = v.check_id | default('') %}
+    {% set extra = ns.counts[cid] - 1 if cid in ns.counts else 0 %}
     <div class="violation-card sev-{{ sev }}" style="border-left-width:4px">
         <div class="violation-title">
             <span class="risk-label {{ sev }}" style="font-size:.75rem;padding:2px 8px;margin-right:6px">
                 {{ sev|upper }}
             </span>
             {{ v.title|default(v.check_id|default('')) }}
+            {% if extra > 0 %}
+            <span style="font-size:.8rem;color:var(--color-text-secondary);margin-left:8px">+ ещё {{ extra }} стр.</span>
+            {% endif %}
         </div>
         <div class="violation-meta">
             {% if v.law_reference %}<span>{{ v.law_reference }}</span>{% endif %}
@@ -89,9 +105,31 @@
 {% endif %}
 
 {% if report.violations %}
+{% macro plural_type(n) %}{%- if n % 10 == 1 and n % 100 != 11 %}тип{%- elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}типа{%- else %}типов{%- endif %}{% endmacro %}
+{% macro plural_occur(n) %}{%- if n % 10 == 1 and n % 100 != 11 %}вхождение{%- elif n % 10 in [2,3,4] and n % 100 not in [12,13,14] %}вхождения{%- else %}вхождений{%- endif %}{% endmacro %}
+{% set grp = namespace(seen=[], groups={}, url_map={}, counts={}) %}
+{% for v in report.violations %}
+  {% set cid = v.check_id | default('_') %}
+  {% if cid not in grp.seen %}
+    {% set _ = grp.seen.append(cid) %}
+    {% set _ = grp.groups.update({cid: v}) %}
+    {% set _ = grp.url_map.update({cid: []}) %}
+    {% set _ = grp.counts.update({cid: 0}) %}
+  {% endif %}
+  {% set _ = grp.counts.update({cid: grp.counts[cid] + 1}) %}
+  {% set urls = grp.url_map[cid] %}
+  {% if v.page_url and v.page_url not in urls %}
+    {% set _ = urls.append(v.page_url) %}
+  {% endif %}
+{% endfor %}
+{% set total = report.violations|length %}
+{% set types = grp.seen|length %}
 <section>
-    <h2>Нарушения ({{ report.violations|length }})</h2>
-    {% for v in report.violations %}
+    <h2>Нарушения ({{ types }} {{ plural_type(types) }}, {{ total }} {{ plural_occur(total) }})</h2>
+    {% for cid in grp.seen %}
+    {% set v = grp.groups[cid] %}
+    {% set urls = grp.url_map[cid] %}
+    {% set count = grp.counts[cid] %}
     {% set sev = v.severity|default('medium') %}
     {% if sev is mapping %}{% set sev = sev.value|default('medium') %}{% endif %}
     {% set sev = sev|lower %}
@@ -101,13 +139,14 @@
                 {{ sev|upper }}
             </span>
             {{ v.title|default(v.check_id|default('')) }}
+            {% if count > 1 %}
+            <span style="font-size:.8rem;color:var(--color-text-secondary);margin-left:8px">{{ count }} {{ plural_occur(count) }}</span>
+            {% endif %}
         </div>
         <div class="violation-meta">
             {% if v.category %}<span>{{ v.category }}</span>{% endif %}
             {% if v.law_reference %} &mdash; <span>{{ v.law_reference }}</span>{% endif %}
-            {% if v.fine_range %}
-                &mdash; {{ v.fine_range }}
-            {% endif %}
+            {% if v.fine_range %} &mdash; {{ v.fine_range }}{% endif %}
         </div>
         {% if v.description %}
         <p style="margin-top:4px">{{ v.description }}</p>
@@ -115,6 +154,17 @@
         {% if v.recommendation %}
         <div class="violation-recommendation">
             <strong>Рекомендация:</strong> {{ v.recommendation }}
+        </div>
+        {% endif %}
+        {% if urls %}
+        <div class="violation-pages" style="margin-top:6px;font-size:.85rem;color:var(--color-text-secondary)">
+            <span style="margin-right:4px">Страницы:</span>
+            {% for url in urls[:3] %}<a href="{{ url }}" target="_blank" rel="noopener" style="word-break:break-all">{{ url }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+            {% if urls|length > 3 %}
+            <span style="cursor:pointer;color:var(--color-primary);margin-left:4px"
+                  onclick="this.style.display='none';this.nextElementSibling.style.display='inline'">+ ещё {{ urls|length - 3 }} страниц ▾</span>
+            <span style="display:none">{% for url in urls[3:] %}, <a href="{{ url }}" target="_blank" rel="noopener" style="word-break:break-all">{{ url }}</a>{% endfor %}</span>
+            {% endif %}
         </div>
         {% endif %}
     </div>
@@ -173,7 +223,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/static/js/marked.min.js"></script>
 <script>
     var el = document.getElementById('report-summary');
     if (el) el.innerHTML = marked.parse(el.dataset.summary || '');
