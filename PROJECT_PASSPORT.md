@@ -303,6 +303,29 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 
 **Документы:** CLAUDE.md (обновлено — чеклист 9 пунктов), PASSPORT (обновлено), NEXT_SESSIONS_PLAN — не трогался, DECISIONS — не трогался, CASES — не трогался, PATTERNS — не трогался, GOLDEN_SET_MAPPING — не трогался, RULES (обновлено — §14 пункт 0).
 
+### 2026-04-17 — Сессия 3: Дорожка Б — keyword-детекторы PDF-политик
+
+**Выполнено:**
+- Диагностика: корневая причина false-negative в POLICY_008/011/013 — обрезка
+  PDF-текста на 20 000 символах. Разделы legal_basis (pos 23k), security (pos 27k),
+  cross_border (pos 31k), rights_procedure (отсутствие паттернов в полном тексте) — все
+  за пределами старого лимита или вне паттернов.
+- `pdf_extractors.py` + `pdf_extractor.py`: лимит текста PDF **20k → 40k** в
+  pdfplumber и yandex_vision экстракторах.
+- `crawler.py` + `playwright_crawler.py`: расширены паттерны детекторов:
+  - `has_legal_basis`: добавлен `основан.{0,20}обработк` (ранний матч, первые 20k)
+  - `has_rights_procedure`: добавлены `направить..обращен/заявлен`,
+    `требова..уточнени/блокировани/уничтожени`
+  - `has_security_measures`: добавлены `режим..защит`, `защит..конфиденциальн`
+- 17 новых тестов: `test_policy_content_detectors.py` + регрессионный тест 40k.
+- Тесты: **251 passed, 0 failed** (было 234). Коммит: `138d93a`, запушен.
+
+**В работе / Следующий шаг:**
+- Прогон `python tools/run_golden_scan.py` → el-ed v5. Ожидаем POLICY_008/011/013 → True,
+  score ≥ 55%. Golden scan отложен из-за окончания контекста сессии.
+
+**Документы:** CLAUDE.md (статус 251 passed, лимит 40k, задачи), PASSPORT (обновлено), NEXT_SESSIONS_PLAN (сессия 3 помечена выполненной, сессия 4 = запуск v5). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+
 wappalyzer-next — интеграция для определения технологий по заголовкам ответа
   → план зафиксирован в docs_scanner_logic.md
 

@@ -234,8 +234,27 @@ Delta vs v4: без изменений — ожидаемо, задачи D/E/F 
 Причина: в `.env` была строка `OPENROUTER_MODEL=openrouter/free` (случайная бесплатная модель).
 Исправлено вручную: `OPENROUTER_MODEL=google/gemini-2.5-pro`. Коммит `88238ae` (CASES.md).
 
-### 3. Дорожка Б — корпус нормативки (knowledge_base/)
-4–5 точечных улучшений. Запускать после прогона и CASE-006.
+### 3. Дорожка Б — точечные улучшения keyword-детекторов ✅ Выполнено 2026-04-17
+
+**Что сделано:**
+- `pdf_extractors.py` + `pdf_extractor.py`: лимит текста PDF поднят 20k → 40k
+  (корневая причина: el-ed.ru policy sections legal_basis/security/cross_border
+  находятся за позицией 23k–32k, были обрезаны)
+- `crawler.py` + `playwright_crawler.py`: расширены паттерны:
+  - `has_legal_basis`: добавлен `основан.{0,20}обработк`
+  - `has_rights_procedure`: добавлены `направить..обращен/заявлен`,
+    `требова..уточнени/блокировани/уничтожени`
+  - `has_security_measures`: добавлены `режим..защит`, `защит..конфиденциальн`
+- 17 новых тестов (test_policy_content_detectors.py + 40k regression)
+- Тесты: 251 passed, 0 failed. Коммит: `138d93a`
+
+**Следующий шаг (начало сессии 4):**
+Запустить `python tools/run_golden_scan.py` на el-ed.ru.
+Сохранить результат как `el-ed_<дата>_v5.json`.
+Сравнить diff vs `el-ed_2026-04-15.json`:
+- Ожидаем `has_legal_basis`, `has_security_measures`, `has_cross_border_info` → True
+- Ожидаем `has_rights_procedure` → True
+- Ожидаем score ≥ 55%
 
 ### 4. Технический долг (низкий приоритет, не блокирует)
 - Stealth Canvas/WebGL/Plugins: проверить на реальном Tinkoff (CASE-002 открыт частично)
