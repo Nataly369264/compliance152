@@ -223,7 +223,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/static/js/marked.min.js"></script>
 <script>
     var el = document.getElementById('report-summary');
     if (el) el.innerHTML = marked.parse(el.dataset.summary || '');
