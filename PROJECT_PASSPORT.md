@@ -355,7 +355,7 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 - `.vscode/tasks.json` и `.vscode/settings.json` созданы; `.vscode/` добавлен в `.gitignore`.
 - Коммиты: `c49b17a`, `38ec85c`, `91e5995`, `fa74d84`, `c14a9de` — смёрджены в `main`.
 
-**Документы:** CLAUDE.md (статус, задачи обновлены), PASSPORT (обновлено). NEXT_SESSIONS_PLAN, DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+**Документы:** CLAUDE.md (статус, задачи обновлены), PASSPORT (обновлено), NEXT_SESSIONS_PLAN (сессия 5 → ✅ Выполнено), TESTING_GUIDE (инструкция запуска сервера). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
 wappalyzer-next — интеграция для определения технологий по заголовкам ответа
   → план зафиксирован в docs_scanner_logic.md
