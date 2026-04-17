@@ -342,6 +342,21 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 
 **Документы:** CLAUDE.md (статус score 64%, задачи), PASSPORT (обновлено), NEXT_SESSIONS_PLAN (сессия 4 выполнена, сессия 5 добавлена), PATTERNS (новая запись). DECISIONS, CASES, GOLDEN_SET_MAPPING, RULES — не трогались.
 
+### 2026-04-18 — Сессия 5: UX улучшения страницы /check и /reports
+
+**Выполнено:**
+- Прогресс-бар (0→90%, градиент синий→зелёный) + 8 фаз сканирования (~22.5 сек каждая) на `/check`.
+- Фикс бага: `#loading` не скрывался после результата (`display:flex` перебивал `hidden`). Добавлен `#loading[hidden] { display:none !important }`.
+- Спиннер увеличен вдвое (96px), шрифты фазы/подписи подправлены.
+- Дедупликация топ-5 критических нарушений в `report.html` по `check_id` + счётчик «+ ещё N стр.».
+- Группировка всех нарушений в `report.html` по типу: «N типов, M вхождений», первые 3 URL + раскрываемый список. Склонения через Jinja-макросы.
+- Дедупликация топ-3 нарушений на `/check` (JS оверрайд `renderTopViolations`).
+- `marked.min.js` вендорится локально (`src/web/static/js/`) — убрана CDN-зависимость, устранена блокировка Edge Tracking Prevention.
+- `.vscode/tasks.json` и `.vscode/settings.json` созданы; `.vscode/` добавлен в `.gitignore`.
+- Коммиты: `c49b17a`, `38ec85c`, `91e5995`, `fa74d84`, `c14a9de` — смёрджены в `main`.
+
+**Документы:** CLAUDE.md (статус, задачи обновлены), PASSPORT (обновлено). NEXT_SESSIONS_PLAN, DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+
 wappalyzer-next — интеграция для определения технологий по заголовкам ответа
   → план зафиксирован в docs_scanner_logic.md
 
