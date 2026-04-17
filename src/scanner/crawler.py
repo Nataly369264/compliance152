@@ -395,7 +395,8 @@ class SiteScanner:
                 text_lower)),
             has_purposes=bool(re.search(r"(цел.{0,20}обработк|purpose)", text_lower)),
             has_legal_basis=bool(re.search(
-                r"(правов.{0,20}основан|закон.{0,20}основан|legal.?basis|на основании)",
+                r"(правов.{0,20}основан|закон.{0,20}основан|legal.?basis|на основании"
+                r"|основан.{0,20}обработк)",
                 text_lower)),
             has_retention_periods=bool(re.search(
                 r"(срок.{0,20}хранен|срок.{0,20}обработк|период.{0,20}хранен)",
@@ -404,13 +405,15 @@ class SiteScanner:
                 r"(прав.{0,20}субъект|прав.{0,20}пользовател|right.{0,10}data.?subject)",
                 text_lower)),
             has_rights_procedure=bool(re.search(
-                r"(порядок.{0,20}реализац|порядок.{0,20}обращен|10.{0,10}рабочих|направить.{0,20}запрос)",
+                r"(порядок.{0,20}реализац|порядок.{0,20}обращен|10.{0,10}рабочих|направить.{0,20}запрос"
+                r"|направить.{0,20}(обращен|заявлен)|требова.{0,30}(уточнени|блокировани|уничтожени))",
                 text_lower)),
             has_cross_border_info=bool(re.search(
                 r"(трансграничн|cross.?border|передач.{0,20}за рубеж|иностранн.{0,20}государств)",
                 text_lower)),
             has_security_measures=bool(re.search(
-                r"(мер.{0,20}безопасност|мер.{0,20}защит|security.?measure|шифрован|encrypt)",
+                r"(мер.{0,20}безопасност|мер.{0,20}защит|security.?measure|шифрован|encrypt"
+                r"|режим.{0,20}защит|защит.{0,10}конфиденциальн)",
                 text_lower)),
             has_cookie_info=bool(re.search(r"(cookie|куки|файл.{0,10}cookie)", text_lower)),
             has_localization_statement=bool(re.search(

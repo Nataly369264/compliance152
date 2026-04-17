@@ -47,7 +47,7 @@ def extract_text_from_pdf(content: bytes) -> str | None:
         )
         return None
 
-    return text[:20000]  # Same limit as HTML policy text
+    return text[:40000]  # Same limit as HTML policy text
 
 
 def is_pdf_content_type(content_type: str) -> bool:

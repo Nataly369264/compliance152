@@ -301,3 +301,38 @@ def test_is_russian_short_cyrillic_below_threshold():
 def test_is_russian_long_machine_text_still_passes():
     """Original machine-extracted text (long words, no spaces) must still pass."""
     assert _is_russian("многопользовательского " * 10) is True  # 200 Cyrillic chars
+
+
+# ── PdfplumberExtractor: 40k limit (regression for raised limit) ──────────────
+
+def test_pdfplumber_extracts_text_beyond_20k():
+    """After raising the limit from 20k to 40k, text at position ~25k is accessible.
+
+    Regression guard: el-ed.ru policy has legal_basis/security keywords at
+    positions 23k–28k, which were silently truncated when the limit was 20k.
+    """
+    # Word repeated to produce >20k chars of filler, keyword placed at position ~25k
+    word = "обработка персональных данных пользователя сайта. "
+    filler = word * 420          # ~21 000 chars
+    keyword = " правовые основания для обработки персональных данных"
+    full_text = filler + keyword
+    assert len(filler) > 20000, "filler must exceed old 20k limit"
+
+    page_mock = MagicMock()
+    page_mock.extract_text.return_value = full_text
+
+    pdf_cm = MagicMock()
+    pdf_cm.__enter__ = MagicMock(return_value=pdf_cm)
+    pdf_cm.__exit__ = MagicMock(return_value=False)
+    pdf_cm.pages = [page_mock]
+
+    with patch("pdfplumber.open", return_value=pdf_cm):
+        from src.scanner.pdf_extractors import PdfplumberExtractor
+        result = PdfplumberExtractor().extract(b"%PDF-fake")
+
+    assert result.error is None
+    assert result.text is not None
+    assert len(result.text) > 20000, "extracted text must exceed old 20k limit"
+    assert "правовые основания" in result.text, (
+        "keyword at position ~25k must be present after raising limit to 40k"
+    )

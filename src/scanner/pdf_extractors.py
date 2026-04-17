@@ -82,7 +82,7 @@ class PdfplumberExtractor:
             )
             return ExtractionResult(text=None, method="pdfplumber", error="text_too_short")
 
-        return ExtractionResult(text=text[:20000], method="pdfplumber", error=None)
+        return ExtractionResult(text=text[:40000], method="pdfplumber", error=None)
 
 
 _YANDEX_OCR_URL = "https://ocr.api.cloud.yandex.net/ocr/v1/recognizeText"
@@ -180,7 +180,7 @@ class YandexVisionExtractor:
             "YandexVisionExtractor: extracted %d chars from %d/%d pages",
             len(full_text), len(page_texts), total,
         )
-        return ExtractionResult(text=full_text[:20000], method="yandex_vision", error=None)
+        return ExtractionResult(text=full_text[:40000], method="yandex_vision", error=None)
 
     def _recognize_page(
         self,
