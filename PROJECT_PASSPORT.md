@@ -326,6 +326,22 @@ CONSENT_CHECK (Этап 5) — проверки согласия по ст. 9 15
 
 **Документы:** CLAUDE.md (статус 251 passed, лимит 40k, задачи), PASSPORT (обновлено), NEXT_SESSIONS_PLAN (сессия 3 помечена выполненной, сессия 4 = запуск v5). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
+---
+
+### 2026-04-17 — Сессия 4: Прогон v5 + диагностика CONSENT_002 и POLICY_002
+
+**Выполнено:**
+- Прогон `python tools/run_golden_scan.py` на el-ed.ru: score **47% → 64%** (было 16 fail, стало 10 fail).
+- Исправлено 7 пунктов чеклиста: POLICY_003, POLICY_005, POLICY_008, POLICY_011, POLICY_013, POLICY_015, TRACKER_002 — лимит PDF 40k дал ожидаемый эффект.
+- `has_legal_basis`, `has_security_measures`, `has_cross_border_info`, `has_rights_procedure` → все True. `content_length` 20 000 → 37 825.
+- **CONSENT_002** — новый fail, **реальное нарушение сайта**: согласие на ПДн включено в текст оферты (ст. 9 ч. 8 152-ФЗ, запрет с 01.09.2025). В v4 был pass только потому, что нужные строки находились за позицией 20k. Регрессии нет.
+- **POLICY_002** — остаётся fail: страница `/about/` (1 из 47) не имеет ссылки на политику в футере. Реальное нарушение, детектор работает корректно.
+- Паттерн «Лимит PDF-текста напрямую влияет на score» зафиксирован в PATTERNS.md.
+- Файл прогона: `tests/fixtures/golden_runs/el-ed_2026-04-17.json`.
+- Коммиты: `aed0ef8` (golden run v5), `11d623f` (PATTERNS.md) — в origin.
+
+**Документы:** CLAUDE.md (статус score 64%, задачи), PASSPORT (обновлено), NEXT_SESSIONS_PLAN (сессия 4 выполнена, сессия 5 добавлена), PATTERNS (новая запись). DECISIONS, CASES, GOLDEN_SET_MAPPING, RULES — не трогались.
+
 wappalyzer-next — интеграция для определения технологий по заголовкам ответа
   → план зафиксирован в docs_scanner_logic.md
 
