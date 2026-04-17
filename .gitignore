@@ -24,6 +24,9 @@ __pycache__/
 venv/
 dist/
 
+# IDE
+.vscode/
+
 # macOS
 .DS_Store
 .claude/worktrees/
