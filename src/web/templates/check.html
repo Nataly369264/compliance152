@@ -163,5 +163,41 @@ function stopPhaseProgress() {
     var bar = document.getElementById('progress-bar-fill');
     if (bar) bar.style.width = '100%';
 }
+
+function renderTopViolations(violations) {
+    var block = document.getElementById('top-violations');
+    var list = document.getElementById('violations-list');
+    if (!violations || violations.length === 0) { block.hidden = true; return; }
+
+    var seen = {};
+    var deduped = [];
+    violations.forEach(function (v) {
+        var cid = v.check_id || '';
+        if (!seen[cid]) {
+            seen[cid] = true;
+            deduped.push(v);
+        }
+    });
+
+    var sorted = deduped.slice().sort(function (a, b) {
+        return (SEVERITY_ORDER[a.severity] || 9) - (SEVERITY_ORDER[b.severity] || 9);
+    });
+
+    list.innerHTML = '';
+    sorted.slice(0, 3).forEach(function (v) {
+        var li = document.createElement('li');
+        li.className = 'violation-preview-item';
+        var fine = v.fine_range
+            ? '<span class="violation-fine">' + escapeHtml(v.fine_range) + '</span>'
+            : '';
+        li.innerHTML =
+            '<span class="severity-dot risk-' + riskClass(v.severity) + '"></span>' +
+            '<span class="violation-preview-title" title="' + escapeHtml(v.recommendation || '') + '">' +
+            escapeHtml(v.title) + '</span>' +
+            fine;
+        list.appendChild(li);
+    });
+    block.hidden = false;
+}
 </script>
 {% endblock %}
