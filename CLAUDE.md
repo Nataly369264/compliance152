@@ -51,7 +51,7 @@ src/
   config.py     — конфигурация
   main.py       — точка входа
 
-tests/              — 234+ тестов, fixtures/golden_runs/
+tests/              — 251+ тестов, fixtures/golden_runs/
 knowledge_base/     — чеклисты, шаблоны документов, обновления НПА
 config/             — sources.yaml
 data/               — БД и результаты сканов
