@@ -213,6 +213,22 @@ with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
 
 ---
 
+### Лимит PDF-текста напрямую влияет на score
+
+**Контекст:** сессия 3–4, диагностика false-negative на el-ed.ru (POLICY-группа), 2026-04-17.
+
+**Проблема:** четыре поля политики возвращали `False` (`has_legal_basis`, `has_security_measures`, `has_cross_border_info`, `has_rights_procedure`) несмотря на то, что соответствующие разделы физически присутствовали в документе. Причина — лимит `text[:20_000]` в `pdf_extractors.py` и `pdf_extractor.py` обрезал текст политики ровно перед нужными разделами: `content_length` застывал на ровно 20 000 символов.
+
+**Решение:** поднять лимит до 40 000 символов (`MAX_POLICY_TEXT_LEN = 40_000`) в обоих файлах-экстракторах.
+
+**Эффект:** `content_length` 20 000 → 37 825, score 47% → 64%, исправлено 7 пунктов чеклиста (POLICY_003/005/008/011/013/015 + TRACKER_002).
+
+**Вывод:** при появлении кластера false-negative в POLICY-группе — первый вопрос: «не обрезается ли PDF?». Признак: `content_length` == ровно `MAX_POLICY_TEXT_LEN` (значение выглядит как константа, а не реальный размер). Диагностика: `grep content_length` в golden run JSON.
+
+**Где применено:** `src/scanner/pdf_extractors.py`, `src/scanner/pdf_extractor.py`.
+
+---
+
 ### scan_limitations используется для двух разных типов событий
 
 **Контекст:** `ScanResult.scan_limitations: list[str]` — поле для диагностических примечаний краулера. Сейчас в него попадают записи двух принципиально разных типов:
