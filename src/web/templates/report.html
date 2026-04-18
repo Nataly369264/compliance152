@@ -72,8 +72,9 @@
 {% endfor %}
 {% set critical_violations = ns.deduped %}
 {% if critical_violations %}
+{% set crit_count = critical_violations | length %}
 <section>
-    <h2>ТОП-5 критических проблем</h2>
+    <h2>ТОП-{{ [crit_count, 5] | min }} критических проблем</h2>
     {% for v in critical_violations[:5] %}
     {% set sev = v.severity|default('medium') %}
     {% if sev is mapping %}{% set sev = sev.value|default('medium') %}{% endif %}
@@ -211,7 +212,7 @@
 <section>
     <h2>Анализ политики конфиденциальности</h2>
     <div class="card">
-        <p style="white-space:pre-wrap">{{ report.llm_analysis }}</p>
+        <div id="llm-analysis-content" data-content="{{ report.llm_analysis | e }}"></div>
     </div>
 </section>
 {% endif %}
@@ -227,6 +228,8 @@
 <script>
     var el = document.getElementById('report-summary');
     if (el) el.innerHTML = marked.parse(el.dataset.summary || '');
+    var llmEl = document.getElementById('llm-analysis-content');
+    if (llmEl) llmEl.innerHTML = marked.parse(llmEl.dataset.content || '');
 </script>
 <script>
     var ORDER = { fail: 0, not_applicable: 1, warning: 2, manual_check: 3, pass: 4 };
