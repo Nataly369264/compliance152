@@ -740,6 +740,14 @@ class ComplianceAnalyzer:
             logger.error("LLM policy analysis failed: %s", e)
             return None
 
+    @staticmethod
+    def _strip_llm_preamble(text: str) -> str:
+        import re
+        for i, line in enumerate(text.splitlines()):
+            if re.match(r'[А-ЯЁа-яё]', line):
+                return "\n".join(text.splitlines()[i:])
+        return ""
+
     async def _generate_summary(self) -> str:
         """Generate a human-readable summary using LLM.
 
@@ -777,9 +785,9 @@ class ComplianceAnalyzer:
                     https_status="да" if self.scan.ssl_info.has_ssl else "нет",
                     violations_summary=violations_text or "Нарушений не обнаружено",
                 ),
-                max_tokens=2048,
+                max_tokens=4096,
             )
-            return result
+            return self._strip_llm_preamble(result)
         except Exception as e:
             logger.error("LLM summary generation failed: %s", e)
             return self._fallback_summary()
