@@ -178,8 +178,8 @@ def test_tracker_002_not_applicable_no_policy():
     assert checks["TRACKER_002"].status == CheckStatus.NOT_APPLICABLE
 
 
-def test_tracker_002_violation_severity_is_high():
-    """TRACKER_002 violation must have HIGH severity."""
+def test_tracker_002_violation_severity_is_critical():
+    """TRACKER_002 violation must have CRITICAL severity."""
     scan = _make_scan(
         policy_text="Мы используем google analytics.",
         script_domains=["google-analytics.com"],
@@ -188,7 +188,8 @@ def test_tracker_002_violation_severity_is_high():
     analyzer._check_trackers()
     tracker_002_violations = [v for v in analyzer.violations if v.check_id == "TRACKER_002"]
     assert len(tracker_002_violations) == 1
-    assert tracker_002_violations[0].severity == Severity.HIGH
+    # TRACKER_002 = critical: трекер загружается до согласия = обработка ПДн без согласия (ч. 2 ст. 13.11)
+    assert tracker_002_violations[0].severity == Severity.CRITICAL
     assert tracker_002_violations[0].category == CheckCategory.TRACKERS
 
 

@@ -55,7 +55,17 @@ function renderTopViolations(violations) {
     var list = document.getElementById('violations-list');
     if (!violations || violations.length === 0) { block.hidden = true; return; }
 
-    var sorted = violations.slice().sort(function (a, b) {
+    var seen = {};
+    var deduped = [];
+    violations.forEach(function (v) {
+        var cid = v.check_id || '';
+        if (!seen[cid]) {
+            seen[cid] = true;
+            deduped.push(v);
+        }
+    });
+
+    var sorted = deduped.slice().sort(function (a, b) {
         return (SEVERITY_ORDER[a.severity] || 9) - (SEVERITY_ORDER[b.severity] || 9);
     });
 
@@ -175,7 +185,22 @@ function renderCheckResults(data) {
     countUp(document.getElementById('score-value'), data.overall_score, 800);
 
     document.getElementById('result-url').textContent = data.site_url;
-    document.getElementById('result-summary').innerHTML = marked.parse(data.summary || '');
+    var score = data.overall_score || 0;
+    var sent1 = score >= 80
+        ? 'Сайт в целом соответствует требованиям 152-ФЗ, однако выявлены нарушения, требующие внимания.'
+        : score >= 60
+        ? 'Сайт имеет существенные нарушения законодательства о персональных данных, требующие устранения.'
+        : score >= 40
+        ? 'Сайт имеет серьёзные нарушения 152-ФЗ с высоким риском штрафов со стороны Роскомнадзора.'
+        : 'Критическое несоответствие требованиям 152-ФЗ — необходимо немедленное вмешательство.';
+    var sent2 = 'Выявлено ' + (data.violations_count || 0) + ' нарушений, из них ' +
+        (data.critical_violations || 0) + ' критических. Возможный штраф — от ' +
+        formatRubles(data.estimated_fine_min) + ' до ' + formatRubles(data.estimated_fine_max) + ' ₽.';
+    var sent3 = score > 60
+        ? 'Для устранения нарушений воспользуйтесь подробными рекомендациями в полном отчёте.'
+        : 'Подробный план устранения нарушений и готовые документы — в полном отчёте.';
+    var summaryText = sent1 + ' ' + sent2 + ' ' + sent3;
+    document.getElementById('result-summary').innerHTML = marked.parse(summaryText);
     document.getElementById('checks-passed').textContent = data.passed_checks;
     document.getElementById('checks-failed').textContent = data.failed_checks;
     document.getElementById('violations-count').textContent = data.violations_count;

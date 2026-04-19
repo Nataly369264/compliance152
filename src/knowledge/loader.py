@@ -31,6 +31,28 @@ def load_fine_schedule() -> list[dict]:
         return json.load(f)
 
 
+@lru_cache(maxsize=1)
+def _checklist_by_id() -> dict[str, dict]:
+    return {entry["id"]: entry for entry in load_website_checklist()}
+
+
+def get_check_by_id(check_id: str) -> dict | None:
+    return _checklist_by_id().get(check_id)
+
+
+@lru_cache(maxsize=1)
+def _fine_schedule_by_id() -> dict[str, dict]:
+    return {entry["id"]: entry for entry in load_fine_schedule()}
+
+
+def get_fine_by_id(fine_id: str) -> dict | None:
+    return _fine_schedule_by_id().get(fine_id)
+
+
+def get_checks_by_category(category: str) -> list[dict]:
+    return [c for c in load_website_checklist() if c.get("category") == category]
+
+
 def get_prohibited_domains() -> set[str]:
     """Return a flat set of all prohibited domains for quick lookup."""
     domains = set()
@@ -51,53 +73,39 @@ def get_prohibited_service_by_domain(domain: str) -> dict | None:
 
 
 def estimate_fines(violation_ids: list[str]) -> dict:
-    """Estimate total fines based on violation IDs.
+    """Estimate total fines based on violation IDs using fine_reference from checklist.
 
     Returns dict with min_total, max_total, and breakdown list.
+    One fine_id is counted only once even if multiple violations reference it (КоАП logic).
     """
-    schedule = load_fine_schedule()
-    # Map violation categories to fine schedule entries
-    fine_map = {
-        "no_notification": 0,
-        "incorrect_notification": 1,
-        "no_consent": 2,
-        "data_breach": 3,
-        "biometric_breach": 4,
-        "breach_no_notify": 5,
-        "prohibited_services": 6,
-        "no_cookie_consent": 7,
-        "cookie_sensitive": 8,
-    }
-
+    seen_fine_ids: set[str] = set()
     min_total = 0
     max_total = 0
     breakdown = []
 
-    # Determine which fines apply based on violations
-    applicable_fines = set()
     for vid in violation_ids:
-        if vid.startswith("FORM_") and "001" in vid:
-            applicable_fines.add("no_consent")
-        elif vid.startswith("COOKIE_001"):
-            applicable_fines.add("no_cookie_consent")
-        elif vid.startswith("TECH_") or vid.startswith("COOKIE_"):
-            applicable_fines.add("prohibited_services")
-        elif vid.startswith("REG_001") or vid.startswith("REG_002"):
-            applicable_fines.add("no_notification")
+        check = get_check_by_id(vid)
+        if not check:
+            continue
+        fine_ref = check.get("fine_reference")
+        if not fine_ref or fine_ref in seen_fine_ids:
+            continue  # штраф уже учтён (один состав = один штраф)
+        seen_fine_ids.add(fine_ref)
 
-    for fine_key in applicable_fines:
-        idx = fine_map.get(fine_key)
-        if idx is not None and idx < len(schedule):
-            entry = schedule[idx]
-            min_total += entry["first_offense_min"]
-            max_total += entry["first_offense_max"]
-            breakdown.append({
-                "violation": entry["violation"],
-                "min_fine": entry["first_offense_min"],
-                "max_fine": entry["first_offense_max"],
-                "law_reference": entry["law_reference"],
-                "repeat_offense_max": entry.get("repeat_offense_max"),
-            })
+        fine = get_fine_by_id(fine_ref)
+        if not fine:
+            continue
+
+        min_total += fine["first_offense_min"]
+        max_total += fine["first_offense_max"]
+        breakdown.append({
+            "violation": fine["violation"],
+            "fine_id": fine["id"],
+            "min_fine": fine["first_offense_min"],
+            "max_fine": fine["first_offense_max"],
+            "law_reference": fine["law_reference"],
+            "repeat_offense_max": fine.get("repeat_offense_max"),
+        })
 
     return {
         "min_total": min_total,

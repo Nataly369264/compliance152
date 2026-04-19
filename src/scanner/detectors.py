@@ -50,6 +50,8 @@ _CONSENT_BANNER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"consent[\-_]?(banner|notice|modal|overlay)", re.IGNORECASE),
     re.compile(r"cookie[\-_]?law", re.IGNORECASE),
     re.compile(r"CybotCookiebot", re.IGNORECASE),
+    re.compile(r"onetrust", re.IGNORECASE),                          # OneTrust: id="onetrust-banner-sdk"
+    re.compile(r"cky[\-_]?(consent|container|overlay|banner)", re.IGNORECASE),  # CookieYes: class="cky-consent-container"
 ]
 
 

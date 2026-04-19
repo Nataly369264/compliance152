@@ -1,0 +1,3901 @@
+{
+  "run_info": {
+    "url": "https://el-ed.ru",
+    "run_at": "2026-04-17T10:42:07.462751Z",
+    "scanner": "SiteScanner (httpx)",
+    "llm_enabled": true
+  },
+  "scan_result": {
+    "url": "https://el-ed.ru",
+    "pages_scanned": 47,
+    "errors": [],
+    "privacy_policy": {
+      "found": true,
+      "url": "https://el-ed.ru/wp-content/themes/egeland/docs/policy.pdf#page=4",
+      "in_footer": false,
+      "content_length": 37825,
+      "has_operator_name": true,
+      "has_inn_ogrn": true,
+      "has_responsible_person": true,
+      "has_data_categories": true,
+      "has_purposes": true,
+      "has_legal_basis": true,
+      "has_retention_periods": true,
+      "has_subject_rights": true,
+      "has_rights_procedure": true,
+      "has_cross_border_info": true,
+      "has_security_measures": true,
+      "has_cookie_info": true,
+      "has_localization_statement": true,
+      "has_date": true,
+      "is_russian": true
+    },
+    "ssl_info": {
+      "has_ssl": true,
+      "certificate_valid": true
+    },
+    "cookie_banner": {
+      "found": true,
+      "has_accept_button": true,
+      "has_decline_button": false,
+      "has_category_choice": false,
+      "has_cookie_policy_link": true,
+      "analytics_before_consent": true
+    },
+    "forms": [
+      {
+        "page_url": "https://el-ed.ru",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-asya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-asya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-asya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-asya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhestvoznanie/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhestvoznanie/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhestvoznanie/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhestvoznanie/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/informatika-vova/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/informatika-vova/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/informatika-vova/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/informatika-vova/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-sasha/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-sasha/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-sasha/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-sasha/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-masha/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-masha/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-masha/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-masha/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-katya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-katya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-katya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-katya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/anglijskij-nastya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/anglijskij-nastya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/anglijskij-nastya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/anglijskij-nastya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/litra-yulya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/litra-yulya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/litra-yulya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/litra-yulya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/fizika-maks/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/fizika-maks/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/fizika-maks/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/fizika-maks/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/himiya-zhenya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/himiya-zhenya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/himiya-zhenya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/himiya-zhenya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/istoriya-olya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/istoriya-olya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/istoriya-olya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/istoriya-olya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-gelya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-gelya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-gelya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-gelya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-zhenya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-zhenya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-zhenya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-zhenya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-oge-nastya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-oge-nastya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-oge-nastya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/russkij-oge-nastya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhaga-oge-vanya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhaga-oge-vanya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhaga-oge-vanya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/obshhaga-oge-vanya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-oge-katya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-oge-katya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-oge-katya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/matematika-oge-katya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-oge-gelya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-oge-gelya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-oge-gelya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/biologiya-oge-gelya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-7/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-7/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-7/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-7/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-7/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-8/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-8/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-8/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-8/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/class-8/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/parents/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/parents/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/reviews/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/reviews/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/reviews/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/wiki_cats/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/wiki_cats/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/wiki_cats/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/wiki_cats/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/wiki_cats/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/sitemap/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/sitemap/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/sitemap/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog_cats/ege/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog_cats/ege/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog_cats/ege/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog_cats/7-8-class/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog_cats/7-8-class/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog_cats/7-8-class/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/2/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/2/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/2/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/2/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/2/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/3/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/3/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/3/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/3/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/3/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/336/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/336/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/336/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/336/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/page/336/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": true,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/",
+        "collects_personal_data": true,
+        "personal_data_fields": [
+          "name",
+          "phone"
+        ],
+        "has_consent_checkbox": false,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      },
+      {
+        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/",
+        "collects_personal_data": false,
+        "personal_data_fields": [],
+        "has_consent_checkbox": true,
+        "consent_checkbox_prechecked": false,
+        "has_privacy_link": true,
+        "has_marketing_checkbox": false
+      }
+    ],
+    "external_scripts": [
+      {
+        "url": "https://smartcaptcha.cloud.yandex.ru/captcha.js?render=onload&onload=cfycOnloadFunction&ver=1.0.0",
+        "domain": "smartcaptcha.cloud.yandex.ru",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      },
+      {
+        "url": "https://www.googletagmanager.com/gtag/js?id=G-KM51L4VZHZ",
+        "domain": "www.googletagmanager.com",
+        "is_prohibited": true,
+        "service_name": "Google Tag Manager",
+        "script_type": "js"
+      },
+      {
+        "url": "https://cdn.targetads.io/websdk/v2/index.js",
+        "domain": "cdn.targetads.io",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      },
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+        "domain": "fonts.googleapis.com",
+        "is_prohibited": true,
+        "service_name": "Google Fonts",
+        "script_type": "css"
+      },
+      {
+        "url": "https://fonts.googleapis.com",
+        "domain": "fonts.googleapis.com",
+        "is_prohibited": true,
+        "service_name": "Google Fonts",
+        "script_type": "font"
+      },
+      {
+        "url": "https://fonts.gstatic.com",
+        "domain": "fonts.gstatic.com",
+        "is_prohibited": true,
+        "service_name": "Google Fonts",
+        "script_type": "font"
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js",
+        "domain": "cdn.jsdelivr.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css",
+        "domain": "cdn.jsdelivr.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "css"
+      },
+      {
+        "url": "https://securepay.tinkoff.ru/html/payForm/js/tinkoff_v2.js",
+        "domain": "securepay.tinkoff.ru",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      }
+    ],
+    "cookies": [],
+    "pages": [
+      {
+        "url": "https://el-ed.ru",
+        "status_code": 200,
+        "title": "Подготовка к ЕГЭ и ОГЭ онлайн школа ЕГЭЛЕНД",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/russkij-asya/",
+        "status_code": 200,
+        "title": "Онлайн курс подготовки к ЕГЭ по русскому языку в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/obshhestvoznanie/",
+        "status_code": 200,
+        "title": "Онлайн подготовка к ЕГЭ по обществознанию в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/informatika-vova/",
+        "status_code": 200,
+        "title": "Сдать ЕГЭ по информатике в 2026 поможет Вова информатик",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/matematika-sasha/",
+        "status_code": 200,
+        "title": "Подготовка к ЕГЭ по профильной математике: стратегии успеха",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/matematika-masha/",
+        "status_code": 200,
+        "title": "Онлайн подготовка к ЕГЭ по математике в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/matematika-katya/",
+        "status_code": 200,
+        "title": "Онлайн подготовка к ЕГЭ по математике - база в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/anglijskij-nastya/",
+        "status_code": 200,
+        "title": "Онлайн курсы подготовки к ЕГЭ по английскому в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/litra-yulya/",
+        "status_code": 200,
+        "title": "Онлайн курсы для подготовки к ЕГЭ по литературе в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/fizika-maks/",
+        "status_code": 200,
+        "title": "Онлайн курсы для подготовки к ЕГЭ по физике в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/himiya-zhenya/",
+        "status_code": 200,
+        "title": "Онлайн курсы для подготовки к ЕГЭ по химии в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/istoriya-olya/",
+        "status_code": 200,
+        "title": "Онлайн курсы для подготовки к ЕГЭ по истории в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/biologiya-gelya/",
+        "status_code": 200,
+        "title": "Подготовка к ЕГЭ по Биологии в онлайн школе ЕГЭLand",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/biologiya-zhenya/",
+        "status_code": 200,
+        "title": "Курс подготовки к ЕГЭ по биологии: секреты успешной сдачи",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/russkij-oge-nastya/",
+        "status_code": 200,
+        "title": "Онлайн курсы для подготовки к ОГЭ по русскому языку в 2026 г.",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/obshhaga-oge-vanya/",
+        "status_code": 200,
+        "title": "Онлайн курсы для подготовки к ОГЭ по обществознанию в 2026",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/matematika-oge-katya/",
+        "status_code": 200,
+        "title": "Онлайн курсы для подготовки к ОГЭ по математике в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/biologiya-oge-gelya/",
+        "status_code": 200,
+        "title": "Онлайн курсы подготовки к ОГЭ по биологии в 2026 году",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/class-7/",
+        "status_code": 200,
+        "title": "7 класс",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 5,
+        "external_scripts_count": 7
+      },
+      {
+        "url": "https://el-ed.ru/class-8/",
+        "status_code": 200,
+        "title": "8 класс",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 5,
+        "external_scripts_count": 7
+      },
+      {
+        "url": "https://el-ed.ru/parents/",
+        "status_code": 200,
+        "title": "Родитель",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 2,
+        "external_scripts_count": 5
+      },
+      {
+        "url": "https://el-ed.ru/reviews/",
+        "status_code": 200,
+        "title": "Отзывы",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 3,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/",
+        "status_code": 200,
+        "title": "Блог - ЕГЭЛЭНД",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 5,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/wiki_cats/",
+        "status_code": 200,
+        "title": "Учебник",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 5,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/sitemap/",
+        "status_code": 200,
+        "title": "Карта сайта",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 3,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/",
+        "status_code": 200,
+        "title": "История политической элиты в эпоху дворцовых переворотов",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/",
+        "status_code": 200,
+        "title": "Заданиях 17 и 19 на ЕГЭ по истории: Политические партии",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/",
+        "status_code": 200,
+        "title": "Развитие образовательной политики в Российской Федерации",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/",
+        "status_code": 200,
+        "title": "Зачем говорить о политике с детьми и их будущим",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/about/",
+        "status_code": 200,
+        "title": "О компании",
+        "has_privacy_link_in_footer": false,
+        "forms_count": 0,
+        "external_scripts_count": 7
+      },
+      {
+        "url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/",
+        "status_code": 200,
+        "title": "Клише для итогового сочинения: лайфхаки и советы",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/",
+        "status_code": 200,
+        "title": "Мощные аргументы для ЕГЭ по русскому языку",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/",
+        "status_code": 200,
+        "title": "Задание 38 ЕГЭ по английскому языку: объем и требования",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/",
+        "status_code": 200,
+        "title": "Старый открытый банк заданий ЕГЭ: достоинства и недостатки - ЕГЭЛЭНД",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog_cats/ege/",
+        "status_code": 200,
+        "title": "Архивы ЕГЭ",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 3,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog_cats/7-8-class/",
+        "status_code": 200,
+        "title": "Архивы Средняя школа",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 3,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/",
+        "status_code": 200,
+        "title": "Обособление одиночных определений и личные местоимения",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/",
+        "status_code": 200,
+        "title": "Причастные обороты обособление в русском языке",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/",
+        "status_code": 200,
+        "title": "Обособление приложений и их значение в предложении",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/",
+        "status_code": 200,
+        "title": "Присоединительные конструкции: примеры и правила",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/",
+        "status_code": 200,
+        "title": "Что такое уточнение в языке и письменности",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/page/2/",
+        "status_code": 200,
+        "title": "Блог - Страница 2 из 336 - ЕГЭЛЭНД",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 5,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/page/3/",
+        "status_code": 200,
+        "title": "Блог - Страница 3 из 336 - ЕГЭЛЭНД",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 5,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/page/336/",
+        "status_code": 200,
+        "title": "Блог - Страница 336 из 336 - ЕГЭЛЭНД",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 5,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/",
+        "status_code": 200,
+        "title": "Главные задачи на проценты для эффективного управления",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/",
+        "status_code": 200,
+        "title": "Как защитить ребёнка в интернете: шаги к безопасности",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      },
+      {
+        "url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/",
+        "status_code": 200,
+        "title": "Сдать ОГЭ по обществознанию: полное руководство",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 4,
+        "external_scripts_count": 6
+      }
+    ]
+  },
+  "compliance_report": {
+    "id": "f7305f1e-efef-4331-9bf9-66a90fb48496",
+    "overall_score": 64,
+    "risk_level": "critical",
+    "total_checks": 42,
+    "passed_checks": 27,
+    "failed_checks": 10,
+    "warnings": 2,
+    "scan_limitations": [
+      "Чекбоксы согласия: в SPA-формах (React/Vue) динамические атрибуты могут не совпадать с HTML-снимком — рекомендуется ручная проверка."
+    ],
+    "checklist": [
+      {
+        "id": "FORM_001",
+        "category": "forms",
+        "title": "Чекбокс согласия на обработку ПДн",
+        "status": "fail",
+        "severity": "critical",
+        "details": "Форм с ПДн: 133, без согласия: 24"
+      },
+      {
+        "id": "FORM_002",
+        "category": "forms",
+        "title": "Чекбокс согласия не отмечен по умолчанию",
+        "status": "fail",
+        "severity": "high",
+        "details": "Форм с предотмеченным чекбоксом согласия: 109"
+      },
+      {
+        "id": "FORM_003",
+        "category": "forms",
+        "title": "Ссылка на Политику обработки ПДн рядом с формой",
+        "status": "pass",
+        "severity": "high",
+        "details": "Форм без ссылки на Политику: 0"
+      },
+      {
+        "id": "FORM_006",
+        "category": "forms",
+        "title": "Отдельный чекбокс для маркетинговых рассылок",
+        "status": "warning",
+        "severity": "medium",
+        "details": "Требуется ручная проверка наличия отдельного согласия для маркетинга"
+      },
+      {
+        "id": "FORM_007",
+        "category": "forms",
+        "title": "Минимальный объём собираемых данных",
+        "status": "pass",
+        "severity": "medium",
+        "details": "Форм с >5 полями ПДн: 0"
+      },
+      {
+        "id": "CONSENT_001",
+        "category": "consent",
+        "title": "Наличие согласия на обработку ПДн",
+        "status": "fail",
+        "severity": "critical",
+        "details": "Формы без согласия: 24"
+      },
+      {
+        "id": "CONSENT_002",
+        "category": "consent",
+        "title": "Согласие отделено от оферты",
+        "status": "fail",
+        "severity": "critical",
+        "details": "Согласие на ПДн включено в текст оферты"
+      },
+      {
+        "id": "CONSENT_003",
+        "category": "consent",
+        "title": "Обязательные реквизиты в тексте согласия",
+        "status": "pass",
+        "severity": "high",
+        "details": "Все обязательные реквизиты присутствуют"
+      },
+      {
+        "id": "CONSENT_004",
+        "category": "consent",
+        "title": "Возможность отзыва согласия",
+        "status": "pass",
+        "severity": "high",
+        "details": "Информация об отзыве согласия найдена"
+      },
+      {
+        "id": "CONSENT_005",
+        "category": "consent",
+        "title": "Раздельные согласия для разных целей",
+        "status": "pass",
+        "severity": "high",
+        "details": "Раздельные согласия или маркетинговые цели не обнаружены"
+      },
+      {
+        "id": "COOKIE_001",
+        "category": "cookies",
+        "title": "Cookie-баннер при первом визите",
+        "status": "pass",
+        "severity": "high",
+        "details": "Cookie-баннер обнаружен"
+      },
+      {
+        "id": "COOKIE_002",
+        "category": "cookies",
+        "title": "Кнопка «Отклонить» в cookie-баннере",
+        "status": "fail",
+        "severity": "medium",
+        "details": "Кнопка 'Отклонить' нет"
+      },
+      {
+        "id": "COOKIE_003",
+        "category": "cookies",
+        "title": "Аналитические/маркетинговые cookie выключены по умолчанию",
+        "status": "warning",
+        "severity": "medium",
+        "details": "Выбор категорий cookie: нет"
+      },
+      {
+        "id": "COOKIE_005",
+        "category": "cookies",
+        "title": "Аналитика не загружается до согласия",
+        "status": "fail",
+        "severity": "high",
+        "details": "Аналитика загружается до получения согласия"
+      },
+      {
+        "id": "POLICY_001",
+        "category": "privacy_policy",
+        "title": "Политика обработки ПДн опубликована",
+        "status": "pass",
+        "severity": "critical",
+        "details": "Политика обработки ПДн найдена"
+      },
+      {
+        "id": "POLICY_002",
+        "category": "privacy_policy",
+        "title": "Ссылка на Политику в футере каждой страницы",
+        "status": "fail",
+        "severity": "medium",
+        "details": "Страниц без ссылки на Политику в футере: 1/47"
+      },
+      {
+        "id": "POLICY_003",
+        "category": "privacy_policy",
+        "title": "Полное наименование оператора",
+        "status": "pass",
+        "severity": "high",
+        "details": "Полное наименование оператора"
+      },
+      {
+        "id": "POLICY_004",
+        "category": "privacy_policy",
+        "title": "ИНН/ОГРН и адрес оператора",
+        "status": "pass",
+        "severity": "high",
+        "details": "ИНН/ОГРН оператора"
+      },
+      {
+        "id": "POLICY_005",
+        "category": "privacy_policy",
+        "title": "Ответственный за обработку ПДн",
+        "status": "pass",
+        "severity": "high",
+        "details": "Контакт ответственного за обработку ПДн"
+      },
+      {
+        "id": "POLICY_006",
+        "category": "privacy_policy",
+        "title": "Категории персональных данных",
+        "status": "pass",
+        "severity": "high",
+        "details": "Категории персональных данных"
+      },
+      {
+        "id": "POLICY_007",
+        "category": "privacy_policy",
+        "title": "Цели обработки для каждой категории",
+        "status": "pass",
+        "severity": "high",
+        "details": "Цели обработки"
+      },
+      {
+        "id": "POLICY_008",
+        "category": "privacy_policy",
+        "title": "Правовые основания обработки",
+        "status": "pass",
+        "severity": "high",
+        "details": "Правовые основания"
+      },
+      {
+        "id": "POLICY_009",
+        "category": "privacy_policy",
+        "title": "Сроки хранения данных",
+        "status": "pass",
+        "severity": "high",
+        "details": "Сроки хранения"
+      },
+      {
+        "id": "POLICY_010",
+        "category": "privacy_policy",
+        "title": "Права субъектов ПДн",
+        "status": "pass",
+        "severity": "high",
+        "details": "Права субъектов ПДн"
+      },
+      {
+        "id": "POLICY_011",
+        "category": "privacy_policy",
+        "title": "Порядок реализации прав (10 рабочих дней)",
+        "status": "pass",
+        "severity": "high",
+        "details": "Порядок реализации прав"
+      },
+      {
+        "id": "POLICY_012",
+        "category": "privacy_policy",
+        "title": "Информация о трансграничной передаче",
+        "status": "pass",
+        "severity": "high",
+        "details": "Информация о трансграничной передаче"
+      },
+      {
+        "id": "POLICY_013",
+        "category": "privacy_policy",
+        "title": "Описание мер безопасности",
+        "status": "pass",
+        "severity": "medium",
+        "details": "Меры безопасности"
+      },
+      {
+        "id": "POLICY_014",
+        "category": "privacy_policy",
+        "title": "Информация о cookies",
+        "status": "pass",
+        "severity": "medium",
+        "details": "Информация о cookies"
+      },
+      {
+        "id": "POLICY_015",
+        "category": "privacy_policy",
+        "title": "Заявление о локализации данных в РФ",
+        "status": "pass",
+        "severity": "critical",
+        "details": "Локализация данных на территории РФ"
+      },
+      {
+        "id": "POLICY_016",
+        "category": "privacy_policy",
+        "title": "Дата публикации и обновления",
+        "status": "pass",
+        "severity": "medium",
+        "details": "Дата публикации/обновления"
+      },
+      {
+        "id": "POLICY_017",
+        "category": "privacy_policy",
+        "title": "Документ на русском языке",
+        "status": "pass",
+        "severity": "high",
+        "details": "Политика на отдельной странице: да"
+      },
+      {
+        "id": "TECH_001",
+        "category": "technical",
+        "title": "HTTPS на всех страницах",
+        "status": "pass",
+        "severity": "critical",
+        "details": "HTTPS активен"
+      },
+      {
+        "id": "TECH_002",
+        "category": "technical",
+        "title": "Отсутствие Google Fonts с серверов Google",
+        "status": "fail",
+        "severity": "high",
+        "details": "Google Fonts: обнаружен"
+      },
+      {
+        "id": "TECH_003",
+        "category": "technical",
+        "title": "Отсутствие Google Analytics",
+        "status": "pass",
+        "severity": "critical",
+        "details": "Google Analytics: не обнаружен"
+      },
+      {
+        "id": "TECH_004",
+        "category": "technical",
+        "title": "Отсутствие Facebook Pixel",
+        "status": "pass",
+        "severity": "critical",
+        "details": "Facebook Pixel: не обнаружен"
+      },
+      {
+        "id": "TECH_005",
+        "category": "technical",
+        "title": "Отсутствие Google reCAPTCHA",
+        "status": "pass",
+        "severity": "high",
+        "details": "Google reCAPTCHA: не обнаружен"
+      },
+      {
+        "id": "TECH_006",
+        "category": "technical",
+        "title": "Отсутствие Google Tag Manager",
+        "status": "fail",
+        "severity": "high",
+        "details": "Google Tag Manager: обнаружен"
+      },
+      {
+        "id": "TRACKER_001",
+        "category": "trackers",
+        "title": "Трекер без упоминания в политике",
+        "status": "fail",
+        "severity": "high",
+        "details": "Не упомянуты в политике: Google Tag Manager"
+      },
+      {
+        "id": "TRACKER_002",
+        "category": "trackers",
+        "title": "Трекер без согласия пользователя",
+        "status": "pass",
+        "severity": "critical",
+        "details": "Трансграничная передача данных раскрыта в политике"
+      },
+      {
+        "id": "REG_001",
+        "category": "regulatory",
+        "title": "Оператор зарегистрирован в реестре РКН",
+        "status": "manual_check",
+        "severity": "critical",
+        "details": "Требуется ручная проверка: оператор зарегистрирован в реестре РКН"
+      },
+      {
+        "id": "REG_002",
+        "category": "regulatory",
+        "title": "Уведомление об обработке ПДн подано",
+        "status": "manual_check",
+        "severity": "critical",
+        "details": "Требуется ручная проверка: уведомление об обработке ПДн подано в РКН"
+      },
+      {
+        "id": "REG_003",
+        "category": "regulatory",
+        "title": "Хостинг на территории РФ",
+        "status": "manual_check",
+        "severity": "critical",
+        "details": "Требуется ручная проверка: хостинг на территории РФ"
+      }
+    ],
+    "violations": [
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/wiki_cats/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/sitemap/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog_cats/ege/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog_cats/7-8-class/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/2/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/3/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/336/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/"
+      },
+      {
+        "check_id": "FORM_001",
+        "title": "Форма без согласия на обработку ПДн",
+        "severity": "critical",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/russkij-asya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/russkij-asya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/russkij-asya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/obshhestvoznanie/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/obshhestvoznanie/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/obshhestvoznanie/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/informatika-vova/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/informatika-vova/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/informatika-vova/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-sasha/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-sasha/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-sasha/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-masha/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-masha/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-masha/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-katya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-katya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-katya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/anglijskij-nastya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/anglijskij-nastya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/anglijskij-nastya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/litra-yulya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/litra-yulya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/litra-yulya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/fizika-maks/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/fizika-maks/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/fizika-maks/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/himiya-zhenya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/himiya-zhenya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/himiya-zhenya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/istoriya-olya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/istoriya-olya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/istoriya-olya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-gelya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-gelya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-gelya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-zhenya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-zhenya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-zhenya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/russkij-oge-nastya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/russkij-oge-nastya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/russkij-oge-nastya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/obshhaga-oge-vanya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/obshhaga-oge-vanya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/obshhaga-oge-vanya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-oge-katya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-oge-katya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/matematika-oge-katya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-oge-gelya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-oge-gelya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/biologiya-oge-gelya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-7/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-7/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-7/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-7/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-8/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-8/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-8/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/class-8/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/parents/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/parents/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/reviews/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/reviews/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/wiki_cats/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/wiki_cats/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/sitemap/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/epoha-dvorczovyh-perevorotov/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/politicheskie-partii-v-xx-veke-kakie-primery-napisat-v-zadaniyah-17-i-19-na-ege-po-istorii/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/zachem-govorit-o-politike-s-detmi-i-kak-eto-delat/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/klishe-dlya-itogovogo-sochineniya-2024-2025-po-literature-v-11-klasse-gotovye-shablony/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/luchshie-argumenty-dlya-sochineniya-v-ege-po-russkomu-yazyku-2025/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kak-napisat-esse-dlya-ege-po-anglijskomu-yazyku-na-maksimum/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/gde-luchshe-vsego-reshat-zadaniya-ege-fipi-reshu-ege-ili-drugie-istochniki/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obosoblenie-odinochnyh-opredelenij-osnovnye-sluchai/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/prichastnye-oboroty-obosoblenie-mesto-v-predlozhenii/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/obosoblenie-prilozhenij-zapyatye-i-tire/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/prisoedinitelnye-konstrukczii-a-imenno-to-est-zapyatye-i-tire/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/zapyataya-pri-utochnyayushhih-chlenah-predlozheniya/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/2/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/2/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/3/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/3/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/336/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/page/336/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/dve-glavnye-zadachi-na-proczenty-i-kak-ih-ne-pereputat/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kiberbezopasnost-kak-zashhitit-rebyonka-v-internete/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/"
+      },
+      {
+        "check_id": "FORM_002",
+        "title": "Чекбокс согласия предотмечен по умолчанию",
+        "severity": "high",
+        "category": "forms",
+        "page_url": "https://el-ed.ru/blog/kak-sdat-oge-po-obshhestvoznaniyu/"
+      },
+      {
+        "check_id": "CONSENT_001",
+        "title": "Формы без механизма получения согласия",
+        "severity": "critical",
+        "category": "consent",
+        "page_url": "https://el-ed.ru"
+      },
+      {
+        "check_id": "CONSENT_002",
+        "title": "Согласие вшито в оферту",
+        "severity": "critical",
+        "category": "consent",
+        "page_url": "https://el-ed.ru"
+      },
+      {
+        "check_id": "COOKIE_002",
+        "title": "Cookie-баннер без возможности отказа",
+        "severity": "medium",
+        "category": "cookies",
+        "page_url": "https://el-ed.ru"
+      },
+      {
+        "check_id": "COOKIE_005",
+        "title": "Аналитика загружается до согласия на cookie",
+        "severity": "high",
+        "category": "cookies",
+        "page_url": "https://el-ed.ru"
+      },
+      {
+        "check_id": "POLICY_002",
+        "title": "Ссылка на Политику отсутствует в футере",
+        "severity": "medium",
+        "category": "privacy_policy",
+        "page_url": null
+      },
+      {
+        "check_id": "TECH_002",
+        "title": "Использование запрещённого сервиса: Google Fonts",
+        "severity": "high",
+        "category": "technical",
+        "page_url": null
+      },
+      {
+        "check_id": "TECH_006",
+        "title": "Использование запрещённого сервиса: Google Tag Manager",
+        "severity": "high",
+        "category": "technical",
+        "page_url": null
+      },
+      {
+        "check_id": "TRACKER_001",
+        "title": "Трекеры не упомянуты в политике обработки ПДн",
+        "severity": "high",
+        "category": "trackers",
+        "page_url": "https://el-ed.ru/wp-content/themes/egeland/docs/policy.pdf#page=4"
+      }
+    ],
+    "fine_estimate": {
+      "min_total": 1780000,
+      "max_total": 7760000
+    },
+    "llm_analysis": "```json\n{\n  \"overall_assessment\": \"частично соответствует\",\n  \"critical_issues\": [\n    \"Отсутствуют ФИО и контактные данные лица, ответственного за организацию обработки персональных данных.\",\n    \"Не указан ОГРН оператора.\",\n    \"Не указаны установленные законом сроки ответа на запросы субъектов персональных данных (10 рабочих дней).\",\n    \"Дата публикации/обновления документа указана в будущем (15.05.2025 г.), что делает его недействительным на текущий момент.\"\n  ],\n  \"score\": 70,\n  \"checks\": [\n    {\n      \"id\": \"POLICY_CHECK_001",
+    "summary": "На основе предоставленных данных, вот резюме рисков и рекомендации по сайту https://el-ed.ru в соответствии с 152-ФЗ.\n\n### 1. Краткое резюме\n\nСайт имеет базовые элементы соответствия (Политика, HTTPS), однако содержит критические системные нарушения. Основные проблемы — массовый сбор персональных данных без получения согласия пользователей и использование зарубежных сервисов, что создает высокие риски получения крупных штрафов и предписаний от Роскомнадзора.\n\n### 2. Топ-5 критических проблем и рекомендации\n\n1.  **Проблема:** **Массовый сбор ПДн без согласия.** На 24 формах (включая формы в блоге, карте сайта и др.) собираются имя и телефон без обязательного чекбокса о согласии на обработку персональных данных.\n    *   **Риск:** Прямое нарушение ст. 9 "
+  }
+}

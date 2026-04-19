@@ -125,8 +125,8 @@ def test_is_pdf_url_false():
 
 # ── analyzer: NOT_APPLICABLE when found=True, text=None ──────────
 
-def test_analyzer_policy_found_no_text_content_checks_not_applicable():
-    """found=True, text=None → POLICY_003..016 all NOT_APPLICABLE."""
+def test_analyzer_policy_found_no_text_content_checks_manual_review_needed():
+    """found=True, text=None → POLICY_003..016 all MANUAL_REVIEW_NEEDED."""
     scan = _make_scan_pdf_policy(policy_found=True, policy_text=None)
     analyzer = ComplianceAnalyzer(scan, enable_web_verification=False)
     analyzer._check_privacy_policy()
@@ -139,8 +139,8 @@ def test_analyzer_policy_found_no_text_content_checks_not_applicable():
         "POLICY_015", "POLICY_016",
     ]
     for cid in content_ids:
-        assert checks[cid].status == CheckStatus.NOT_APPLICABLE, (
-            f"{cid} должен быть NOT_APPLICABLE, получен {checks[cid].status}"
+        assert checks[cid].status == CheckStatus.MANUAL_REVIEW_NEEDED, (
+            f"{cid} должен быть MANUAL_REVIEW_NEEDED, получен {checks[cid].status}"
         )
 
 

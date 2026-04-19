@@ -254,6 +254,7 @@ def _is_allowed_domain(url: str) -> bool:
 
 def _clean_html_text(html: str) -> str:
     """Extract clean text from HTML, removing scripts/styles/navigation."""
+    html = html[:MAX_PAGE_TEXT * 20]  # 240 000 chars max input — avoid parsing huge DOMs
     soup = BeautifulSoup(html, "lxml")
 
     # Remove non-content elements

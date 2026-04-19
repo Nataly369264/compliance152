@@ -44,6 +44,40 @@ def _build_scanner(max_pages: int) -> SiteScanner:
     return SiteScanner(max_pages=max_pages)
 
 
+def _is_poor_result(result) -> bool:
+    """Return True if SiteScanner result warrants a Playwright retry (DEC-002)."""
+    if result.pages_scanned == 0:
+        return True
+    if any("HTTP 4" in e for e in result.errors):
+        return True
+    if not result.privacy_policy.found:
+        return True
+    return False
+
+
+async def _scan_with_fallback(url: str, max_pages: int):
+    """Start with SiteScanner; if result is poor, retry with PlaywrightCrawler (DEC-002).
+
+    Only used when USE_PLAYWRIGHT=false (default). When USE_PLAYWRIGHT=true the
+    caller goes directly through _build_scanner, preserving the existing behaviour.
+    """
+    from src.scanner.playwright_crawler import PlaywrightCrawler
+
+    result = await SiteScanner(max_pages=max_pages).scan(url)
+    if _is_poor_result(result):
+        logger.info(
+            "Poor result from SiteScanner for %s (pages=%d, errors=%s, pp=%s) "
+            "— retrying with PlaywrightCrawler",
+            url, result.pages_scanned, result.errors, result.privacy_policy.found,
+        )
+        result = await PlaywrightCrawler(max_pages=min(max_pages, 20)).scan(url)
+        result.scan_limitations.append(
+            "Автоматический повтор через PlaywrightCrawler: "
+            "статичный сканер вернул неполный результат (JS-сайт)."
+        )
+    return result
+
+
 
 class UTF8JSONResponse(JSONResponse):
     """JSONResponse with ensure_ascii=False — Cyrillic returned as-is."""
@@ -210,9 +244,11 @@ async def health():
 @app.post("/api/v1/scan", response_model=ScanResponse)
 async def scan_site(request: ScanRequest):
     """Scan a website and return raw scan results."""
-    scanner = _build_scanner(request.max_pages)
     try:
-        result = await scanner.scan(request.url)
+        if USE_PLAYWRIGHT:
+            result = await _build_scanner(request.max_pages).scan(request.url)
+        else:
+            result = await _scan_with_fallback(request.url, request.max_pages)
     except Exception as e:
         logger.error("Scan failed for %s: %s", request.url, e)
         raise HTTPException(status_code=500, detail=f"Scan failed: {e}")
@@ -242,9 +278,11 @@ async def scan_site(request: ScanRequest):
 async def analyze(request: AnalyzeRequest):
     """Scan + analyze a website for 152-FZ compliance."""
     # Step 1: Scan
-    scanner = _build_scanner(request.max_pages)
     try:
-        scan_result = await scanner.scan(request.url)
+        if USE_PLAYWRIGHT:
+            scan_result = await _build_scanner(request.max_pages).scan(request.url)
+        else:
+            scan_result = await _scan_with_fallback(request.url, request.max_pages)
     except Exception as e:
         logger.error("Scan failed for %s: %s", request.url, e)
         raise HTTPException(status_code=500, detail=f"Scan failed: {e}")

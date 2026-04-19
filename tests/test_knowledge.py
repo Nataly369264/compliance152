@@ -12,13 +12,14 @@ from src.knowledge.loader import (
 
 def test_load_website_checklist():
     items = load_website_checklist()
-    assert len(items) == 40
+    assert len(items) == 47
     ids = [item["id"] for item in items]
     assert "FORM_001" in ids
     assert "COOKIE_001" in ids
     assert "POLICY_001" in ids
     assert "TECH_001" in ids
     assert "REG_001" in ids
+    assert "CONSENT_001" in ids
 
 
 def test_load_prohibited_services():
@@ -32,7 +33,7 @@ def test_load_prohibited_services():
 
 def test_load_fine_schedule():
     fines = load_fine_schedule()
-    assert len(fines) == 9
+    assert len(fines) == 10
     for fine in fines:
         assert fine["first_offense_min"] > 0
         assert fine["first_offense_max"] >= fine["first_offense_min"]

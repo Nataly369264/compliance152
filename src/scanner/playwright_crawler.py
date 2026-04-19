@@ -8,8 +8,10 @@ Requires: playwright install chromium  (one-time setup after pip install)
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import re
+from datetime import datetime
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -31,26 +33,18 @@ from src.scanner.detectors import (
     extract_forms,
     is_privacy_policy_page,
 )
+from src.scanner.pdf_extractor import is_pdf_content_type, is_pdf_url
+from src.scanner.pdf_extractors import _is_russian as _is_russian_text, extract_pdf_text
+from src.scanner.tracker_registry import find_trackers_in_scripts
+from src.scanner.utils import (
+    FALLBACK_PRIVACY_PATHS,
+    is_same_domain,
+    is_valid_policy_text,
+    normalize_url,
+    should_skip,
+)
 
 logger = logging.getLogger(__name__)
-
-_FALLBACK_PRIVACY_PATHS = [
-    "/privacy-policy", "/privacy_policy", "/privacy",
-    "/documents/privacy-policy", "/documents/privacy_policy",
-    "/legal/privacy", "/legal/privacy-policy",
-    "/info/privacy", "/pages/privacy-policy",
-    "/personal-data", "/personalnyye-dannyye",
-    "/politika-konfidencialnosti", "/obrabotka-personalnyh-dannyh",
-]
-
-_SKIP_EXTENSIONS = frozenset({
-    ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", ".ico",
-    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    ".zip", ".rar", ".tar", ".gz",
-    ".mp3", ".mp4", ".avi", ".mov", ".wmv",
-    ".woff", ".woff2", ".ttf", ".eot",
-    ".css", ".js", ".json", ".xml",
-})
 
 
 class PlaywrightCrawler:
@@ -71,10 +65,12 @@ class PlaywrightCrawler:
         max_pages: int = 20,
         timeout: int = 30,
         crawl_delay: float = 1.0,
+        js_render_delay: float = 2.0,
     ):
         self.max_pages = max_pages
         self.timeout = timeout
         self.crawl_delay = crawl_delay
+        self.js_render_delay = js_render_delay
 
     async def scan(self, url: str) -> ScanResult:
         """Scan a JS-rendered website and return structured ScanResult."""
@@ -92,10 +88,16 @@ class PlaywrightCrawler:
 
         try:
             async with async_playwright() as pw:
-                browser = await pw.chromium.launch(headless=True)
+                browser = await pw.chromium.launch(
+                    headless=True,
+                    args=["--disable-blink-features=AutomationControlled"],
+                )
                 context = await browser.new_context(
-                    user_agent="Compliance152Bot/0.1 (+https://compliance152.ru)",
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     ignore_https_errors=False,
+                )
+                await context.add_init_script(
+                    "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
                 )
                 try:
                     result = await self._crawl(context, url, base_domain)
@@ -114,7 +116,7 @@ class PlaywrightCrawler:
 
         visited: set[str] = set()
         to_visit: list[str] = [url]
-        queued: set[str] = {self._normalize_url(url)}
+        queued: set[str] = {normalize_url(url)}
 
         pages: list[PageInfo] = []
         all_forms: list[FormInfo] = []
@@ -132,13 +134,14 @@ class PlaywrightCrawler:
 
         while to_visit and len(visited) < self.max_pages:
             current_url = to_visit.pop(0)
-            normalized = self._normalize_url(current_url)
+            normalized = normalize_url(current_url)
 
             if normalized in visited:
                 continue
-            if not self._is_same_domain(normalized, base_domain):
+            if not is_same_domain(normalized, base_domain):
                 continue
-            if self._should_skip(normalized):
+            # Privacy policy PDFs bypass the skip filter (Bug A fix)
+            if should_skip(normalized) and not is_privacy_policy_page(current_url):
                 continue
 
             visited.add(normalized)
@@ -146,13 +149,52 @@ class PlaywrightCrawler:
             try:
                 page = await context.new_page()
                 try:
-                    await page.goto(
+                    # Collect all request domains during page load
+                    request_domains: set[str] = set()
+
+                    def _on_request(request) -> None:
+                        domain = urlparse(request.url).netloc.lower()
+                        if domain:
+                            request_domains.add(domain)
+
+                    page.on("request", _on_request)
+
+                    pw_resp = await page.goto(
                         current_url,
                         timeout=self.timeout * 1000,
                         wait_until="domcontentloaded",
                     )
+
+                    # PDF branch: policy document served as PDF
+                    resp_content_type = (
+                        pw_resp.headers.get("content-type", "") if pw_resp else ""
+                    )
+                    if is_pdf_content_type(resp_content_type) or is_pdf_url(current_url):
+                        if is_privacy_policy_page(current_url) and not privacy_policy_info.found:
+                            pdf_bytes = await pw_resp.body() if pw_resp else b""
+                            extraction = extract_pdf_text(pdf_bytes)
+                            if extraction.text is not None:
+                                privacy_policy_info = self._extract_privacy_policy_from_text(
+                                    extraction.text, current_url, has_footer_link=False,
+                                )
+                                privacy_policy_info.extraction_method = extraction.method
+                            else:
+                                privacy_policy_info = PrivacyPolicyInfo(
+                                    found=True,
+                                    url=current_url,
+                                    text=None,
+                                    is_separate_page=True,
+                                    extraction_method=extraction.method,
+                                )
+                        pages.append(PageInfo(
+                            url=current_url,
+                            title=None,
+                            status_code=pw_resp.status if pw_resp else 0,
+                        ))
+                        continue
+
                     # Allow JS a moment to render dynamic content after DOM load
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(self.js_render_delay)
                     html = await page.content()
                     soup = BeautifulSoup(html, "lxml")
                     title = soup.title.string.strip() if soup.title and soup.title.string else None
@@ -188,27 +230,24 @@ class PlaywrightCrawler:
                     if cookie_banner_info is None:
                         banner = detect_cookie_banner(soup)
                         if banner.found:
-                            analytics_re = re.compile(
-                                r"(google-analytics|googletagmanager|mc\.yandex\.ru|metrika)",
-                                re.IGNORECASE,
-                            )
-                            banner.analytics_before_consent = any(
-                                analytics_re.search(s.url) for s in ext_scripts
-                            )
+                            tracker_hits = find_trackers_in_scripts(list(request_domains))
+                            banner.analytics_before_consent = bool(tracker_hits)
                             cookie_banner_info = banner
 
                             for bl in extract_banner_policy_links(soup, current_url):
-                                norm_bl = self._normalize_url(bl)
+                                norm_bl = normalize_url(bl)
                                 if (norm_bl not in visited and norm_bl not in queued
-                                        and self._is_same_domain(norm_bl, base_domain)):
+                                        and is_same_domain(norm_bl, base_domain)):
                                     queued.add(norm_bl)
                                     to_visit.insert(0, bl)
 
                     # Privacy policy
                     if not privacy_policy_info.found and is_privacy_policy_page(current_url, title):
-                        privacy_policy_info = self._extract_privacy_policy(
+                        candidate = self._extract_privacy_policy(
                             soup, current_url, has_footer_link,
                         )
+                        if is_valid_policy_text(candidate.text, candidate.is_russian):
+                            privacy_policy_info = candidate
 
                     pages.append(PageInfo(
                         url=current_url,
@@ -222,9 +261,9 @@ class PlaywrightCrawler:
                     # Discover links
                     for a in soup.find_all("a", href=True):
                         abs_url = urljoin(current_url, a["href"])
-                        norm = self._normalize_url(abs_url)
+                        norm = normalize_url(abs_url)
                         if (norm not in visited and norm not in queued
-                                and self._is_same_domain(norm, base_domain)):
+                                and is_same_domain(norm, base_domain)):
                             queued.add(norm)
                             link_text = a.get_text(separator=" ", strip=True)
                             if is_privacy_policy_page(abs_url, link_text):
@@ -234,13 +273,13 @@ class PlaywrightCrawler:
 
                 except PlaywrightError as page_err:
                     logger.warning("Playwright page error %s: %s", current_url, page_err)
-                    errors.append(f"{current_url}: {page_err}")
+                    errors.append(f"{current_url}: {type(page_err).__name__}: {page_err}")
                 finally:
                     await page.close()
 
             except Exception as e:
                 logger.warning("Error scanning %s: %s", current_url, e)
-                errors.append(f"{current_url}: {e}")
+                errors.append(f"{current_url}: {type(e).__name__}: {e}")
 
             if self.crawl_delay > 0 and to_visit:
                 await asyncio.sleep(self.crawl_delay)
@@ -290,9 +329,9 @@ class PlaywrightCrawler:
         pages: list[PageInfo],
     ) -> PrivacyPolicyInfo:
         """Try well-known privacy policy URL paths as last resort."""
-        for path in _FALLBACK_PRIVACY_PATHS:
+        for path in FALLBACK_PRIVACY_PATHS:
             candidate = f"https://{base_domain}{path}"
-            norm = self._normalize_url(candidate)
+            norm = normalize_url(candidate)
             if norm in visited:
                 continue
             try:
@@ -303,7 +342,7 @@ class PlaywrightCrawler:
                         timeout=self.timeout * 1000,
                         wait_until="domcontentloaded",
                     )
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(self.js_render_delay / 2)
                     if not resp or resp.status != 200:
                         continue
                     html = await page.content()
@@ -311,13 +350,16 @@ class PlaywrightCrawler:
                     title = soup.title.string.strip() if soup.title and soup.title.string else None
                     if is_privacy_policy_page(candidate, title):
                         has_footer_link, _ = detect_footer_privacy_link(soup)
+                        result = self._extract_privacy_policy(soup, candidate, has_footer_link)
+                        if not is_valid_policy_text(result.text, result.is_russian):
+                            continue
                         pages.append(PageInfo(
                             url=candidate,
                             title=title,
                             status_code=200,
                             has_privacy_link_in_footer=has_footer_link,
                         ))
-                        return self._extract_privacy_policy(soup, candidate, has_footer_link)
+                        return result
                 finally:
                     await page.close()
             except Exception as e:
@@ -348,12 +390,22 @@ class PlaywrightCrawler:
     ) -> PrivacyPolicyInfo:
         """Extract and analyze privacy policy content."""
         text = soup.get_text(separator="\n", strip=True)
-        text_lower = text.lower()
+        return self._extract_privacy_policy_from_text(text, url, has_footer_link)
 
+    def _extract_privacy_policy_from_text(
+        self, text: str, url: str, has_footer_link: bool,
+    ) -> PrivacyPolicyInfo:
+        """Build PrivacyPolicyInfo from plain text (shared by HTML and PDF paths)."""
+        text_lower = text.lower()
+        text_hash = hashlib.sha256(text.encode("utf-8", errors="replace")).hexdigest()
+        content_length = len(text)
         return PrivacyPolicyInfo(
             found=True,
             url=url,
-            text=text[:20000],
+            text=text[:100000],
+            text_hash=text_hash,
+            fetched_at=datetime.utcnow(),
+            content_length=content_length,
             in_footer=has_footer_link,
             has_operator_name=bool(re.search(
                 r"(общество с ограниченной|акционерное общество|индивидуальный предприниматель|ООО|АО|ИП)",
@@ -380,7 +432,8 @@ class PlaywrightCrawler:
                 text_lower)),
             has_purposes=bool(re.search(r"(цел.{0,20}обработк|purpose)", text_lower)),
             has_legal_basis=bool(re.search(
-                r"(правов.{0,20}основан|закон.{0,20}основан|legal.?basis|на основании)",
+                r"(правов.{0,20}основан|закон.{0,20}основан|legal.?basis|на основании"
+                r"|основан.{0,20}обработк)",
                 text_lower)),
             has_retention_periods=bool(re.search(
                 r"(срок.{0,20}хранен|срок.{0,20}обработк|период.{0,20}хранен)",
@@ -389,13 +442,15 @@ class PlaywrightCrawler:
                 r"(прав.{0,20}субъект|прав.{0,20}пользовател|right.{0,10}data.?subject)",
                 text_lower)),
             has_rights_procedure=bool(re.search(
-                r"(порядок.{0,20}реализац|порядок.{0,20}обращен|10.{0,10}рабочих|направить.{0,20}запрос)",
+                r"(порядок.{0,20}реализац|порядок.{0,20}обращен|10.{0,10}рабочих|направить.{0,20}запрос"
+                r"|направить.{0,20}(обращен|заявлен)|требова.{0,30}(уточнени|блокировани|уничтожени))",
                 text_lower)),
             has_cross_border_info=bool(re.search(
                 r"(трансграничн|cross.?border|передач.{0,20}за рубеж|иностранн.{0,20}государств)",
                 text_lower)),
             has_security_measures=bool(re.search(
-                r"(мер.{0,20}безопасност|мер.{0,20}защит|security.?measure|шифрован|encrypt)",
+                r"(мер.{0,20}безопасност|мер.{0,20}защит|security.?measure|шифрован|encrypt"
+                r"|режим.{0,20}защит|защит.{0,10}конфиденциальн)",
                 text_lower)),
             has_cookie_info=bool(re.search(r"(cookie|куки|файл.{0,10}cookie)", text_lower)),
             has_localization_statement=bool(re.search(
@@ -409,26 +464,7 @@ class PlaywrightCrawler:
             has_date=bool(re.search(
                 r"(\d{2}\.\d{2}\.\d{4}|дата.{0,20}(публикац|обновлен|утвержден))",
                 text_lower)),
-            is_russian=bool(re.search(r"[а-яА-ЯёЁ]{20,}", text)),
+            is_russian=_is_russian_text(text),
             is_separate_page=True,
         )
 
-    # ── URL helpers (identical to crawler.py) ────────────────────
-
-    @staticmethod
-    def _normalize_url(url: str) -> str:
-        parsed = urlparse(url)
-        path = parsed.path.rstrip("/") or "/"
-        return f"{parsed.scheme}://{parsed.netloc}{path}"
-
-    @staticmethod
-    def _is_same_domain(url: str, base_domain: str) -> bool:
-        def _strip_www(domain: str) -> str:
-            return domain[4:] if domain.startswith("www.") else domain
-        netloc = urlparse(url).netloc.lower()
-        return _strip_www(netloc) == _strip_www(base_domain)
-
-    @staticmethod
-    def _should_skip(url: str) -> bool:
-        path = urlparse(url).path.lower()
-        return any(path.endswith(ext) for ext in _SKIP_EXTENSIONS)

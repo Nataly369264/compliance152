@@ -29,21 +29,20 @@ from src.scanner.detectors import (
     is_privacy_policy_page,
 )
 from src.scanner.pdf_extractor import (
-    extract_text_from_pdf,
     is_pdf_content_type,
     is_pdf_url,
 )
+from src.scanner.pdf_extractors import _is_russian as _is_russian_text, extract_pdf_text
+from src.scanner.utils import (
+    FALLBACK_PRIVACY_PATHS,
+    SKIP_EXTENSIONS,
+    is_same_domain,
+    is_valid_policy_text,
+    normalize_url,
+    should_skip,
+)
 
 logger = logging.getLogger(__name__)
-
-SKIP_EXTENSIONS = frozenset({
-    ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", ".ico",
-    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    ".zip", ".rar", ".tar", ".gz",
-    ".mp3", ".mp4", ".avi", ".mov", ".wmv",
-    ".woff", ".woff2", ".ttf", ".eot",
-    ".css", ".js", ".json", ".xml",
-})
 
 
 class SiteScanner:
@@ -69,7 +68,7 @@ class SiteScanner:
 
         visited: set[str] = set()
         to_visit: list[str] = [url]
-        queued: set[str] = {self._normalize_url(url)}  # tracks what's already in to_visit
+        queued: set[str] = {normalize_url(url)}  # tracks what's already in to_visit
 
         pages: list[PageInfo] = []
         all_forms: list[FormInfo] = []
@@ -91,19 +90,25 @@ class SiteScanner:
 
             while to_visit and len(visited) < self.max_pages:
                 current_url = to_visit.pop(0)
-                normalized = self._normalize_url(current_url)
+                normalized = normalize_url(current_url)
 
                 if normalized in visited:
                     continue
-                if not self._is_same_domain(normalized, base_domain):
+                if not is_same_domain(normalized, base_domain):
                     continue
-                if self._should_skip(normalized):
+                # Privacy policy PDFs bypass the skip filter (Bug A fix)
+                if should_skip(normalized) and not is_privacy_policy_page(current_url):
                     continue
 
                 visited.add(normalized)
 
                 try:
                     resp = await client.get(current_url)
+
+                    if 400 <= resp.status_code < 500:
+                        errors.append(f"{current_url}: HTTP {resp.status_code}")
+                        continue
+
                     content_type = resp.headers.get("content-type", "")
 
                     # PDF branch: policy document served as PDF
@@ -167,9 +172,9 @@ class SiteScanner:
 
                             # Follow privacy policy links from the banner
                             for bl in extract_banner_policy_links(soup, current_url):
-                                norm_bl = self._normalize_url(bl)
+                                norm_bl = normalize_url(bl)
                                 if (norm_bl not in visited and norm_bl not in queued
-                                        and self._is_same_domain(norm_bl, base_domain)):
+                                        and is_same_domain(norm_bl, base_domain)):
                                     queued.add(norm_bl)
                                     to_visit.insert(0, bl)
 
@@ -194,11 +199,11 @@ class SiteScanner:
                     for a in soup.find_all("a", href=True):
                         href = a["href"]
                         abs_url = urljoin(current_url, href)
-                        norm = self._normalize_url(abs_url)
+                        norm = normalize_url(abs_url)
                         if (
                             norm not in visited
                             and norm not in queued
-                            and self._is_same_domain(norm, base_domain)
+                            and is_same_domain(norm, base_domain)
                         ):
                             queued.add(norm)
                             # Prioritize privacy policy pages
@@ -210,7 +215,7 @@ class SiteScanner:
 
                 except Exception as e:
                     logger.warning("Error scanning %s: %s", current_url, e)
-                    errors.append(f"{current_url}: {e}")
+                    errors.append(f"{current_url}: {type(e).__name__}: {e}")
 
                 if self.crawl_delay > 0 and to_visit:
                     await asyncio.sleep(self.crawl_delay)
@@ -273,18 +278,10 @@ class SiteScanner:
         pages: list[PageInfo],
     ) -> list[PrivacyPolicyInfo]:
         """Try well-known privacy policy URL paths and return all found candidates."""
-        FALLBACK_PATHS = [
-            "/privacy-policy", "/privacy_policy", "/privacy",
-            "/documents/privacy-policy", "/documents/privacy_policy",
-            "/legal/privacy", "/legal/privacy-policy",
-            "/info/privacy", "/pages/privacy-policy",
-            "/politika-konfidencialnosti", "/obrabotka-personalnyh-dannyh",
-            "/personal-data", "/personalnyye-dannyye",
-        ]
         candidates: list[PrivacyPolicyInfo] = []
-        for path in FALLBACK_PATHS:
+        for path in FALLBACK_PRIVACY_PATHS:
             url = f"https://{base_domain}{path}"
-            norm = self._normalize_url(url)
+            norm = normalize_url(url)
             if norm in visited:
                 continue
             try:
@@ -343,17 +340,20 @@ class SiteScanner:
         content checks as NOT_APPLICABLE instead of generating false violations.
         The scan_limitations field is populated by the analyzer._build_scan_limitations().
         """
-        text = extract_text_from_pdf(content)
-        if text is None:
+        extraction = extract_pdf_text(content)
+        if extraction.text is None:
             logger.info("PDF policy at %s: text not extractable (scanned or empty)", url)
             return PrivacyPolicyInfo(
                 found=True,
                 url=url,
                 text=None,
                 is_separate_page=True,
+                extraction_method=extraction.method,
             )
         # Reuse HTML extraction logic on the extracted text
-        return self._extract_privacy_policy_from_text(text, url, has_footer_link=False)
+        result = self._extract_privacy_policy_from_text(extraction.text, url, has_footer_link=False)
+        result.extraction_method = extraction.method
+        return result
 
     def _extract_privacy_policy_from_text(
         self, text: str, url: str, has_footer_link: bool,
@@ -395,7 +395,8 @@ class SiteScanner:
                 text_lower)),
             has_purposes=bool(re.search(r"(цел.{0,20}обработк|purpose)", text_lower)),
             has_legal_basis=bool(re.search(
-                r"(правов.{0,20}основан|закон.{0,20}основан|legal.?basis|на основании)",
+                r"(правов.{0,20}основан|закон.{0,20}основан|legal.?basis|на основании"
+                r"|основан.{0,20}обработк)",
                 text_lower)),
             has_retention_periods=bool(re.search(
                 r"(срок.{0,20}хранен|срок.{0,20}обработк|период.{0,20}хранен)",
@@ -404,13 +405,15 @@ class SiteScanner:
                 r"(прав.{0,20}субъект|прав.{0,20}пользовател|right.{0,10}data.?subject)",
                 text_lower)),
             has_rights_procedure=bool(re.search(
-                r"(порядок.{0,20}реализац|порядок.{0,20}обращен|10.{0,10}рабочих|направить.{0,20}запрос)",
+                r"(порядок.{0,20}реализац|порядок.{0,20}обращен|10.{0,10}рабочих|направить.{0,20}запрос"
+                r"|направить.{0,20}(обращен|заявлен)|требова.{0,30}(уточнени|блокировани|уничтожени))",
                 text_lower)),
             has_cross_border_info=bool(re.search(
                 r"(трансграничн|cross.?border|передач.{0,20}за рубеж|иностранн.{0,20}государств)",
                 text_lower)),
             has_security_measures=bool(re.search(
-                r"(мер.{0,20}безопасност|мер.{0,20}защит|security.?measure|шифрован|encrypt)",
+                r"(мер.{0,20}безопасност|мер.{0,20}защит|security.?measure|шифрован|encrypt"
+                r"|режим.{0,20}защит|защит.{0,10}конфиденциальн)",
                 text_lower)),
             has_cookie_info=bool(re.search(r"(cookie|куки|файл.{0,10}cookie)", text_lower)),
             has_localization_statement=bool(re.search(
@@ -424,7 +427,7 @@ class SiteScanner:
             has_date=bool(re.search(
                 r"(\d{2}\.\d{2}\.\d{4}|дата.{0,20}(публикац|обновлен|утвержден))",
                 text_lower)),
-            is_russian=bool(re.search(r"[а-яА-ЯёЁ]{20,}", text)),
+            is_russian=_is_russian_text(text),
             is_separate_page=True,
         )
 
@@ -445,22 +448,15 @@ class SiteScanner:
 
     @staticmethod
     def _normalize_url(url: str) -> str:
-        parsed = urlparse(url)
-        # Remove fragment and trailing slash
-        path = parsed.path.rstrip("/") or "/"
-        return f"{parsed.scheme}://{parsed.netloc}{path}"
+        return normalize_url(url)
 
     @staticmethod
     def _is_same_domain(url: str, base_domain: str) -> bool:
-        def _strip_www(domain: str) -> str:
-            return domain[4:] if domain.startswith("www.") else domain
-        netloc = urlparse(url).netloc.lower()
-        return _strip_www(netloc) == _strip_www(base_domain)
+        return is_same_domain(url, base_domain)
 
     @staticmethod
     def _should_skip(url: str) -> bool:
-        path = urlparse(url).path.lower()
-        return any(path.endswith(ext) for ext in SKIP_EXTENSIONS)
+        return should_skip(url)
 
     @staticmethod
     def _url_priority(url: str) -> int:
@@ -484,8 +480,16 @@ class SiteScanner:
         1. Longest text (most complete document)
         2. URL keyword score: politika > policy > privacy > personal
         3. First found (stable tie-break)
+
+        All candidates are validated first; only those passing is_valid_policy_text
+        are considered. This ensures a long-but-invalid candidate (e.g. a WAF
+        challenge page or a non-Russian OCR result) does not block a shorter but
+        valid candidate from being selected.
         """
+        valid = [c for c in candidates if is_valid_policy_text(c.text, c.is_russian)]
+        if not valid:
+            return PrivacyPolicyInfo()
         return max(
-            candidates,
+            valid,
             key=lambda p: (len(p.text or ""), cls._url_priority(p.url or "")),
         )
