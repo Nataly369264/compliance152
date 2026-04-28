@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Tests & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint with ruff (informational)
+        run: ruff check src/ tests/
+        continue-on-error: true
+
+      - name: Run tests
+        run: pytest tests/ -q --tb=short
+        env:
+          OPENROUTER_API_KEY: "dummy-for-ci"
+          BEARER_TOKEN: "dummy-for-ci"
