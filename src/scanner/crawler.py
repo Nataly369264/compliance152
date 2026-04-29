@@ -35,7 +35,6 @@ from src.scanner.pdf_extractor import (
 from src.scanner.pdf_extractors import _is_russian as _is_russian_text, extract_pdf_text
 from src.scanner.utils import (
     FALLBACK_PRIVACY_PATHS,
-    SKIP_EXTENSIONS,
     is_same_domain,
     is_valid_policy_text,
     normalize_url,

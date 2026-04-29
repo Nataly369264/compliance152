@@ -281,7 +281,7 @@ class LegalMonitor:
         rkn_content = "\n\n---\n\n".join(npa_texts) if npa_texts else "[Не удалось загрузить]"
 
         # Step 3: LLM analysis
-        if not unique_results and not rkn_texts:
+        if not unique_results and not npa_texts:
             logger.warning("No data gathered during monitoring")
             return []
 

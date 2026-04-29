@@ -1,9 +1,7 @@
 """Tests for DOCX export, PDF export, and API endpoints."""
 from __future__ import annotations
 
-import io
 
-import pytest
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Mm, Pt
 

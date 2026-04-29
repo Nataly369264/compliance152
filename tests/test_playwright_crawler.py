@@ -192,7 +192,7 @@ async def test_pdf_policy_link_not_skipped_by_playwright_crawler():
 
     pw_crawler = PlaywrightCrawler(max_pages=2, timeout=5, crawl_delay=0, js_render_delay=0)
     with patch("src.scanner.playwright_crawler.asyncio.sleep", new=AsyncMock()):
-        result = await pw_crawler._crawl(context, "https://example.com", "example.com")
+        await pw_crawler._crawl(context, "https://example.com", "example.com")
 
     assert any("policy.pdf" in u for u in visited_urls), (
         "PDF policy URL was filtered by should_skip — Bug A regression"

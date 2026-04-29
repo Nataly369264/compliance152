@@ -5,7 +5,6 @@ import logging
 
 import uvicorn
 
-from src.api.server import app  # re-export for uvicorn src.main:app
 from src.config import API_HOST, API_PORT, LOG_LEVEL
 
 logging.basicConfig(

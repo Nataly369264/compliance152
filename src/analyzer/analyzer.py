@@ -28,6 +28,7 @@ from src.models.compliance import (
     Severity,
     Violation,
 )
+from src.models.scan import ScanResult
 from src.scanner.tracker_registry import find_trackers_in_scripts
 
 # Keywords indicating cross-border data transfer in a privacy policy
@@ -38,7 +39,6 @@ _CROSS_BORDER_KEYWORDS = [
     "третьи страны",
     "зарубежн",
 ]
-from src.models.scan import ScanResult
 
 logger = logging.getLogger(__name__)
 

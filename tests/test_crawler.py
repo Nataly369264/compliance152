@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-from bs4 import BeautifulSoup
 
 from src.models.scan import PrivacyPolicyInfo
 from src.scanner.crawler import SiteScanner

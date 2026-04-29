@@ -67,7 +67,6 @@ class DocumentUpdater:
 
         Returns list of update results, one per affected document.
         """
-        db = await get_db()
         results = []
 
         logger.info(
@@ -188,8 +187,6 @@ class DocumentUpdater:
         }
 
         if mode == "auto":
-            # Save new version immediately
-            doc_id = doc_data.get("id", str(uuid.uuid4()))
             await db.save_document({
                 "id": str(uuid.uuid4()),
                 "organization_id": org_id,

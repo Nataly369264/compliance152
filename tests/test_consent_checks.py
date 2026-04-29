@@ -1,8 +1,7 @@
 """Tests for CONSENT_001–005 compliance checks (ст. 9 152-ФЗ)."""
-import pytest
 
 from src.analyzer.analyzer import ComplianceAnalyzer
-from src.models.compliance import CheckCategory, CheckStatus
+from src.models.compliance import CheckStatus
 from src.models.scan import FormInfo, PrivacyPolicyInfo, ScanResult
 
 

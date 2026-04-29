@@ -160,7 +160,7 @@ class OpenRouterClient:
                     )
                     await asyncio.sleep(delay)
 
-                except (httpx.ConnectError, httpx.ReadTimeout) as e:
+                except (httpx.ConnectError, httpx.ReadTimeout):
                     total_waited += delay
                     if total_waited > MAX_TOTAL_WAIT:
                         last_error = LLMError("Connection error")

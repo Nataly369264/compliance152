@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import httpx
 
 from src.monitor.competitor import (
     RAW_TEXT_LIMIT,

@@ -216,7 +216,6 @@ async def _fetch_url(url: str) -> FetchResult:
     }
 
     last_status: FetchStatus = "error"
-    last_error = ""
 
     for attempt in range(1, RETRY_COUNT + 1):
         try:
@@ -264,13 +263,11 @@ async def _fetch_url(url: str) -> FetchResult:
         except httpx.HTTPStatusError as e:
             logger.warning("HTTP %d fetching %s", e.response.status_code, url)
             last_status = "error"
-            last_error = str(e.response.status_code)
             break  # non-recoverable HTTP error, no retry
 
         except Exception as e:
             logger.error("Unexpected error fetching %s: %s", url, e)
             last_status = "error"
-            last_error = str(e)
             break
 
     return FetchResult(url=url, status=last_status, text="", content_hash="")

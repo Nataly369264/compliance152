@@ -1,9 +1,8 @@
 """Tests for web search tools, verification, and cache modules."""
 from __future__ import annotations
 
-import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -168,9 +167,6 @@ class TestGatherWebContext:
 
             await gather_web_context("privacy_policy")
 
-            # LLM should receive deduplicated results
-            llm_call = mock_llm.call_args
-            user_prompt = llm_call.kwargs.get("user_prompt", "") or llm_call.args[1] if len(llm_call.args) > 1 else ""
             # Even though search is called multiple times, results should be unique
             assert mock_search.called
 

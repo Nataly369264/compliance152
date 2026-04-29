@@ -1,5 +1,4 @@
 """Tests for TRACKER_001 and TRACKER_002 compliance checks."""
-import pytest
 
 from src.analyzer.analyzer import ComplianceAnalyzer
 from src.models.compliance import CheckCategory, CheckStatus, Severity
