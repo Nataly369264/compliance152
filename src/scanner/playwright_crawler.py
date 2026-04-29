@@ -78,7 +78,7 @@ class PlaywrightCrawler:
             url = "https://" + url
 
         try:
-            from playwright.async_api import async_playwright, Error as PlaywrightError
+            from playwright.async_api import async_playwright
         except ImportError:
             logger.warning("playwright not installed — falling back to static scanner")
             return await self._fallback(url, "Playwright не установлен")

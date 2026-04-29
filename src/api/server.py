@@ -8,7 +8,6 @@ from datetime import datetime
 
 from pathlib import Path
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -24,9 +23,9 @@ from src.llm.cache import get_cache
 from src.models.organization import OrganizationData
 from src.monitor.monitor import run_monitoring_cycle
 from src.scanner.crawler import SiteScanner
-from src.scheduler.jobs import create_scheduler, run_competitor_check, run_digest, run_npa_check
+from src.scheduler.jobs import create_scheduler, run_competitor_check, run_npa_check
 from src.storage.database import get_db
-from src.updater.updater import DocumentUpdater, process_legal_updates
+from src.updater.updater import process_legal_updates
 from src.web.routes import web_router
 
 
@@ -167,7 +166,7 @@ async def _scheduled_process_updates():
         if not updates:
             logger.info("Scheduler: no legal updates to process")
             return
-        results = await process_legal_updates(updates, mode="confirm")
+        await process_legal_updates(updates, mode="confirm")
         logger.info("Scheduler: process_legal_updates — %d updates processed", len(updates))
     except Exception as exc:
         logger.error("Scheduler: process_legal_updates failed: %s", exc)

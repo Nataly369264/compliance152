@@ -52,18 +52,18 @@ def _format_critical_alert(alert: dict) -> str:
     action = alert.get("action", "")
 
     lines = [
-        f"⚠️ *НПА — критическое изменение*",
-        f"",
+        "⚠️ *НПА — критическое изменение*",
+        "",
         f"*Источник:* {source_name}",
         f"*Уровень угрозы:* {label}",
         f"*URL:* {url}",
-        f"",
-        f"*Изменение:*",
+        "",
+        "*Изменение:*",
         summary,
     ]
 
     if action_required and action:
-        lines += ["", f"*Требуемые действия:*", action]
+        lines += ["", "*Требуемые действия:*", action]
 
     return "\n".join(lines)
 

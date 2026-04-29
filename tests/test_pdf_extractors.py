@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-import pytest
 
 from src.analyzer.analyzer import ComplianceAnalyzer
 from src.models.compliance import CheckCategory, CheckItem, CheckStatus, Severity

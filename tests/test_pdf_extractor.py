@@ -1,8 +1,7 @@
 """Tests for PDF extraction and analyzer NOT_APPLICABLE branch."""
-import pytest
 
 from src.analyzer.analyzer import ComplianceAnalyzer
-from src.models.compliance import CheckCategory, CheckStatus
+from src.models.compliance import CheckStatus
 from src.models.scan import PrivacyPolicyInfo, ScanResult
 from src.scanner.pdf_extractor import (
     extract_text_from_pdf,
