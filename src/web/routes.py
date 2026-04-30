@@ -20,8 +20,7 @@ async def dashboard(request: Request):
     db = await get_db()
     reports = await db.list_reports(limit=5)
     orgs = await db.list_organizations(limit=5)
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "dashboard.html", context={
         "recent_reports": reports,
         "recent_orgs": orgs,
     })
@@ -29,16 +28,12 @@ async def dashboard(request: Request):
 
 @web_router.get("/check")
 async def check_page(request: Request):
-    return templates.TemplateResponse("check.html", {
-        "request": request,
-    })
+    return templates.TemplateResponse(request, "check.html")
 
 
 @web_router.get("/organizations/new")
 async def organization_form(request: Request):
-    return templates.TemplateResponse("organization_form.html", {
-        "request": request,
-    })
+    return templates.TemplateResponse(request, "organization_form.html")
 
 
 @web_router.get("/organizations/{org_id}")
@@ -46,15 +41,13 @@ async def organization_view(request: Request, org_id: str):
     db = await get_db()
     org = await db.get_organization(org_id)
     if not org:
-        return templates.TemplateResponse("dashboard.html", {
-            "request": request,
+        return templates.TemplateResponse(request, "dashboard.html", context={
             "recent_reports": [],
             "recent_orgs": [],
             "error": "Организация не найдена",
         })
     docs = await db.get_documents(org_id)
-    return templates.TemplateResponse("organization_view.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "organization_view.html", context={
         "org": org,
         "documents": docs,
     })
@@ -64,8 +57,7 @@ async def organization_view(request: Request, org_id: str):
 async def documents_page(request: Request):
     db = await get_db()
     orgs = await db.list_organizations()
-    return templates.TemplateResponse("documents.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "documents.html", context={
         "organizations": orgs,
     })
 
@@ -74,8 +66,7 @@ async def documents_page(request: Request):
 async def reports_list(request: Request):
     db = await get_db()
     reports = await db.list_reports(limit=50)
-    return templates.TemplateResponse("reports_list.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "reports_list.html", context={
         "reports": reports,
     })
 
@@ -107,7 +98,6 @@ async def report_view(request: Request, report_id: str):
         report_data["violations"] = sorted(
             report_data["violations"], key=_severity_key
         )
-    return templates.TemplateResponse("report.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "report.html", context={
         "report": report_data,
     })
