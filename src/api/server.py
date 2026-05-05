@@ -43,6 +43,23 @@ def _build_scanner(max_pages: int) -> SiteScanner:
     return SiteScanner(max_pages=max_pages)
 
 
+# Ключевые слова в URL скриптов, характерные для JS-фреймворков
+_SPA_URL_KEYWORDS = ("/_next/", "/_nuxt/", "/static/js/main.", "/react.", "/vue.")
+
+
+def _looks_like_spa(result) -> bool:
+    """Return True if external scripts suggest a JS-rendered SPA.
+
+    Если сайт грузит скрипты с путями /_next/ (Next.js) или /_nuxt/ (Nuxt.js)
+    или /static/js/main. (Create React App) — это SPA, и статический краулер
+    не видит динамический контент.
+    """
+    return any(
+        any(kw in s.url for kw in _SPA_URL_KEYWORDS)
+        for s in result.external_scripts
+    )
+
+
 def _is_poor_result(result) -> bool:
     """Return True if SiteScanner result warrants a Playwright retry (DEC-002)."""
     if result.pages_scanned == 0:
@@ -50,6 +67,10 @@ def _is_poor_result(result) -> bool:
     if any("HTTP 4" in e for e in result.errors):
         return True
     if not result.privacy_policy.found:
+        return True
+    # JS-heavy site without cookie banner means banner is rendered by JS,
+    # not that it's absent — Playwright needed to see dynamic content
+    if not result.cookie_banner.found and _looks_like_spa(result):
         return True
     return False
 

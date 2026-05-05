@@ -327,3 +327,25 @@ async def test_stealth_add_init_script_patches_navigator_webdriver():
     mock_context.add_init_script.assert_called_once_with(
         "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
     )
+
+
+def test_build_tracker_scripts_returns_external_scripts():
+    """Метод должен превращать домены трекеров в ExternalScript-объекты."""
+    crawler = PlaywrightCrawler()
+    domains = ["google-analytics.com", "mc.yandex.ru"]
+    scripts = crawler._build_tracker_scripts(domains, page_url="https://example.com")
+
+    assert len(scripts) == 2
+    names = {s.service_name for s in scripts}
+    assert "Google Analytics" in names
+    assert "Яндекс.Метрика" in names
+
+
+def test_build_tracker_scripts_empty_when_no_known_trackers():
+    """Если домены не из реестра — ничего не возвращает."""
+    crawler = PlaywrightCrawler()
+    scripts = crawler._build_tracker_scripts(
+        ["cdn.example.com", "fonts.example.com"],
+        page_url="https://example.com",
+    )
+    assert scripts == []

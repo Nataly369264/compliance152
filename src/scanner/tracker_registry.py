@@ -16,7 +16,12 @@ TRACKER_REGISTRY: list[dict] = [
     # ── High risk: foreign services ───────────────────────────────
     {
         "name": "Google Analytics",
-        "domains": ["google-analytics.com", "analytics.google.com"],
+        "domains": [
+            "google-analytics.com",
+            "analytics.google.com",
+            "region1.google-analytics.com",   # GA4 — региональный эндпоинт
+            "stats.g.doubleclick.net",        # GA4 через DoubleClick
+        ],
         "keywords": ["google analytics", "гугл аналитика", "google anal"],
         "is_foreign": True,
     },
@@ -72,6 +77,25 @@ TRACKER_REGISTRY: list[dict] = [
         "name": "Jotform",
         "domains": ["jotform.com"],
         "keywords": ["jotform", "джотформ"],
+        "is_foreign": True,
+    },
+    {
+        "name": "Google Fonts",
+        "domains": [
+            "fonts.googleapis.com",   # загрузка CSS со шрифтами
+            "fonts.gstatic.com",      # загрузка самих файлов шрифтов
+        ],
+        "keywords": ["google fonts", "шрифты google", "googleapis", "шрифт google"],
+        "is_foreign": True,
+    },
+    {
+        "name": "Google reCAPTCHA",
+        "domains": [
+            "www.google.com",    # /recaptcha/api.js грузится отсюда
+            "recaptcha.net",     # альтернативный домен reCAPTCHA
+            "www.recaptcha.net",
+        ],
+        "keywords": ["recaptcha", "рекапча", "google recaptcha", "капча google"],
         "is_foreign": True,
     },
     # ── Medium risk: Russian services (must be disclosed, not foreign) ──

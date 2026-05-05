@@ -72,6 +72,33 @@ class PlaywrightCrawler:
         self.crawl_delay = crawl_delay
         self.js_render_delay = js_render_delay
 
+    def _build_tracker_scripts(
+        self, request_domains: list[str], page_url: str
+    ) -> list:
+        """Преобразует домены трекеров из сетевых запросов в ExternalScript-объекты.
+
+        Используется чтобы трекеры, загруженные через JS, попали в итоговый список
+        external_scripts и были проверены анализатором (TRACKER_001, TRACKER_002).
+        """
+        from src.models.scan import ExternalScript
+
+        found_trackers = find_trackers_in_scripts(request_domains)
+        scripts = []
+        for tracker in found_trackers:
+            domain = tracker["domains"][0]
+            script = ExternalScript(
+                url=f"https://{domain}/",
+                page_url=page_url,
+                script_type="js",
+                domain=domain,
+            )
+            script.service_name = tracker["name"]
+            svc = get_prohibited_service_by_domain(domain)
+            if svc:
+                script.is_prohibited = True
+            scripts.append(script)
+        return scripts
+
     async def scan(self, url: str) -> ScanResult:
         """Scan a JS-rendered website and return structured ScanResult."""
         if not url.startswith(("http://", "https://")):
@@ -240,6 +267,16 @@ class PlaywrightCrawler:
                                         and is_same_domain(norm_bl, base_domain)):
                                     queued.add(norm_bl)
                                     to_visit.insert(0, bl)
+
+                    # Всегда добавляем трекеры из сетевых запросов в all_scripts —
+                    # это нужно для TRACKER_001 и TRACKER_002, независимо от того, есть ли баннер
+                    tracker_scripts = self._build_tracker_scripts(
+                        list(request_domains), current_url,
+                    )
+                    for ts in tracker_scripts:
+                        # Не дублируем — если домен уже есть (нашли из HTML), пропускаем
+                        if not any(s.domain == ts.domain for s in all_scripts):
+                            all_scripts.append(ts)
 
                     # Privacy policy
                     if not privacy_policy_info.found and is_privacy_policy_page(current_url, title):

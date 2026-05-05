@@ -204,3 +204,45 @@ def test_tracker_001_violation_severity_is_high():
     assert len(tracker_001_violations) == 1
     assert tracker_001_violations[0].severity == Severity.HIGH
     assert tracker_001_violations[0].category == CheckCategory.TRACKERS
+
+
+# ── Реестр трекеров: новые домены и сервисы ──────────────────────
+
+
+def test_google_fonts_detected_as_foreign_tracker():
+    """Google Fonts должен определяться как иностранный сервис (запрещён с 01.07.2025)."""
+    from src.scanner.tracker_registry import find_trackers_in_scripts
+
+    found = find_trackers_in_scripts(["fonts.googleapis.com"])
+
+    names = [t["name"] for t in found]
+    assert "Google Fonts" in names, "Google Fonts не найден в реестре"
+    google_fonts = next(t for t in found if t["name"] == "Google Fonts")
+    assert google_fonts["is_foreign"] is True
+
+
+def test_google_fonts_gstatic_also_detected():
+    """Шрифты грузятся и с fonts.gstatic.com — тоже должны детектироваться."""
+    from src.scanner.tracker_registry import find_trackers_in_scripts
+
+    found = find_trackers_in_scripts(["fonts.gstatic.com"])
+    names = [t["name"] for t in found]
+    assert "Google Fonts" in names
+
+
+def test_recaptcha_detected_as_foreign_tracker():
+    """reCAPTCHA должна определяться как иностранный сервис."""
+    from src.scanner.tracker_registry import find_trackers_in_scripts
+
+    found = find_trackers_in_scripts(["www.google.com"])
+    names = [t["name"] for t in found]
+    assert "Google reCAPTCHA" in names, "Google reCAPTCHA не найден в реестре"
+
+
+def test_ga4_regional_domain_detected():
+    """Google Analytics 4 использует region1.google-analytics.com — должен детектироваться."""
+    from src.scanner.tracker_registry import find_trackers_in_scripts
+
+    found = find_trackers_in_scripts(["region1.google-analytics.com"])
+    names = [t["name"] for t in found]
+    assert "Google Analytics" in names, "GA4 (region1.google-analytics.com) не найден"

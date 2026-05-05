@@ -30,6 +30,11 @@ _PD_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 _CONSENT_TEXT_RE = re.compile(
     r"(согласи|персональн|обработк|пдн|consent|personal\s+data)", re.IGNORECASE)
 
+_MARKETING_TEXT_RE = re.compile(
+    r"(рассылк|маркетинг|реклам|промо|акци|новост|newsletter|marketing|promo)",
+    re.IGNORECASE,
+)
+
 _PRIVACY_LINK_TEXT_RE = re.compile(
     r"(полити|конфиденциальн|персональн|privacy|обработк.{0,20}данн|пдн|"
     r"защит.{0,10}данн|пользовател.{0,15}соглаш|legal|terms)", re.IGNORECASE)
@@ -52,6 +57,11 @@ _CONSENT_BANNER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"CybotCookiebot", re.IGNORECASE),
     re.compile(r"onetrust", re.IGNORECASE),                          # OneTrust: id="onetrust-banner-sdk"
     re.compile(r"cky[\-_]?(consent|container|overlay|banner)", re.IGNORECASE),  # CookieYes: class="cky-consent-container"
+    re.compile(r"usercentrics", re.IGNORECASE),              # Usercentrics (популярен в РФ)
+    re.compile(r"tarteaucitron", re.IGNORECASE),             # Tarteaucitron.js
+    re.compile(r"klaro", re.IGNORECASE),                     # Klaro
+    re.compile(r"borlabs[\-_]?cookie", re.IGNORECASE),       # Borlabs Cookie (WordPress)
+    re.compile(r"didomi", re.IGNORECASE),                    # Didomi
 ]
 
 
@@ -93,6 +103,7 @@ def extract_forms(soup: Tag, page_url: str) -> list[FormInfo]:
         pd_fields = detect_personal_data_fields(fields)
         has_consent, prechecked, consent_text = detect_consent_checkbox(form)
         has_privacy, privacy_url = detect_privacy_link(form, soup)
+        has_marketing = detect_marketing_checkbox(form)
 
         forms.append(FormInfo(
             page_url=page_url,
@@ -106,6 +117,7 @@ def extract_forms(soup: Tag, page_url: str) -> list[FormInfo]:
             privacy_link_url=privacy_url,
             collects_personal_data=bool(pd_fields),
             personal_data_fields=pd_fields,
+            has_marketing_checkbox=has_marketing,
         ))
 
     return forms
@@ -135,6 +147,29 @@ def detect_consent_checkbox(form_soup: Tag) -> tuple[bool, bool, str | None]:
         if _CONSENT_TEXT_RE.search(text):
             return True, cb.has_attr("checked"), text.strip()
     return False, False, None
+
+
+def detect_marketing_checkbox(form_soup: Tag) -> bool:
+    """Определяет, есть ли в форме отдельный чекбокс для маркетинга/рассылок.
+
+    Логика:
+    - Чекбокс содержит слова о маркетинге, но НЕ о персданных → маркетинговый
+    - Чекбокс содержит и те, и другие слова, НО есть ещё один чекбокс с ПД → маркетинговый
+    """
+    checkboxes = form_soup.find_all("input", attrs={"type": "checkbox"})
+    for cb in checkboxes:
+        text = _get_checkbox_context(cb, form_soup)
+        if _MARKETING_TEXT_RE.search(text) and not _CONSENT_TEXT_RE.search(text):
+            return True
+        if _MARKETING_TEXT_RE.search(text) and _CONSENT_TEXT_RE.search(text):
+            other_consent = [
+                c for c in checkboxes
+                if c is not cb
+                and _CONSENT_TEXT_RE.search(_get_checkbox_context(c, form_soup))
+            ]
+            if other_consent:
+                return True
+    return False
 
 
 def detect_privacy_link(form_soup: Tag, page_soup: Tag) -> tuple[bool, str | None]:
@@ -178,7 +213,10 @@ def detect_cookie_banner(soup: Tag) -> CookieBannerInfo:
 
     # Check for cookie-consent JS libraries
     cookie_script_re = re.compile(
-        r"(cookiebot|cookie[\-_]?consent|onetrust|trustarc|complianz)", re.IGNORECASE)
+        r"(cookiebot|cookie[\-_]?consent|onetrust|trustarc|complianz|"
+        r"usercentrics|tarteaucitron|klaro|didomi|borlabs)",
+        re.IGNORECASE,
+    )
     for script in soup.find_all("script", src=True):
         if cookie_script_re.search(script.get("src", "")):
             return CookieBannerInfo(found=True)

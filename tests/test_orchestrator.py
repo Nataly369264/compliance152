@@ -166,3 +166,45 @@ async def test_playwright_called_with_capped_max_pages():
         await _scan_with_fallback("https://example.com", 50)
 
     MockPW.assert_called_once_with(max_pages=20)
+
+
+def test_is_poor_result_detects_spa_without_banner():
+    """SPA-сайт без cookie-баннера должен триггерить фаллбэк."""
+    from src.api.server import _is_poor_result
+    from src.models.scan import (
+        CookieBannerInfo,
+        ExternalScript,
+        PrivacyPolicyInfo,
+        ScanResult,
+    )
+
+    result = ScanResult(
+        url="https://example.com",
+        pages_scanned=3,
+        privacy_policy=PrivacyPolicyInfo(found=True),
+        cookie_banner=CookieBannerInfo(found=False),
+        external_scripts=[
+            ExternalScript(
+                url="https://example.com/_next/static/chunks/main.js",
+                page_url="https://example.com",
+                script_type="js",
+                domain="example.com",
+            )
+        ],
+    )
+    assert _is_poor_result(result) is True
+
+
+def test_is_poor_result_no_spa_no_banner_is_ok():
+    """Обычный сайт без баннера — это нормально, Playwright не нужен."""
+    from src.api.server import _is_poor_result
+    from src.models.scan import CookieBannerInfo, PrivacyPolicyInfo, ScanResult
+
+    result = ScanResult(
+        url="https://example.com",
+        pages_scanned=5,
+        privacy_policy=PrivacyPolicyInfo(found=True),
+        cookie_banner=CookieBannerInfo(found=False),
+        external_scripts=[],
+    )
+    assert _is_poor_result(result) is False
