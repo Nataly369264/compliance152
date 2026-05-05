@@ -525,3 +525,31 @@ SESSION_*.md и TASK_*.md исключены из Git — хранятся ло�
 
 ### Документы: CLAUDE.md (статус+задачи), PASSPORT, NEXT_SESSIONS_PLAN (добавлен LINT-001). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
+---
+
+## Сессия 2026-05-06 — внеплановая: мёрдж изменений Димы + git-гигиена
+
+### Что сделано
+
+- Проанализирована история git (последние 10 коммитов, разбор перекрытий merge-коммитов)
+- Смёрджена ветка `origin/DIMA` в `main` (2 коммита от Дмитрия Тарасова):
+  - `cce5111` feat(scanner): 6 задач улучшения точности — SPA-фаллбэк, трекеры из сетевых запросов, расширенный реестр (GA4/Google Fonts/reCAPTCHA), detect_marketing_checkbox(), строгие LLM-промпты для пп. 8/12/15, SSL follow_redirects
+  - `7fb616f` fix(legal): актуализация штрафов ст. 13.11 КоАП под ФЗ-420/ФЗ-508 — исправлены FS-001..011, добавлен FS-011, обновлён LU-2025-005, добавлен LU-2025-009
+- Удалены все устаревшие ветки: `fix/test-repair`, `DIMA`, `clean-restart`, `develop`, `diana-bulk-scan`
+- Репозиторий приведён к одной ветке: `main`
+- Обнаружено и исправлено падение теста `test_no_trackers_analytics_before_consent_false`: тест использовал `fonts.googleapis.com` как «не трекер», но Дима правомерно добавил его в реестр → заменён на `example.com/fonts/roboto.woff2`
+- Итог: **265 passed / 0 failed** (было 251; +14 новых тестов от Димы)
+
+### Коммиты сессии в origin/main
+
+- `bd027c2` Merge branch 'DIMA': scanner accuracy improvements + legal fines update
+- `672d2b0` fix(tests): update test fixture after Google Fonts added to tracker registry
+
+### Следующие шаги
+
+- Прогнать golden set на el-ed.ru после улучшений Димы — замерить новую точность
+- POLICY_005: контакт ответственного за ПДн по-прежнему не детектируется
+- DEC-008: вернуть JSON-промпт для llm_analysis
+
+### Документы: CLAUDE.md (статус, ветка, задачи), PASSPORT, NEXT_SESSIONS_PLAN (LINT-001 → ✅). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+

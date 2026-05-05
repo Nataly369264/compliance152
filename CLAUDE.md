@@ -51,7 +51,7 @@ src/
   config.py     — конфигурация
   main.py       — точка входа
 
-tests/              — 251+ тестов, fixtures/golden_runs/
+tests/              — 265+ тестов, fixtures/golden_runs/
 knowledge_base/     — чеклисты, шаблоны документов, обновления НПА
 config/             — sources.yaml
 data/               — БД и результаты сканов
@@ -74,14 +74,14 @@ tools/              — run_golden_scan.py (валидационные прог�
 
 - **ОС:** Windows. Кириллица в путях — только PowerShell, не bash.
 - **httpx:** всегда `trust_env=False` (Windows-прокси).
-- **Ветка:** fix/test-repair
+- **Ветка:** main (fix/test-repair удалена — всё в main)
 - **.env:** OPENROUTER_API_KEY, OPENROUTER_MODEL=google/gemini-2.5-pro, BEARER_TOKEN
 
 ## Текущий статус
 
-- Тесты: **251 passed / 0 failed**
+- Тесты: **265 passed / 0 failed**
 - Score на el-ed.ru: **64%** (цель ~65% практически достигнута; прогон v5 выполнен 2026-04-17)
-- Точность сканера по эталону: **79–85%** (26–28 из 33 сравниваемых пунктов golden_set_v1; замерено 2026-04-18)
+- Точность сканера по эталону: **79–85%** (замерено 2026-04-18; повторный прогон нужен после улучшений Димы)
 - Лимит PDF-текста: **40 000 символов** (был 20k; поднят в сессии 3)
 - Валидационная ниша: онлайн-образование (DEC-003)
 - Эталон: `tests/fixtures/golden_set_v1.ods` + `GOLDEN_SET_MAPPING.md`
@@ -89,12 +89,13 @@ tools/              — run_golden_scan.py (валидационные прог�
 - marked.js вендорится локально (Edge CDN-блокировка устранена)
 - `llm_analysis` рендерится через marked.parse (DEC-008, 2026-04-18)
 - CI: GitHub Actions настроен (pytest blocking, ruff informational; 2026-04-28)
+- LINT-001: закрыт (193421e, 2026-04-29) — все 34 ошибки ruff исправлены, F821 устранён
+- Улучшения Димы смёрджены (2026-05-06): SPA-фаллбэк, расширенный реестр трекеров (GA4/Fonts/reCAPTCHA), маркетинговый чекбокс, строгие LLM-промпты, SSL follow_redirects, штрафы под ФЗ-420/ФЗ-508
 
 ## Сейчас работаем над
 
-1. Точность: исправить пропуски TECH_003/TECH_005/POLICY_005
+1. Точность: прогнать golden set после улучшений Димы; исправить пропуск POLICY_005
 2. Техдолг DEC-008: вернуть JSON-промпт для llm_analysis
-3. Техдолг LINT-001: исправить 34 ошибки ruff (33 стилевые + 1 реальный баг F821 в monitor.py:284)
 
 ## Документы проекта
 
