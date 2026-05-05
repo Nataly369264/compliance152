@@ -22,7 +22,7 @@ from src.models.organization import OrganizationData
 
 def test_load_legal_updates():
     updates = load_legal_updates()
-    assert len(updates) == 8
+    assert len(updates) == 9
     assert all(isinstance(u, LegalUpdate) for u in updates)
 
 
@@ -75,7 +75,7 @@ def test_get_updates_for_nonexistent_type():
 def test_get_active_updates_all():
     """With a future date, all updates should be active."""
     updates = get_active_updates(as_of=date(2026, 1, 1))
-    assert len(updates) == 8
+    assert len(updates) == 9
 
 
 def test_get_active_updates_before_july_2025():
