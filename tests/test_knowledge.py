@@ -33,7 +33,7 @@ def test_load_prohibited_services():
 
 def test_load_fine_schedule():
     fines = load_fine_schedule()
-    assert len(fines) == 10
+    assert len(fines) == 11
     for fine in fines:
         assert fine["first_offense_min"] > 0
         assert fine["first_offense_max"] >= fine["first_offense_min"]

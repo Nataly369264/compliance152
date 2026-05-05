@@ -431,15 +431,18 @@ class SiteScanner:
         )
 
     async def _check_ssl(self, client: httpx.AsyncClient, url: str) -> SSLInfo:
-        """Check if the site uses HTTPS."""
+        """Check if the site uses HTTPS by verifying the final URL scheme after redirects.
+
+        Следует за редиректами и проверяет итоговую схему URL — это важно,
+        потому что некоторые серверы принимают HTTPS, но редиректят на HTTP.
+        """
         parsed = urlparse(url)
         https_url = url.replace("http://", "https://") if parsed.scheme == "http" else url
         try:
-            await client.head(https_url)
-            return SSLInfo(
-                has_ssl=True,
-                certificate_valid=True,
-            )
+            response = await client.head(https_url, follow_redirects=True)
+            final_scheme = urlparse(str(response.url)).scheme
+            has_ssl = final_scheme == "https"
+            return SSLInfo(has_ssl=has_ssl, certificate_valid=has_ssl)
         except (httpx.ConnectError, httpx.ConnectTimeout):
             return SSLInfo(has_ssl=False, certificate_valid=False)
         except Exception:

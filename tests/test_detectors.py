@@ -259,3 +259,65 @@ def test_extract_forms_static_regression():
     assert len(forms) == 1
     assert forms[0].collects_personal_data is True
     assert forms[0].has_consent_checkbox is True
+
+
+# ── Маркетинговый чекбокс ────────────────────────────────────────
+
+
+def test_extract_forms_detects_marketing_checkbox():
+    """Форма с двумя чекбоксами: основным + маркетинговым — has_marketing_checkbox=True."""
+    html = """
+    <html><body>
+    <form>
+        <input type="email" name="email" placeholder="Ваш Email">
+        <input type="checkbox" name="consent" id="cb_consent">
+        <label for="cb_consent">Согласен на обработку персональных данных</label>
+        <input type="checkbox" name="marketing" id="cb_marketing">
+        <label for="cb_marketing">Хочу получать маркетинговые рассылки</label>
+        <button type="submit">Отправить</button>
+    </form>
+    </body></html>
+    """
+    soup = BeautifulSoup(html, "lxml")
+    forms = extract_forms(soup, "https://example.com/")
+
+    assert len(forms) == 1, "Должна быть найдена ровно одна форма"
+    assert forms[0].has_marketing_checkbox is True, "Маркетинговый чекбокс должен быть найден"
+
+
+def test_extract_forms_no_marketing_checkbox_when_absent():
+    """Форма только с одним чекбоксом — has_marketing_checkbox должно быть False."""
+    html = """
+    <html><body>
+    <form>
+        <input type="email" name="email" placeholder="Ваш Email">
+        <input type="checkbox" name="consent" id="cb">
+        <label for="cb">Согласен на обработку персональных данных</label>
+        <button type="submit">Отправить</button>
+    </form>
+    </body></html>
+    """
+    soup = BeautifulSoup(html, "lxml")
+    forms = extract_forms(soup, "https://example.com/")
+
+    assert len(forms) == 1
+    assert forms[0].has_marketing_checkbox is False, "Маркетинговый чекбокс не должен быть найден"
+
+
+# ── Расширенные паттерны cookie-баннера ──────────────────────────
+
+
+def test_detect_cookie_banner_usercentrics():
+    """Usercentrics — один из самых популярных менеджеров согласий, должен детектироваться."""
+    html = '<html><body><div id="usercentrics-root"><button>Принять все</button></div></body></html>'
+    soup = BeautifulSoup(html, "lxml")
+    result = detect_cookie_banner(soup)
+    assert result.found is True, "Usercentrics должен детектироваться как cookie-баннер"
+
+
+def test_detect_cookie_banner_tarteaucitron():
+    """Tarteaucitron.js — популярная open-source библиотека управления согласием."""
+    html = '<html><body><div id="tarteaucitronRoot"><button>OK</button></div></body></html>'
+    soup = BeautifulSoup(html, "lxml")
+    result = detect_cookie_banner(soup)
+    assert result.found is True, "Tarteaucitron должен детектироваться"

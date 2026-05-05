@@ -402,3 +402,36 @@ async def test_404_not_counted_in_pages(scanner):
 
     assert result.pages_scanned == 0
     assert any("404" in e for e in result.errors)
+
+
+# ── Group G: SSL detection follows redirects ────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_check_ssl_false_when_https_redirects_to_http():
+    """Если HTTPS → редирект на HTTP → has_ssl должно быть False."""
+    scanner_ = SiteScanner()
+
+    mock_response = MagicMock()
+    mock_response.url = httpx.URL("http://example.com/")  # HTTP! Редирект произошёл
+
+    mock_client = AsyncMock()
+    mock_client.head = AsyncMock(return_value=mock_response)
+
+    result = await scanner_._check_ssl(mock_client, "https://example.com")
+    assert result.has_ssl is False, "Редирект на HTTP должен означать has_ssl=False"
+
+
+@pytest.mark.asyncio
+async def test_check_ssl_true_when_https_stays_https():
+    """Нормальный HTTPS сайт без редиректов — has_ssl=True."""
+    scanner_ = SiteScanner()
+
+    mock_response = MagicMock()
+    mock_response.url = httpx.URL("https://example.com/")
+
+    mock_client = AsyncMock()
+    mock_client.head = AsyncMock(return_value=mock_response)
+
+    result = await scanner_._check_ssl(mock_client, "https://example.com")
+    assert result.has_ssl is True, "Сайт с HTTPS должен иметь has_ssl=True"
