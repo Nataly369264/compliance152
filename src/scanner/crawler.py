@@ -479,9 +479,14 @@ class SiteScanner:
         """Pick the best privacy policy candidate.
 
         Priority:
-        1. Longest text (most complete document)
-        2. URL keyword score: politika > policy > privacy > personal
+        1. URL keyword score: politika > policy > privacy > personal
+        2. Longest text (most complete document) — only as tie-break within same URL score
         3. First found (stable tie-break)
+
+        URL первым: «правила оказания услуг» / оферта почти всегда длиннее
+        политики, поэтому ранжирование по длине ставило их выше настоящей
+        politika-konfidencialnosti. Имя страницы — гораздо более надёжный
+        сигнал назначения документа, чем его объём.
 
         All candidates are validated first; only those passing is_valid_policy_text
         are considered. This ensures a long-but-invalid candidate (e.g. a WAF
@@ -493,5 +498,5 @@ class SiteScanner:
             return PrivacyPolicyInfo()
         return max(
             valid,
-            key=lambda p: (len(p.text or ""), cls._url_priority(p.url or "")),
+            key=lambda p: (cls._url_priority(p.url or ""), len(p.text or "")),
         )

@@ -234,6 +234,49 @@ def test_select_best_policy_skips_invalid_longer_candidate():
     assert result is short_valid
 
 
+def test_select_best_policy_url_keyword_beats_length():
+    """Регрессия psycho-lad.ru: страница с 'politika' в URL должна побеждать
+    оферту/правила услуг, даже если они в несколько раз длиннее.
+
+    До фикса сортировка шла по (len, url_priority) — длинные правила оказания
+    услуг побеждали настоящую politika-konfidencialnosti.
+    """
+    rules = PrivacyPolicyInfo(
+        found=True,
+        url="https://psycho-lad.ru/pravila-okazaniya-uslug/",
+        text="А" * 25000,  # длинные правила оказания услуг
+        is_russian=True,
+    )
+    real_policy = PrivacyPolicyInfo(
+        found=True,
+        url="https://psycho-lad.ru/politika-konfidencialnosti/",
+        text="А" * 5000,   # короче, но это настоящая политика
+        is_russian=True,
+    )
+    result = SiteScanner._select_best_policy([rules, real_policy])
+    assert result is real_policy, (
+        "Страница с 'politika' в URL должна побеждать длинную страницу без ключевых слов"
+    )
+
+
+def test_select_best_policy_length_tiebreak_within_same_url_score():
+    """В рамках одного url_priority длина по-прежнему решает — длинный privacy побеждает короткий privacy."""
+    short = PrivacyPolicyInfo(
+        found=True,
+        url="https://example.com/privacy",       # priority=2
+        text="А" * 600,
+        is_russian=True,
+    )
+    long = PrivacyPolicyInfo(
+        found=True,
+        url="https://example.com/privacy-policy",  # тоже priority=2 (privacy)
+        text="А" * 5000,
+        is_russian=True,
+    )
+    result = SiteScanner._select_best_policy([short, long])
+    assert result is long
+
+
 # ── Group C: Cookie banner detection ────────────────────────────────────────
 
 async def test_cookie_banner_detected(scanner):
