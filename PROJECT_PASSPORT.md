@@ -553,3 +553,35 @@ SESSION_*.md и TASK_*.md исключены из Git — хранятся ло�
 
 ### Документы: CLAUDE.md (статус, ветка, задачи), PASSPORT, NEXT_SESSIONS_PLAN (LINT-001 → ✅). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
 
+
+---
+
+## Сессия 2026-05-07 — мёрдж PR #12 и #13, разрешение конфликта
+
+### Что сделано
+
+- Проверен репозиторий: обнаружены 2 незамёрженные ветки — `origin/DIMA` (3 коммита) и `origin/feat/qa-google-sheets` (4 коммита)
+- **PR #12 `feat/qa-google-sheets`** — влит штатно через GitHub:
+  - QA-инфраструктура: Google Sheets интеграция (`scripts/update_gsheets.py`, `scripts/update_test_log.py` и др.)
+  - `SCANNER_TEAM_GUIDE.md` — инструкция для команды (Марина + участники)
+  - Golden runs: psycho-lad.ru и stepik.org, эталон v7
+  - `tools/run_golden_scan.py` — добавлен флаг `--playwright`
+- **PR #13 `DIMA`** — конфликт в `tests/test_playwright_crawler.py`: Дима и Марина независимо заменили одну строку (убирали `fonts.googleapis.com` из «нейтральных» URL)
+  - Разрешено: оставлена Маринина версия `example.com/fonts/roboto.woff2` (уже в main)
+  - Ветка DIMA обновлена, конфликт снят, PR влит через GitHub
+  - В PR: фикс приоритета выбора политики (URL > длина), 2 новых теста-регрессии, `diagnose_accuracy.py`
+- Обе ветки удалены (GitHub автоматически + `git fetch --prune`), репозиторий — одна ветка `main`
+- Тесты после всех мёрджей: **267 passed / 0 failed** (было 265)
+
+### Коммиты сессии в origin/main
+
+- `233f36c` Feat/qa google sheets (#12)
+- `ac2986f` Dima (#13)
+
+### Следующие шаги
+
+- Прогнать golden set — `diagnose_accuracy.py` готов, замерить точность после PR #13
+- POLICY_005: контакт ответственного за ПДн по-прежнему не детектируется
+- DEC-008: вернуть JSON-промпт для llm_analysis
+
+### Документы: CLAUDE.md (статус+задачи), PASSPORT. NEXT_SESSIONS_PLAN, DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
