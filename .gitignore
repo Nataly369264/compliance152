@@ -1,5 +1,7 @@
 # Секреты и окружение
 .env
+config/credentials.json
+config/token.json
 
 # База данных
 *.db
@@ -34,3 +36,11 @@ dist/
 # Локальные сессионные заметки (не в git)
 docs/sessions/
 docs/tasks/
+
+# QA-лог (генерируется скриптом, данные хранятся в Google Sheets)
+scanner_test_log.xlsx
+scanner_test_log_v2.xlsx
+
+# Рантайм-логи
+server.log
+*.log

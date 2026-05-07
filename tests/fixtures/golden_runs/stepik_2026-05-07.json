@@ -1,0 +1,521 @@
+{
+  "run_info": {
+    "url": "https://stepik.org",
+    "run_at": "2026-05-07T13:49:58.146741Z",
+    "scanner": "SiteScanner (httpx)",
+    "llm_enabled": true
+  },
+  "scan_result": {
+    "url": "https://stepik.org",
+    "pages_scanned": 4,
+    "errors": [],
+    "privacy_policy": {
+      "found": false,
+      "url": null,
+      "in_footer": false,
+      "content_length": null,
+      "has_operator_name": false,
+      "has_inn_ogrn": false,
+      "has_responsible_person": false,
+      "has_data_categories": false,
+      "has_purposes": false,
+      "has_legal_basis": false,
+      "has_retention_periods": false,
+      "has_subject_rights": false,
+      "has_rights_procedure": false,
+      "has_cross_border_info": false,
+      "has_security_measures": false,
+      "has_cookie_info": false,
+      "has_localization_statement": false,
+      "has_date": false,
+      "is_russian": true
+    },
+    "ssl_info": {
+      "has_ssl": true,
+      "certificate_valid": true
+    },
+    "cookie_banner": {
+      "found": false,
+      "has_accept_button": false,
+      "has_decline_button": false,
+      "has_category_choice": false,
+      "has_cookie_policy_link": false,
+      "analytics_before_consent": false
+    },
+    "forms": [],
+    "external_scripts": [
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/vendor.js?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      },
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/chunk.188.4ac7444714b795eda146.js?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      },
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/chunk.143.e00a14901ada388ed0a1.js?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      },
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/stepic.js?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "js"
+      },
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/fonts.css?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "css"
+      },
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/vendor.css?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "css"
+      },
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/critical.css?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "css"
+      },
+      {
+        "url": "https://cdn.stepik.net/static/frontend-build/stepic.css?1777890590",
+        "domain": "cdn.stepik.net",
+        "is_prohibited": false,
+        "service_name": null,
+        "script_type": "css"
+      }
+    ],
+    "cookies": [
+      {
+        "name": "csrftoken",
+        "domain": "stepik.org",
+        "secure": true,
+        "category": "unknown"
+      }
+    ],
+    "pages": [
+      {
+        "url": "https://stepik.org",
+        "status_code": 200,
+        "title": "Онлайн-курсы - Stepik",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 0,
+        "external_scripts_count": 8
+      },
+      {
+        "url": "https://stepik.org/users/786597732/learn",
+        "status_code": 200,
+        "title": "Stepik",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 0,
+        "external_scripts_count": 8
+      },
+      {
+        "url": "https://stepik.org/catalog",
+        "status_code": 200,
+        "title": "Каталог онлайн-курсов — Stepik",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 0,
+        "external_scripts_count": 8
+      },
+      {
+        "url": "https://stepik.org/learn",
+        "status_code": 200,
+        "title": "Мое обучение — Stepik",
+        "has_privacy_link_in_footer": true,
+        "forms_count": 0,
+        "external_scripts_count": 8
+      }
+    ]
+  },
+  "compliance_report": {
+    "id": "e2d8b92c-1749-4c5c-ab59-b513197bccb0",
+    "overall_score": 14,
+    "risk_level": "critical",
+    "total_checks": 42,
+    "passed_checks": 6,
+    "failed_checks": 2,
+    "warnings": 0,
+    "scan_limitations": [
+      "Формы: не обнаружены статичным парсером — если сайт использует клиентский рендеринг (React/Vue/Next.js), формы могут существовать, но рисоваться через JavaScript. Требуется ручная проверка.",
+      "Чекбоксы согласия: не могут быть проверены автоматически — требуют ручной верификации на страницах с формами.",
+      "Cookie-баннер: определяется косвенно по тегам <script src> — если баннер монтируется JS-библиотекой (OneTrust, Cookiebot и др.), кнопки «Принять»/«Отклонить» могут быть не распознаны. Рекомендуется проверка в браузере."
+    ],
+    "checklist": [
+      {
+        "id": "FORM_001",
+        "category": "forms",
+        "title": "Чекбокс согласия на обработку ПДн",
+        "status": "not_applicable",
+        "severity": "critical",
+        "details": "На сайте не обнаружены формы, собирающие персональные данные"
+      },
+      {
+        "id": "FORM_002",
+        "category": "forms",
+        "title": "Чекбокс согласия не отмечен по умолчанию",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: формы, собирающие ПДн, не обнаружены"
+      },
+      {
+        "id": "FORM_003",
+        "category": "forms",
+        "title": "Ссылка на Политику обработки ПДн рядом с формой",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: формы, собирающие ПДн, не обнаружены"
+      },
+      {
+        "id": "FORM_006",
+        "category": "forms",
+        "title": "Отдельный чекбокс для маркетинговых рассылок",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: формы, собирающие ПДн, не обнаружены"
+      },
+      {
+        "id": "FORM_007",
+        "category": "forms",
+        "title": "Минимальный объём собираемых данных",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: формы, собирающие ПДн, не обнаружены"
+      },
+      {
+        "id": "CONSENT_001",
+        "category": "consent",
+        "title": "Наличие согласия на обработку ПДн",
+        "status": "not_applicable",
+        "severity": "critical",
+        "details": "Формы сбора ПДн не обнаружены"
+      },
+      {
+        "id": "CONSENT_002",
+        "category": "consent",
+        "title": "Согласие отделено от оферты",
+        "status": "not_applicable",
+        "severity": "critical",
+        "details": "Формы сбора ПДн не обнаружены"
+      },
+      {
+        "id": "CONSENT_003",
+        "category": "consent",
+        "title": "Обязательные реквизиты в тексте согласия",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Формы сбора ПДн не обнаружены"
+      },
+      {
+        "id": "CONSENT_004",
+        "category": "consent",
+        "title": "Возможность отзыва согласия",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Формы сбора ПДн не обнаружены"
+      },
+      {
+        "id": "CONSENT_005",
+        "category": "consent",
+        "title": "Раздельные согласия для разных целей",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Формы сбора ПДн не обнаружены"
+      },
+      {
+        "id": "COOKIE_001",
+        "category": "cookies",
+        "title": "Cookie-баннер при первом визите",
+        "status": "fail",
+        "severity": "high",
+        "details": "Cookie-баннер не обнаружен"
+      },
+      {
+        "id": "COOKIE_002",
+        "category": "cookies",
+        "title": "Кнопка «Отклонить» в cookie-баннере",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: cookie-баннер не обнаружен"
+      },
+      {
+        "id": "COOKIE_003",
+        "category": "cookies",
+        "title": "Аналитические/маркетинговые cookie выключены по умолчанию",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: cookie-баннер не обнаружен"
+      },
+      {
+        "id": "COOKIE_005",
+        "category": "cookies",
+        "title": "Аналитика не загружается до согласия",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: cookie-баннер не обнаружен"
+      },
+      {
+        "id": "POLICY_001",
+        "category": "privacy_policy",
+        "title": "Политика обработки ПДн опубликована",
+        "status": "fail",
+        "severity": "critical",
+        "details": "Политика обработки ПДн не найдена"
+      },
+      {
+        "id": "POLICY_002",
+        "category": "privacy_policy",
+        "title": "Ссылка на Политику в футере каждой страницы",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_003",
+        "category": "privacy_policy",
+        "title": "Полное наименование оператора",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_004",
+        "category": "privacy_policy",
+        "title": "ИНН/ОГРН и адрес оператора",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_005",
+        "category": "privacy_policy",
+        "title": "Ответственный за обработку ПДн",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_006",
+        "category": "privacy_policy",
+        "title": "Категории персональных данных",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_007",
+        "category": "privacy_policy",
+        "title": "Цели обработки для каждой категории",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_008",
+        "category": "privacy_policy",
+        "title": "Правовые основания обработки",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_009",
+        "category": "privacy_policy",
+        "title": "Сроки хранения данных",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_010",
+        "category": "privacy_policy",
+        "title": "Права субъектов ПДн",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_011",
+        "category": "privacy_policy",
+        "title": "Порядок реализации прав (10 рабочих дней)",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_012",
+        "category": "privacy_policy",
+        "title": "Информация о трансграничной передаче",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_013",
+        "category": "privacy_policy",
+        "title": "Описание мер безопасности",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_014",
+        "category": "privacy_policy",
+        "title": "Информация о cookies",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_015",
+        "category": "privacy_policy",
+        "title": "Заявление о локализации данных в РФ",
+        "status": "not_applicable",
+        "severity": "critical",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_016",
+        "category": "privacy_policy",
+        "title": "Дата публикации и обновления",
+        "status": "not_applicable",
+        "severity": "medium",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "POLICY_017",
+        "category": "privacy_policy",
+        "title": "Документ на русском языке",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "TECH_001",
+        "category": "technical",
+        "title": "HTTPS на всех страницах",
+        "status": "pass",
+        "severity": "critical",
+        "details": "HTTPS активен"
+      },
+      {
+        "id": "TECH_002",
+        "category": "technical",
+        "title": "Отсутствие Google Fonts с серверов Google",
+        "status": "pass",
+        "severity": "high",
+        "details": "Google Fonts: не обнаружен"
+      },
+      {
+        "id": "TECH_003",
+        "category": "technical",
+        "title": "Отсутствие Google Analytics",
+        "status": "pass",
+        "severity": "critical",
+        "details": "Google Analytics: не обнаружен"
+      },
+      {
+        "id": "TECH_004",
+        "category": "technical",
+        "title": "Отсутствие Facebook Pixel",
+        "status": "pass",
+        "severity": "critical",
+        "details": "Facebook Pixel: не обнаружен"
+      },
+      {
+        "id": "TECH_005",
+        "category": "technical",
+        "title": "Отсутствие Google reCAPTCHA",
+        "status": "pass",
+        "severity": "high",
+        "details": "Google reCAPTCHA: не обнаружен"
+      },
+      {
+        "id": "TECH_006",
+        "category": "technical",
+        "title": "Отсутствие Google Tag Manager",
+        "status": "pass",
+        "severity": "high",
+        "details": "Google Tag Manager: не обнаружен"
+      },
+      {
+        "id": "TRACKER_001",
+        "category": "trackers",
+        "title": "Трекер без упоминания в политике",
+        "status": "not_applicable",
+        "severity": "high",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "TRACKER_002",
+        "category": "trackers",
+        "title": "Трекер без согласия пользователя",
+        "status": "not_applicable",
+        "severity": "critical",
+        "details": "Не применимо: политика обработки ПДн не найдена на сайте"
+      },
+      {
+        "id": "REG_001",
+        "category": "regulatory",
+        "title": "Оператор зарегистрирован в реестре РКН",
+        "status": "manual_check",
+        "severity": "critical",
+        "details": "Требуется ручная проверка: оператор зарегистрирован в реестре РКН"
+      },
+      {
+        "id": "REG_002",
+        "category": "regulatory",
+        "title": "Уведомление об обработке ПДн подано",
+        "status": "manual_check",
+        "severity": "critical",
+        "details": "Требуется ручная проверка: уведомление об обработке ПДн подано в РКН"
+      },
+      {
+        "id": "REG_003",
+        "category": "regulatory",
+        "title": "Хостинг на территории РФ",
+        "status": "manual_check",
+        "severity": "critical",
+        "details": "Требуется ручная проверка: хостинг на территории РФ"
+      }
+    ],
+    "violations": [
+      {
+        "check_id": "COOKIE_001",
+        "title": "Отсутствует cookie-баннер",
+        "severity": "high",
+        "category": "cookies",
+        "page_url": "https://stepik.org"
+      },
+      {
+        "check_id": "POLICY_001",
+        "title": "Политика обработки ПДн не опубликована",
+        "severity": "critical",
+        "category": "privacy_policy",
+        "page_url": "https://stepik.org"
+      }
+    ],
+    "fine_estimate": {
+      "min_total": 180000,
+      "max_total": 360000
+    },
+    "llm_analysis": null,
+    "summary": "Отлично, провел анализ результатов сканирования с учетом актуального законодательства.\n\nВот резюме по сайту `stepik.org`.\n\n### 1. Краткое резюме состояния соответствия\n\nНа сайте выявлены критические нарушения базовых требований 152-ФЗ. Отсутствие опубликованной Политики и механизма получения согласия на использование cookie-файлов создает прямые риски получения крупных штрафов и предписаний от Роскомнадзора. Текущее состояние соответствия оценивается как неудовлетворительное.\n\n### 2. Топ-5 критических проблем и рекомендации\n\nНесмотря на то, что сканирование было поверхностным (4 страницы), выявленные и вероятные нарушения носят системный характер.\n\n1.  **Проблема:** Не опубликована Политика обработки персональных данных.\n    *   **Риск:** Прямое нарушение ч. 2 ст. 18.1 152-ФЗ. Это одно из самых легко выявляемых нарушений.\n    *   **Штраф:** **30 000 – 60 000 руб.** (ч. 3 ст. 13.11 КоАП).\n    *   **Рекомендация:** Срочно разработать и опубликовать Политику на сайте. Ссылка на нее должна быть доступна с любой страницы (обычно размещается в футере сайта).\n\n2.  **Проблема:** Отсутствует механизм получения согласия на обработку cookie (cookie-баннер).\n    *   **Риск:** Cookie-файлы (особенно аналитические и маркетинговые) признаются персональными данными. Их обработка без согласия пользователя является незаконной.\n    *   **Штраф:** **150 000 – 300 000 руб.** (ч. 1 ст. 13.11 КоАП).\n    *   **Рекомендация:** Внедрить cookie-баннер, который блокирует установку всех необязательных cookie до получения активного согласия пользователя. Согласие не должно быть получено через простое продолжение использования сайта.\n\n3.  **Проблема (вероятная):** Некорректное получение согласия в формах сбора данных (регистрация, подписка, обратная связь).\n    *   **Риск:** Сканер не нашел форм, но на образовательной платформе они точно есть. Вероятно, согласие либо не запрашивается, либо включено в текст пользовательского соглашения, что скоро станет незаконным.\n    *   **Штраф:** **300 000 – 700 000 руб.** (ч. 2 ст. 13.11 КоАП) за обработку без письменного согласия, если оно требуется. Повторное нарушение — **до 1,5 млн руб.**\n    *   **Рекомендация:** Провести аудит всех форм. Под каждой формой разместить отдельный чекбокс (не предустановленный) с текстом согласия. **Важно:** с 01.09.2025 согласие должно быть оформлено как отдельный документ, к которому ведет ссылка.\n\n4.  **Проблема (вероятная):** Нарушение требования о локализации баз данных.\n    *   **Риск:** Stepik — крупная платформа, которая может использовать зарубежные серверы. Первичный сбор и хранение ПДн граждан РФ должны осуществляться в базах данных на территории России. Это одно из самых серьезных нарушений.\n    *   **Штраф:** **1 000 000 – 6 000 000 руб.** Повторное нарушение — **до 18 000 000 руб.** (ч. 8, 9 ст. 13.11 КоАП).\n    *   **Рекомендация:** Провести технический аудит и документально подтвердить, что базы данных с ПДн российских пользователей находятся в РФ.\n\n5.  **Проблема (вероятная):** Отсутствие уведомления Роскомнадзора об обработке ПДн.\n    *   **Риск:** Большинство компаний, обрабатывающих ПДн (кроме узких исключений), обязаны подать уведомление в РКН и состоять в реестре операторов.\n    *   **Штраф:** **100 000 – 300 000 руб.** (ч. 10 ст. 13.11 КоАП).\n    *   **Рекомендация:** Проверить наличие компании в [реестре операторов ПДн](https://pd.rkn.gov.ru/operators-registry/operators-list/). Если уведомление не подано — подготовить и направить его в РКН.\n\n### 3. Оценка общего уровня риска и потенциальных штрафов\n\n**Общий уровень риска: КРИТИЧЕСКИЙ.**\n\nНарушены фундаментальные принципы законодательства о персональных данных. Сайт уязвим для любой проверки Роскомнадзора или жалобы пользователя.\n\n**Потенциальные штрафы:**\nСуммарный штраф только по очевидным и вероятным нарушениям (без учета утечек и повторных нарушений) может составить:\n`60 000 (Политика) + 300 000 (Cookie) + 700 000 (Формы) + 6 000 000 (Локализация) + 300 000 (Уведомление РКН) =` **до 7 360 000 рублей.**\n\nКроме того, низкий уровень комплаенса многократно повышает риск **утечки данных**, что повлечет за собой оборотные штрафы **до 3% годовой выручки (но не менее 20 млн руб.)** и **уголовную ответственность** для должностных лиц (до 10 лет лишения свободы по ст. 272.1 УК РФ).\n\n**Вывод:** Необходимо срочно инициировать комплексный проект по приведению процессов обработки ПДн в соответствие с требованиями 152-ФЗ."
+  }
+}

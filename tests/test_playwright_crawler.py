@@ -79,7 +79,7 @@ async def test_no_trackers_analytics_before_consent_false(crawler):
         request_urls=[
             "https://example.com/style.css",
             "https://example.com/logo.png",
-            "https://cdn.example.com/font.woff2",  # собственный CDN, не из реестра трекеров
+            "https://example.com/fonts/roboto.woff2",  # self-hosted font, not a tracker
         ],
     )
     result = await crawler._crawl(_make_context(page), "https://example.com", "example.com")

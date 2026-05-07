@@ -1,7 +1,7 @@
 """Golden set validation scan runner.
 
 Usage:
-    python -m tools.run_golden_scan [URL]
+    python -m tools.run_golden_scan [URL] [--playwright]
 
 Defaults:
     URL = https://el-ed.ru
@@ -11,7 +11,7 @@ Output is always saved to tests/fixtures/golden_runs/ with a dated filename:
 If that file already exists, a version suffix is added (_v2, _v3, …).
 Existing files are never overwritten.
 
-Runs SiteScanner (httpx, no Playwright) + ComplianceAnalyzer (full LLM)
+Runs SiteScanner (httpx) or PlaywrightCrawler (--playwright) + ComplianceAnalyzer (full LLM)
 and saves the raw combined result as JSON. Does NOT modify any src/ files.
 """
 from __future__ import annotations
@@ -32,6 +32,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 
 from src.analyzer.analyzer import ComplianceAnalyzer
 from src.scanner.crawler import SiteScanner
+from src.scanner.playwright_crawler import PlaywrightCrawler
 
 logging.basicConfig(
     level=logging.INFO,
@@ -63,12 +64,16 @@ def _resolve_output_path(url: str) -> Path:
     raise RuntimeError(f"No free slot for golden run: {host} {date_str}")
 
 
-async def run(url: str, output_path: Path) -> None:
+async def run(url: str, output_path: Path, use_playwright: bool = False) -> None:
     logger.info("=== Golden scan started: %s ===", url)
 
-    # Step 1: crawl with SiteScanner (httpx, no Playwright)
-    logger.info("Step 1/2: crawling with SiteScanner...")
-    scanner = SiteScanner(max_pages=50, timeout=30, crawl_delay=1.0)
+    # Step 1: crawl
+    if use_playwright:
+        logger.info("Step 1/2: crawling with PlaywrightCrawler (headless Chromium)...")
+        scanner = PlaywrightCrawler(max_pages=20, timeout=30, crawl_delay=1.0)
+    else:
+        logger.info("Step 1/2: crawling with SiteScanner (httpx)...")
+        scanner = SiteScanner(max_pages=50, timeout=30, crawl_delay=1.0)
     scan_result = await scanner.scan(url)
 
     logger.info(
@@ -99,7 +104,7 @@ async def run(url: str, output_path: Path) -> None:
         "run_info": {
             "url": url,
             "run_at": datetime.utcnow().isoformat() + "Z",
-            "scanner": "SiteScanner (httpx)",
+            "scanner": "PlaywrightCrawler (chromium)" if use_playwright else "SiteScanner (httpx)",
             "llm_enabled": True,
         },
         "scan_result": {
@@ -226,9 +231,12 @@ async def run(url: str, output_path: Path) -> None:
 
 
 def main() -> None:
-    url = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_URL
+    args = sys.argv[1:]
+    use_playwright = "--playwright" in args
+    args = [a for a in args if a != "--playwright"]
+    url = args[0] if args else DEFAULT_URL
     output_path = _resolve_output_path(url)
-    asyncio.run(run(url, output_path))
+    asyncio.run(run(url, output_path, use_playwright=use_playwright))
 
 
 if __name__ == "__main__":
