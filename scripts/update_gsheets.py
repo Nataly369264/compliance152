@@ -128,27 +128,7 @@ def gap_hypothesis(gap_type: str, item_name: str) -> str:
     return 'Требует ручного анализа.'
 
 
-def f_etalon(rn: int) -> str:
-    return f'=IFERROR(VLOOKUP(B{rn}&"|"&C{rn},Эталон!$A:$E,5,0),"нет данных")'
 
-
-def f_srav(rn: int) -> str:
-    e, f = f'E{rn}', f'F{rn}'
-    return (
-        f'=IF(OR({e}="не проверялось",{f}="нет данных",{f}=""),"НУЖНА ПРОВЕРКА",'
-        f'IF(OR(AND({e}="PASS",OR({f}="Да",{f}="Частично(неявное)",{f}="Не обнаружен")),'
-        f'AND({e}="FAIL",OR({f}="Нет",{f}="Обнаружен"))),"✓","РАСХОЖДЕНИЕ"))'
-    )
-
-
-def pct_formula(rn: int) -> str:
-    return (
-        f'=IFERROR('
-        f'COUNTIFS(Результаты!$A:$A,A{rn},Результаты!$G:$G,"✓")'
-        f'/(COUNTIFS(Результаты!$A:$A,A{rn},Результаты!$G:$G,"✓")'
-        f'+COUNTIFS(Результаты!$A:$A,A{rn},Результаты!$G:$G,"РАСХОЖДЕНИЕ"))'
-        f'*100,0)'
-    )
 
 # =============================================
 # ЧИТАЕМ АРГУМЕНТЫ
@@ -286,10 +266,18 @@ if new_etalon:
 # ШАГ 2: Добавляем строку в Прогоны
 # =============================================
 
-next_run_row = len(runs_rows) + 1
+# Считаем точность в Python (избегаем зависимости от локали Google Sheets)
+_pre_comps = [compare(
+    scanner_results.get(cid, 'не проверялось') if cid else 'не проверялось',
+    get_etalon(site_url, iid)
+) for iid, _, cid, _ in CHECKLIST_MAP]
+_ok  = _pre_comps.count('✓')
+_gap = _pre_comps.count('РАСХОЖДЕНИЕ')
+pct_val = round(_ok / (_ok + _gap) * 100, 1) if (_ok + _gap) > 0 else 0
+
 ws_runs.append_row([
     run_id, dt_str, site_url, f'{score}%',
-    pct_formula(next_run_row), '—', scanner_ver,
+    pct_val, '—', scanner_ver,
     f'golden run {golden_path.name}'
 ], value_input_option='USER_ENTERED')
 
@@ -315,7 +303,7 @@ for iid, iname, cid, _ in CHECKLIST_MAP:
 
     new_res.append([
         run_id, site_url, iid, iname, scanner_res,
-        f_etalon(rn), f_srav(rn),
+        etalon_val, comp,
         disc_type, severity, comment
     ])
     rn += 1
@@ -324,11 +312,13 @@ for cid in EXTRA_CHECKS:
     if cid in scanner_results:
         scanner_res = scanner_results[cid]
         iname       = EXTRA_NAMES.get(cid, cid)
+        etalon_val  = get_etalon(site_url, cid)
+        comp        = compare(scanner_res, etalon_val)
         disc_type   = 'новая находка' if scanner_res == 'FAIL' else ''
         severity    = 'минор' if scanner_res == 'FAIL' else ''
         new_res.append([
             run_id, site_url, cid, iname, scanner_res,
-            f_etalon(rn), f_srav(rn),
+            etalon_val, comp,
             disc_type, severity,
             'Пункт отсутствует в эталоне 1–37, требует ручной верификации' if disc_type else ''
         ])
