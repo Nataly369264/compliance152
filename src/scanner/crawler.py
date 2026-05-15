@@ -462,8 +462,18 @@ class SiteScanner:
 
     @staticmethod
     def _url_priority(url: str) -> int:
-        """Score URL by policy-keyword specificity (higher = better)."""
+        """Score URL by policy-keyword specificity (higher = better).
+
+        URLs внутри блогов/новостей/статей не могут быть политикой обработки ПДн,
+        даже если содержат слово «politika» (например, «образовательная политика РФ»).
+        Возвращаем 0 для таких URL, чтобы они проиграли реальной политике на чистом пути.
+        """
         path = urlparse(url).path.lower()
+        if any(seg in path for seg in (
+            "/blog/", "/blogs/", "/article/", "/articles/",
+            "/news/", "/post/", "/posts/", "/journal/",
+        )):
+            return 0
         if "politika" in path:
             return 4
         if "policy" in path:

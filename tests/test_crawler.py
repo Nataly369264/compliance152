@@ -465,6 +465,31 @@ async def test_check_ssl_false_when_https_redirects_to_http():
     assert result.has_ssl is False, "Редирект на HTTP должен означать has_ssl=False"
 
 
+def test_select_best_policy_blog_article_loses_to_pdf_policy():
+    """Регрессия: блог-статья с «politika» в URL не должна побеждать реальную /policy.pdf.
+
+    Кейс el-ed.ru: статья «obrazovatelnaya-politika-v-rossijskoj-federaczii» в /blog/
+    содержит слово politika и формально получала url_priority=4, перебивая настоящую
+    политику в PDF (url_priority=3). После фикса /blog/* получает 0.
+    """
+    blog_article = PrivacyPolicyInfo(
+        found=True,
+        url="https://el-ed.ru/blog/obrazovatelnaya-politika-v-rossijskoj-federaczii/",
+        text="А" * 5832,
+        is_russian=True,
+    )
+    real_policy = PrivacyPolicyInfo(
+        found=True,
+        url="https://el-ed.ru/wp-content/themes/egeland/docs/policy.pdf",
+        text="Б" * 2000,
+        is_russian=True,
+    )
+    winner = SiteScanner._select_best_policy([blog_article, real_policy])
+    assert winner.url == real_policy.url, (
+        f"Блог-статья не должна побеждать PDF-политику. Выбрано: {winner.url}"
+    )
+
+
 @pytest.mark.asyncio
 async def test_check_ssl_true_when_https_stays_https():
     """Нормальный HTTPS сайт без редиректов — has_ssl=True."""
