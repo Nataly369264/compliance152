@@ -60,7 +60,7 @@ tools/              — run_golden_scan.py (валидационные прог�
 
 ## Правила работы
 
-**Обязательно прочитай `CLAUDE_CODE_RULES.md`** — полный свод правил (15 параграфов).
+**Обязательно прочитай `docs/CLAUDE_CODE_RULES.md`** — полный свод правил (15 параграфов).
 
 Критичное:
 - `pytest` перед каждым коммитом. Красные тесты не коммитятся.
@@ -84,7 +84,7 @@ tools/              — run_golden_scan.py (валидационные прог�
 - Точность сканера по эталону: **79–85%** (26–28 из 33 сравниваемых пунктов golden_set_v1; замерено 2026-04-18)
 - Лимит PDF-текста: **40 000 символов** (был 20k; поднят в сессии 3)
 - Валидационная ниша: онлайн-образование (DEC-003)
-- Эталон: `tests/fixtures/golden_set_v1.ods` + `GOLDEN_SET_MAPPING.md`
+- Эталон: `tests/fixtures/golden_set_v1.ods` + `docs/GOLDEN_SET_MAPPING.md`
 - UX сканирования: прогресс-бар + фазы готовы (2026-04-18)
 - marked.js вендорится локально (Edge CDN-блокировка устранена)
 - `llm_analysis` рендерится через marked.parse (DEC-008, 2026-04-18)
@@ -100,14 +100,17 @@ tools/              — run_golden_scan.py (валидационные прог�
 
 | Файл | Что внутри |
 |------|------------|
-| `ROADMAP.md`            | Дорожная карта: 6 этапов от прототипа до SaaS |
-| `PROJECT_PASSPORT.md`   | Полная история проекта, записи всех сессий |
-| `NEXT_SESSIONS_PLAN.md` | План ближайших сессий с Claude Code |
-| `DECISIONS.md`          | Архитектурные решения (DEC-001..007) |
-| `CASES.md`              | Кейсы и баги на реальных сайтах (CASE-001..011) |
-| `PATTERNS.md`           | Технические паттерны и уроки |
-| `GOLDEN_SET_MAPPING.md` | Маппинг 37 пунктов эталона ↔ 47 CHECK_ID сканера |
-| `CLAUDE_CODE_RULES.md`  | Правила работы с Claude Code (15 параграфов) |
+| `docs/PROJECT_PASSPORT.md`       | Полная история проекта, записи всех сессий |
+| `docs/journal/NEXT_SESSIONS.md`  | План ближайших сессий с Claude Code |
+| `docs/journal/DECISIONS.md`      | Архитектурные решения (DEC-001..007) |
+| `docs/journal/CASES.md`          | Кейсы и баги на реальных сайтах (CASE-001..011) |
+| `docs/journal/PATTERNS.md`       | Технические паттерны и уроки |
+| `docs/journal/SESSIONS.md`       | Журнал сессий с политикой ротации |
+| `docs/GOLDEN_SET_MAPPING.md`     | Маппинг 37 пунктов эталона ↔ 47 CHECK_ID сканера |
+| `docs/CLAUDE_CODE_RULES.md`      | Правила работы с Claude Code (15 параграфов) |
+| `docs/SCANNER_TEAM_GUIDE.md`     | Гайд для команды сканера |
+| `docs/scanner_logic.md`          | Логика работы сканера |
+| `docs/TESTING_GUIDE.md`          | Гайд по тестированию |
 
 ## Запуск
 
