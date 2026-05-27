@@ -585,3 +585,35 @@ SESSION_*.md и TASK_*.md исключены из Git — хранятся ло�
 - DEC-008: вернуть JSON-промпт для llm_analysis
 
 ### Документы: CLAUDE.md (статус+задачи), PASSPORT. NEXT_SESSIONS_PLAN, DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
+
+---
+
+## Сессия 2026-05-27 — разрешение конфликтов, влитие веток Димы и Марины
+
+### Что сделано
+
+- **Ветка `origin/DIMA`** — конфликт с `main` из-за частичного squash-мёрджа (коммиты 662ec20 и 241b810 уже были в main через PR #13). Cherry-pick двух новых коммитов:
+  - `e53d42c` — блог-фильтр в `_url_priority`: `/blog/`, `/articles/`, `/news/` и т.д. возвращают `priority=0`, не перебивают реальную политику
+  - `2ddb5e5` — пропущен как уже пустой (фикс fonts-теста уже в main с `672d2b0`)
+  - Ветка `origin/DIMA` удалена
+- **Ветка `feat/qa-google-sheets` (Марина)** — влита через merge с ручным разрешением:
+  - Реструктуризация docs/: `docs/journal/` (CASES, DECISIONS, PATTERNS, NEXT_SESSIONS, SESSIONS), `docs/archive/` (ARCHITECTURE, HANDOFF, PLAN, PROGRESS), `docs/` (CLAUDE_CODE_RULES, GOLDEN_SET_MAPPING, PROJECT_PASSPORT, SCANNER_TEAM_GUIDE)
+  - Удалены мусорные файлы: `CONTEXT_BUNDLE.md`, `_scan_umschool_v2.py`, `run_scan_test.py`, `data/scan_umschool_net.*`
+  - Karpathy Skills принципы добавлены в `CLAUDE.md`
+  - `@pytest.mark.xfail(strict=True)` убран вручную — тест уже зелёный с `672d2b0`
+  - Ветка `feat/qa-google-sheets` удалена (уже не существовала на remote)
+- На GitHub осталась единственная ветка `main`
+- Тесты: **267 → 268 passed / 0 failed**
+
+### Коммиты сессии в origin/main
+
+- `9620bb4` fix(scanner): /blog/, /articles/ etc. не повышают url_priority
+- `441b888` merge(feat/qa-google-sheets): реструктуризация docs/ + Karpathy-принципы
+
+### Следующие шаги
+
+- Прогнать golden set — `diagnose_accuracy.py` готов, замерить точность после всех улучшений
+- POLICY_005: контакт ответственного за ПДн по-прежнему не детектируется
+- DEC-008: вернуть JSON-промпт для llm_analysis
+
+### Документы: CLAUDE.md (статус + два новых пункта), PASSPORT, NEXT_SESSIONS (запись добавлена). DECISIONS, CASES, PATTERNS, GOLDEN_SET_MAPPING, RULES — не трогались.
